@@ -1,0 +1,12 @@
+<resources>
+
+    <color name="button">#BABABA</color>
+    <color name="hyperlink">#0645AD</color>
+    <color name="warning">#ffff0000</color>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <!-- Customize your theme here. -->
+    </style>
+
+</resources>
