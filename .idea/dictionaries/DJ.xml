@@ -2,6 +2,7 @@
   <dictionary name="DJ">
     <words>
       <w>asmx</w>
+      <w>loggedin</w>
       <w>textview</w>
     </words>
   </dictionary>

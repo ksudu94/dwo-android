@@ -8,6 +8,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Property;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -83,6 +84,7 @@ public class Login extends ActionBarActivity {
         String METHOD_NAME = "";
         String SOAP_ACTION = "";
         Integer UserID = 0;
+        String UserGUID = "";
 
         public PlaceholderFragment() {
         }
@@ -132,10 +134,14 @@ public class Login extends ActionBarActivity {
             if (loggedin){
                 loginPreferences.getInt("UserID", UserID);
                 if (UserID>0){
+                    loginPreferences.getString("UserGUID", UserGUID);
                     tvError.setText("");
                     new getUserByID().execute();
                 }else{
                     tvError.setText("Please enter your email address and password to login");
+                    loginEditor.clear();
+                    loginEditor.putBoolean("loggedin", false);
+                    loginEditor.commit();
                 }
             }
             return rootView;
@@ -162,104 +168,19 @@ public class Login extends ActionBarActivity {
 
                 SoapObject requestUser = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
-                PropertyInfo Email = new PropertyInfo();
-                Email.setType("STRING_CLASS");
-                Email.setName("email");
+                PropertyInfo piEmail = new PropertyInfo();
+                piEmail.setType("STRING_CLASS");
+                piEmail.setName("email");
 
-                Email.setValue(etEmail.getText().toString());
-                requestUser.addProperty(Email);
+                piEmail.setValue(etEmail.getText().toString());
+                requestUser.addProperty(piEmail);
 
-                PropertyInfo Password = new PropertyInfo();
-                Password.setType("STRING_CLASS");
-                Password.setName("password");
+                PropertyInfo piPassword = new PropertyInfo();
+                piPassword.setType("STRING_CLASS");
+                piPassword.setName("password");
 
-                Password.setValue(etPassword.getText().toString());
-                requestUser.addProperty(Password);
-
-                SoapSerializationEnvelope envelopeUser = new SoapSerializationEnvelope(
-                        SoapEnvelope.VER11);
-
-                envelopeUser.dotNet = true;
-                envelopeUser.setOutputSoapObject(requestUser);
-
-                HttpTransportSE httpTransport = new HttpTransportSE(Data.URL);
-
-                try {
-                    httpTransport.call(SOAP_ACTION, envelopeUser);
-                    SoapObject responseUser = (SoapObject) envelopeUser
-                            .getResponse();
-                    user.SchID = Integer.parseInt(responseUser.getProperty(0)
-                            .toString());
-                    user.UserID = Integer.parseInt(responseUser.getProperty(1)
-                            .toString());
-                        /*_appPrefs.saveEmail(strEmail);
-                        _appPrefs.saveSchID(user.SchID);
-                        _appPrefs.saveUserID(user.UserID);
-
-                        METHOD_NAME = "getSchool";
-                        SOAP_ACTION = "getSchool";
-                        School school = new School();
-                        SoapObject requestSchool = new SoapObject(Data.NAMESPACE,
-                                METHOD_NAME);
-
-                        PropertyInfo SchID = new PropertyInfo();
-                        SchID.setName("SchID");
-                        SchID.setValue(user.SchID);
-                        requestSchool.addProperty(SchID);
-
-                        SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
-                                SoapEnvelope.VER11);
-                        envelopeSchool.dotNet = true;
-                        envelopeSchool.setOutputSoapObject(requestSchool);
-
-                        httpTransport.call(SOAP_ACTION, envelopeSchool);
-                        SoapObject responseSchool = (SoapObject) envelopeSchool
-                                .getResponse();
-
-                        school.SessionID = Integer.parseInt(responseSchool
-                                .getProperty(3).toString());
-                        school.CCProcessor = responseSchool.getProperty(88)
-                                .toString();
-
-                        test = school.CCProcessor;
-                        _appPrefs.saveSessionID(school.SessionID);
-                        _appPrefs.saveCCProcessor(test.toString());
-                        Intent openMainPage = new Intent(
-                                "com.akada.danceworksonline.studio.Home");
-                        startActivity(openMainPage);*/
-
-                } catch (Exception exception) {
-
-                }
-
-                return user;
-
-        }
-            protected void onPostExecute(User user) {
-                if (user.UserID == 0){
-                    tvError.setText("FAIL");
-                }else{
-                    tvError.setText("SUCCESS");
-                }
-
-            }
-
-        }
-
-        public class getUserByID extends AsyncTask<Data, Void, User> {
-
-            @Override
-            protected User doInBackground(Data... data) {
-
-                METHOD_NAME = "getUserByID";
-                SOAP_ACTION = "getUserByID";
-
-                SoapObject requestUser = new SoapObject(Data.NAMESPACE, METHOD_NAME);
-
-                PropertyInfo UserID = new PropertyInfo();
-                UserID.setName("UserID");
-                UserID.setValue(UserID);
-                requestUser.addProperty(UserID);
+                piPassword.setValue(etPassword.getText().toString());
+                requestUser.addProperty(piPassword);
 
                 SoapSerializationEnvelope envelopeUser = new SoapSerializationEnvelope(
                         SoapEnvelope.VER11);
@@ -276,21 +197,21 @@ public class Login extends ActionBarActivity {
                     for (int i = 0; i < responseUser.getPropertyCount(); i++) {
                         user.setProperty(i, responseUser.getProperty(i).toString());
                     }
-                    _appPrefs.saveSchID(user.SchID);
-                    _appPrefs.saveUserID(user.UserID);
-                                            /*_appPrefs.saveEmail(strEmail);*/
 
-
+                    if (user.SchID>0){
+                        _appPrefs.saveSchID(user.SchID);
+                        _appPrefs.saveUserID(user.UserID);
+                        _appPrefs.saveUser(user);
                         METHOD_NAME = "getSchool";
                         SOAP_ACTION = "getSchool";
                         School school = new School();
                         SoapObject requestSchool = new SoapObject(Data.NAMESPACE,
                                 METHOD_NAME);
 
-                        PropertyInfo SchID = new PropertyInfo();
-                        SchID.setName("SchID");
-                        SchID.setValue(user.SchID);
-                        requestSchool.addProperty(SchID);
+                        PropertyInfo piSchID = new PropertyInfo();
+                        piSchID.setName("SchID");
+                        piSchID.setValue(user.SchID);
+                        requestSchool.addProperty(piSchID);
 
                         SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
                                 SoapEnvelope.VER11);
@@ -308,9 +229,104 @@ public class Login extends ActionBarActivity {
 
                         _appPrefs.saveSessionID(school.SessionID);
                         _appPrefs.saveCCProcessor(school.CCProcessor);
-                        Intent openMainPage = new Intent(
-                                "com.akada.danceworksonline.studio.Home");
-                        startActivity(openMainPage);
+                    }
+
+                } catch (Exception exception) {
+
+                }
+
+                return user;
+
+        }
+            protected void onPostExecute(User user) {
+                if (user.UserID>0) {
+                    if (chkRemember.isChecked()){
+                        loginEditor.putBoolean("loggedin", true);
+                        loginEditor.putInt("UserID", user.UserID);
+                        loginEditor.putString("UserGUID", user.UserGUID);
+                        loginEditor.commit();
+                    }else{
+                        loginEditor.clear();
+                        loginEditor.putBoolean("loggedin", false);
+                        loginEditor.commit();
+                    }
+                    Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.Home");
+                    startActivity(openMainPage);
+                }else{
+                    tvError.setText("Login information is incorrect");
+                }
+            }
+
+        }
+
+        public class getUserByID extends AsyncTask<Data, Void, User> {
+
+            @Override
+            protected User doInBackground(Data... data) {
+
+                METHOD_NAME = "getUserByID";
+                SOAP_ACTION = "getUserByID";
+
+                SoapObject requestUser = new SoapObject(Data.NAMESPACE, METHOD_NAME);
+
+                PropertyInfo piUserID = new PropertyInfo();
+                piUserID.setName("UserID");
+                piUserID.setValue(UserID);
+                requestUser.addProperty(piUserID);
+
+                PropertyInfo piUserGUID = new PropertyInfo();
+                piUserGUID.setName("UserGUID");
+                piUserGUID.setValue(UserGUID);
+                requestUser.addProperty(piUserGUID);
+
+                SoapSerializationEnvelope envelopeUser = new SoapSerializationEnvelope(
+                        SoapEnvelope.VER11);
+
+                envelopeUser.dotNet = true;
+                envelopeUser.setOutputSoapObject(requestUser);
+
+                HttpTransportSE httpTransport = new HttpTransportSE(Data.URL);
+
+                try {
+                    httpTransport.call(SOAP_ACTION, envelopeUser);
+                    SoapObject responseUser = (SoapObject) envelopeUser
+                            .getResponse();
+                    for (int i = 0; i < responseUser.getPropertyCount(); i++) {
+                        user.setProperty(i, responseUser.getProperty(i).toString());
+                    }
+                                            /*_appPrefs.saveEmail(strEmail);*/
+
+                    if (user.SchID > 0){
+                        _appPrefs.saveSchID(user.SchID);
+                        _appPrefs.saveUserID(user.UserID);
+                        METHOD_NAME = "getSchool";
+                        SOAP_ACTION = "getSchool";
+                        School school = new School();
+                        SoapObject requestSchool = new SoapObject(Data.NAMESPACE,
+                                METHOD_NAME);
+
+                        PropertyInfo piSchID = new PropertyInfo();
+                        piSchID.setName("SchID");
+                        piSchID.setValue(user.SchID);
+                        requestSchool.addProperty(piSchID);
+
+                        SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
+                                SoapEnvelope.VER11);
+                        envelopeSchool.dotNet = true;
+                        envelopeSchool.setOutputSoapObject(requestSchool);
+
+                        httpTransport.call(SOAP_ACTION, envelopeSchool);
+                        SoapObject responseSchool = (SoapObject) envelopeSchool
+                                .getResponse();
+
+                        school.SessionID = Integer.parseInt(responseSchool
+                                .getProperty(3).toString());
+                        school.CCProcessor = responseSchool.getProperty(88)
+                                .toString();
+
+                        _appPrefs.saveSessionID(school.SessionID);
+                        _appPrefs.saveCCProcessor(school.CCProcessor);
+                    }
 
                 } catch (Exception exception) {
 
@@ -321,7 +337,8 @@ public class Login extends ActionBarActivity {
             }
             protected void onPostExecute(User user) {
                 if (user.UserID == 0){
-                    tvError.setText("FAIL");
+                    Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.Home");
+                    startActivity(openMainPage);
                 }else{
                     tvError.setText("SUCCESS");
                 }
