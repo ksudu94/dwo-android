@@ -4,14 +4,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Property;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,6 +16,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.School;
 import com.akadasoftware.danceworksonline.classes.User;
@@ -29,7 +27,13 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.util.ArrayList;
+
 public class Login extends ActionBarActivity {
+
+    private static SharedPreferences loginPreferences;
+    private static SharedPreferences.Editor loginEditor;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +42,16 @@ public class Login extends ActionBarActivity {
         SharedPreferences loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, new LoginFragment())
                     .commit();
         }
 
     }
 
+    //May want in future
+/*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -58,20 +63,32 @@ public class Login extends ActionBarActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch(id)
+        {
+            case R.id.action_settings:
+                return true;
+            case R.id.log_out:
+                loginEditor.clear();
+                loginEditor.commit();
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.container, new Login.LoginFragment()).commit();
+                break;
+            case R.id.profile:
+                return true;
+            default:
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
+*/
 
     /**
-     * A placeholder fragment containing a simple view.
+     * A Login fragment containing edit texts for the email and password and various other
+     * views.
      */
-    public static class PlaceholderFragment extends Fragment {
+    public static class LoginFragment extends Fragment {
         View rootView;
         Activity activity;
-        SharedPreferences loginPreferences;
-        SharedPreferences.Editor loginEditor;
         private AppPreferences _appPrefs;
         Button btnLogin;
         EditText etEmail;
@@ -86,16 +103,17 @@ public class Login extends ActionBarActivity {
         Integer UserID = 0;
         String UserGUID = "";
 
-        public PlaceholderFragment() {
+        public LoginFragment() {
         }
 
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
             rootView = inflater.inflate(R.layout.fragment_login, container, false);
             activity = this.getActivity();
             _appPrefs = new AppPreferences(activity);
+
             btnLogin = (Button) rootView.findViewById(R.id.btnLogin);
             etEmail = (EditText) rootView.findViewById(R.id.etEmail);
             etPassword = (EditText) rootView.findViewById(R.id.etPassword);
@@ -109,7 +127,7 @@ public class Login extends ActionBarActivity {
             chkShowPassword.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (chkShowPassword.isChecked()){
+                    if (chkShowPassword.isChecked()) {
                         etPassword.setTransformationMethod(null);
                         etPassword.setSelection(etPassword.getText().length());
                     } else {
@@ -129,21 +147,32 @@ public class Login extends ActionBarActivity {
 
             loginPreferences = activity.getSharedPreferences("loginPrefs", MODE_PRIVATE);
             loginEditor = loginPreferences.edit();
-            Boolean loggedin = false;
-            loginPreferences.getBoolean("loggedin", loggedin);
-            if (loggedin){
-                loginPreferences.getInt("UserID", UserID);
-                if (UserID>0){
-                    loginPreferences.getString("UserGUID", UserGUID);
+            Boolean loggedin = loginPreferences.getBoolean("loggedin", false);
+
+            /*if (loggedin) {
+                UserID = loginPreferences.getInt("UserID", 0);
+                if (UserID > 0) {
+                    UserGUID = loginPreferences.getString("UserGUID", "");
                     tvError.setText("");
                     new getUserByID().execute();
-                }else{
+                } else {
                     tvError.setText("Please enter your email address and password to login");
                     loginEditor.clear();
                     loginEditor.putBoolean("loggedin", false);
                     loginEditor.commit();
                 }
-            }
+            }*/
+
+            tvForgotPassword.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (etEmail.getText().length() > 0)
+                        _appPrefs.saveEmail(etEmail.getText().toString());
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.container, new RecoverPasswordFragment())
+                            .commit();
+                }
+            });
             return rootView;
 
         }
@@ -152,6 +181,7 @@ public class Login extends ActionBarActivity {
         public void onStart() {
             super.onStart();
         }
+
         class Data {
 
             static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
@@ -188,20 +218,28 @@ public class Login extends ActionBarActivity {
                 envelopeUser.dotNet = true;
                 envelopeUser.setOutputSoapObject(requestUser);
 
+                //Creates an instance of HttpTransportSE with set url
                 HttpTransportSE httpTransport = new HttpTransportSE(Data.URL);
 
                 try {
+                    //Sets the desired soapAction field which corresponds with our webservice
+                    //method
                     httpTransport.call(SOAP_ACTION, envelopeUser);
+                    //A dynamic object that is used to build soap calls.
                     SoapObject responseUser = (SoapObject) envelopeUser
                             .getResponse();
                     for (int i = 0; i < responseUser.getPropertyCount(); i++) {
                         user.setProperty(i, responseUser.getProperty(i).toString());
                     }
-
-                    if (user.SchID>0){
+                    ArrayList<User> userarray = new ArrayList<User>();
+                    userarray.add(0, user);
+                    if (user.SchID > 0) {
                         _appPrefs.saveSchID(user.SchID);
                         _appPrefs.saveUserID(user.UserID);
-                        _appPrefs.saveUser(user);
+                        _appPrefs.saveUser(userarray);
+                        ArrayList<Account> AccountsArray = new ArrayList<Account>();
+                        _appPrefs.saveAccounts(AccountsArray);
+
                         METHOD_NAME = "getSchool";
                         SOAP_ACTION = "getSchool";
                         School school = new School();
@@ -237,29 +275,30 @@ public class Login extends ActionBarActivity {
 
                 return user;
 
-        }
+            }
+
             protected void onPostExecute(User user) {
-                if (user.UserID>0) {
-                    if (chkRemember.isChecked()){
+                if (user.UserID > 0) {
+                    if (chkRemember.isChecked()) {
                         loginEditor.putBoolean("loggedin", true);
                         loginEditor.putInt("UserID", user.UserID);
                         loginEditor.putString("UserGUID", user.UserGUID);
                         loginEditor.commit();
-                    }else{
+                    } else {
                         loginEditor.clear();
                         loginEditor.putBoolean("loggedin", false);
                         loginEditor.commit();
                     }
                     Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.Home");
                     startActivity(openMainPage);
-                }else{
+                } else {
                     tvError.setText("Login information is incorrect");
                 }
             }
 
         }
 
-        public class getUserByID extends AsyncTask<Data, Void, User> {
+       /* public class getUserByID extends AsyncTask<Data, Void, User> {
 
             @Override
             protected User doInBackground(Data... data) {
@@ -294,11 +333,16 @@ public class Login extends ActionBarActivity {
                     for (int i = 0; i < responseUser.getPropertyCount(); i++) {
                         user.setProperty(i, responseUser.getProperty(i).toString());
                     }
-                                            /*_appPrefs.saveEmail(strEmail);*/
+                                            *//*_appPrefs.saveEmail(strEmail);*//*
 
-                    if (user.SchID > 0){
+                    ArrayList<User> userarray = new ArrayList<User>();
+                    userarray.add(0, user);
+                    if (user.SchID > 0) {
                         _appPrefs.saveSchID(user.SchID);
                         _appPrefs.saveUserID(user.UserID);
+                        _appPrefs.saveUser(userarray);
+                        ArrayList<Account> AccountsArray = new ArrayList<Account>();
+                        _appPrefs.saveAccounts(AccountsArray);
                         METHOD_NAME = "getSchool";
                         SOAP_ACTION = "getSchool";
                         School school = new School();
@@ -335,16 +379,76 @@ public class Login extends ActionBarActivity {
                 return user;
 
             }
+
             protected void onPostExecute(User user) {
-                if (user.UserID == 0){
+                if (user.UserID > 0) {
+
                     Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.Home");
                     startActivity(openMainPage);
-                }else{
-                    tvError.setText("SUCCESS");
+                } else {
+                    tvError.setText("Login information is incorrect");
                 }
 
             }
 
+        }
+*/
+    }
+
+    public static class RecoverPasswordFragment extends Fragment {
+        View rootView;
+        Activity activity;
+        SharedPreferences loginPreferences;
+        SharedPreferences.Editor loginEditor;
+        private AppPreferences _appPrefs;
+        TextView tvMessage;
+        TextView tvResponse;
+        EditText etRecoverPassword;
+        Button btnSendEmail;
+        Button btnCancel;
+
+
+        public RecoverPasswordFragment() {
+        }
+
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            rootView = inflater.inflate(R.layout.fragment_recover_password, container, false);
+            activity = this.getActivity();
+            _appPrefs = new AppPreferences(activity);
+            btnSendEmail = (Button) rootView.findViewById(R.id.btnSendEmail);
+            btnCancel = (Button) rootView.findViewById(R.id.btnCancel);
+            etRecoverPassword = (EditText) rootView.findViewById(R.id.etRecoverPassword);
+            tvMessage = (TextView) rootView.findViewById(R.id.tvMessage);
+            tvResponse = (TextView) rootView.findViewById(R.id.tvResponse);
+            //
+
+            etRecoverPassword.setText(_appPrefs.getEmailPref());
+            btnCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    getFragmentManager().beginTransaction()
+                            .replace(R.id.container, new LoginFragment())
+                            .commit();
+                }
+            });
+
+            return rootView;
+
+        }
+
+        @Override
+        public void onStart() {
+            super.onStart();
+        }
+
+        class Data {
+
+            static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
+            private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
         }
 
     }

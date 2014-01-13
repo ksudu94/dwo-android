@@ -1,12 +1,13 @@
 package com.akadasoftware.danceworksonline.classes;
-import java.util.ArrayList;
+
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import java.util.ArrayList;
 
 /**
  * Created by DJ on 12/28/13.
@@ -20,6 +21,7 @@ public class AppPreferences {
     public static final String putStuID = "StuID";
     public static final String putAcctID = "AcctID";
     public static final String putSessionID = "SessionID";
+    public static final String putAccountListPosition = "AccountListPosition";
     private SharedPreferences sharedPrefs;
     private SharedPreferences.Editor prefsEditor;
     Gson gson = new Gson();
@@ -98,20 +100,30 @@ public class AppPreferences {
         prefsEditor.commit();
     }
 
-    public User getUser(){
+    public int getAccountListPosition() {
+        return sharedPrefs.getInt(putAccountListPosition, 0);
+    }
+
+    public void saveAccountListPosition(int position) {
+        prefsEditor.putInt(putAccountListPosition, position);
+        prefsEditor.commit();
+    }
+
+    public User getUser() {
         User user = new User();
         jsonUser = sharedPrefs.getString("User", "None found");
-        if(jsonUser != "None found"){
+        if (jsonUser != "None found") {
             JsonParser parser = new JsonParser();
             JsonArray array = parser.parse(jsonUser).getAsJsonArray();
-            user = gson.fromJson(array.get(0),User.class);
+
+            user = gson.fromJson(array.get(0), User.class);
         }
         return user;
     }
 
-    public void saveUser(User user){
+    public void saveUser(ArrayList<User> userarray) {
         Gson gson = new Gson();
-        jsonUser = gson.toJson(user);
+        jsonUser = gson.toJson(userarray);
 
         prefsEditor.putString("User", jsonUser);
         prefsEditor.commit();
@@ -120,10 +132,10 @@ public class AppPreferences {
     public ArrayList<Account> getAccounts() {
         ArrayList<Account> accounts = new ArrayList<Account>();
         jsonAccounts = sharedPrefs.getString("Accounts", "None found");
-        if(jsonAccounts != "None found"){
+        if (jsonAccounts != "None found") {
             JsonParser parser = new JsonParser();
             JsonArray array = parser.parse(jsonAccounts).getAsJsonArray();
-            for(int i = 0; i < array.size()-1; i ++){
+            for (int i = 0; i < array.size() - 1; i++) {
                 Account account = gson.fromJson(array.get(i), Account.class);
                 accounts.add(account);
             }

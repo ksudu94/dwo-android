@@ -3,6 +3,7 @@
     <color name="button">#BABABA</color>
     <color name="hyperlink">#0645AD</color>
     <color name="warning">#ffff0000</color>
+    <color name="blankspace">#000000</color>
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
