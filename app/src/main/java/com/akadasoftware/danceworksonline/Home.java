@@ -65,6 +65,8 @@ public class Home extends ActionBarActivity
             case R.id.action_settings:
                 return true;
             case R.id.home:
+                //Overrides to function to open nav drawer instead of going to specificed home
+                //page. Done by enabling bar.setDisplayHomeAsUpEnabled(true);
                 mNavigationDrawerFragment.openNavigationDrawer();
                 break;
             case R.id.log_out:

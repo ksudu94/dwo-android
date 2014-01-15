@@ -1,5 +1,6 @@
 package com.akadasoftware.danceworksonline;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -21,7 +22,7 @@ import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener {
+public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener, AccountTransactionsFragment.OnFragmentInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -53,6 +54,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         accounts = _appPrefs.getAccounts();
 
         account = accounts.get(_appPrefs.getAccountListPosition());
+        _appPrefs.saveAcctID(account.AcctID);
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -147,6 +149,12 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                 case 0:
                     newFragment = new AccountInformationFragment();
                     break;
+                case 1:
+                    newFragment = new AccountInformationFragment();
+                    break;
+                case 2:
+                    newFragment = new AccountTransactionsFragment();
+                    break;
                 default:
                     newFragment = new AccountInformationFragment();
                     break;
@@ -226,5 +234,20 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
             return rootView;
         }
     }
+
+    public void OnFragmentInteraction(int id) {
+
+        /* Starting a new activity (AccountInformation) which is handled by intents in the manifest.
+        The position is saved to fill a matching account in the listarray.
+         */
+
+        // _appPrefs = new AppPreferences(getApplicationContext());
+        // _appPrefs.saveAccountListPosition(id);
+        Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.AccountInformation");
+        startActivity(openMainPage);
+
+
+    }
+
 
 }
