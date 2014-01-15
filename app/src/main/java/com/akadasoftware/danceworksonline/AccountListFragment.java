@@ -153,6 +153,7 @@ public class AccountListFragment extends ListFragment {
             _appPrefs.saveAccounts(result);
             acctListAdpater.setNotifyOnChange(true);
 
+
         }
     }
 
