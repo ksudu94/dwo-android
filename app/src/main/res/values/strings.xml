@@ -9,6 +9,7 @@
     <string name="login">Login</string>
     <string name="log_out">Log Out </string>
     <string name="cancel">Cancel</string>
+    <string name="status">Status</string>
     <string name="show_password">Show Password</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_home">Home</string>

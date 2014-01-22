@@ -1,104 +1,304 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="com.akadasoftware.danceworksonline.AccountInformation$PlaceholderFragment"
-    android:orientation="vertical">
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/accountSwitcher"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="5dp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tvacctname"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="name: " />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvacctnamefield"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:orientation="horizontal">
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="@color/blankspace"></View>
+                <TextView
+                    android:id="@+id/tvContact"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="20dp"
+                    android:text="Contact" />
 
-    <LinearLayout
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right">
+
+                    <Button
+                        android:id="@+id/btnEdit"
+                        android:layout_width="75dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="right"
+                        android:clickable="true"
+                        android:text="Edit" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:paddingBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvacctname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="name: " />
+
+                <TextView
+                    android:id="@+id/tvacctnamefield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvacctaddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="address: " />
+
+                <TextView
+                    android:id="@+id/tvacctaddressfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvacctphone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="phone: " />
+
+                <TextView
+                    android:id="@+id/tvacctphonefield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvacctemail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="email: " />
+
+                <TextView
+                    android:id="@+id/tvacctemailfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvstatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="status: " />
+
+                <TextView
+                    android:id="@+id/tvstatusfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvcc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="credit card: " />
+
+                <TextView
+                    android:id="@+id/tvccfield"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="5dp"
-        android:paddingTop="5dp"
-        android:orientation="horizontal">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/tvacctaddress"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="address: " />
+            android:layout_gravity="center"
+            android:layout_marginTop="2dip"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvacctaddressfield"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="75dip"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:text="Save" />
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="@color/blankspace"></View>
+            <TextView
+                android:id="@+id/tvFName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip"
+                android:textStyle="bold"
+                android:text="First Name: " />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:orientation="horizontal">
+            <EditText
+                android:id="@+id/etFirst"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dip"
+                android:hint="First Name"
+                android:padding="5dip" />
 
-        <TextView
-            android:id="@+id/tvacctphone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="phone: " />
+            <TextView
+                android:id="@+id/tvLName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip"
+                android:textStyle="bold"
+                android:text="Last Name: " />
 
-        <TextView
-            android:id="@+id/tvacctphonefield"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/etLast"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dip"
+                android:hint="Last Name"
+                android:padding="5dip" />
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="@color/blankspace"></View>
+            <TextView
+                android:id="@+id/tvAddress"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip"
+                android:textStyle="bold"
+                android:text="Address: " />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="5dp"
-        android:paddingBottom="5dp"
-        android:orientation="horizontal">
+            <EditText
+                android:id="@+id/etAddress"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dip"
+                android:hint="First Name"
+                android:padding="5dip" />
 
-        <TextView
-            android:id="@+id/tvacctemail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="email: " />
+            <TextView
+                android:id="@+id/tvPhone"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip"
+                android:textStyle="bold"
+                android:text="Phone:" />
 
-        <TextView
-            android:id="@+id/tvacctemailfield"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/etPhone"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dip"
+                android:hint="Phone Number"
+                android:padding="5dip" />
 
+            <TextView
+                android:id="@+id/tvEmail"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip"
+                android:textStyle="bold"
+                android:text="Email:" />
 
-</LinearLayout>
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dip"
+                android:hint="Email"
+                android:padding="5dip" />
+
+            <TextView
+                android:id="@+id/tvcc"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip"
+                android:textStyle="bold"
+                android:text="Credit Card:" />
+
+            <EditText
+                android:id="@+id/etCC"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dip"
+                android:hint="Credit Card"
+                android:padding="5dip" />
+
+            <Spinner
+                android:id="@+id/AccountStatusSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:dropDownSelector="#000000"
+                android:spinnerMode="dropdown"
+                android:prompt="@string/status" />
+
+        </LinearLayout>
+    </ScrollView>
+</ViewSwitcher>
