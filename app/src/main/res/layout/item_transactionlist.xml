@@ -3,14 +3,11 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:fadeScrollbars="false"
-    android:orientation="vertical"
-    android:scrollbarAlwaysDrawVerticalTrack="true"
-    android:scrollbarStyle="outsideOverlay"
-    android:scrollbars="vertical">
+    android:orientation="horizontal">
 
     <TextView
         android:id="@+id/tvDate"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
@@ -20,7 +17,7 @@
 
     <TextView
         android:id="@+id/tvType"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
@@ -30,7 +27,7 @@
 
     <TextView
         android:id="@+id/tvDescription"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
@@ -40,7 +37,7 @@
 
     <TextView
         android:id="@+id/tvAmount"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"
@@ -50,7 +47,7 @@
 
     <TextView
         android:id="@+id/tvBalance"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="false"
         android:focusable="false"

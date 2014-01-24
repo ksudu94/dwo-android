@@ -57,7 +57,7 @@
 
                 <TextView
                     android:id="@+id/tvacctname"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/information_label"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="name: " />
@@ -79,7 +79,7 @@
 
                 <TextView
                     android:id="@+id/tvacctaddress"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/information_label"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="address: " />
@@ -99,7 +99,7 @@
 
                 <TextView
                     android:id="@+id/tvacctphone"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/information_label"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="phone: " />
@@ -120,7 +120,7 @@
 
                 <TextView
                     android:id="@+id/tvacctemail"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/information_label"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="email: " />
@@ -140,7 +140,7 @@
 
                 <TextView
                     android:id="@+id/tvstatus"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/information_label"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="status: " />
@@ -154,13 +154,44 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvCreditCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="20dp"
+                    android:text="Credit Card" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right">
+
+                    <Button
+                        android:id="@+id/btnEditCreditCard"
+                        android:layout_width="75dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="right"
+                        android:clickable="true"
+                        android:text="Edit" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tvcc"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/information_label"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="credit card: " />
