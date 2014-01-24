@@ -1,5 +1,6 @@
 package com.akadasoftware.danceworksonline;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,7 +14,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
@@ -21,7 +26,7 @@ import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import java.util.ArrayList;
 import java.util.Locale;
 
-public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener {
+public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener, AccountTransactionsFragment.OnFragmentInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -40,6 +45,13 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     private AppPreferences _appPrefs;
     Account account;
     ArrayList<Account> accounts;
+    String status, expdate, cctype, ccnum;
+
+    Button btnEdit, btnSave;
+    EditText etFirst, etLast, etAddress, etPhone, etEmail, etCC;
+    ViewSwitcher accountSwitcher;
+    Spinner AccountStatusSpinner;
+
 
     /*Uses the saved position from the onAccountSelected method in Home.java to fill an empty
      account with the matching position in the accountlist array.
@@ -53,6 +65,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         accounts = _appPrefs.getAccounts();
 
         account = accounts.get(_appPrefs.getAccountListPosition());
+        _appPrefs.saveAcctID(account.AcctID);
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -76,6 +89,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
             }
         });
 
+
         // For each of the sections in the app, add a tab to the action bar.
         for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
             // Create a tab with text corresponding to the page title defined by
@@ -88,7 +102,6 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                             .setTabListener(this));
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -147,8 +160,14 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                 case 0:
                     newFragment = new AccountInformationFragment();
                     break;
+                case 1:
+                    newFragment = new AccountTransactionsFragment();
+                    break;
+                case 2:
+                    newFragment = new AccountTransactionsFragment();
+                    break;
                 default:
-                    newFragment = new AccountInformationFragment();
+                    newFragment = new AccountTransactionsFragment();
                     break;
             }
 
@@ -203,13 +222,77 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
             return fragment;
         }
 
+        // Used to create an instance of this fragment
         public AccountInformationFragment() {
         }
 
+        //Before anything to run, the view is created
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_account_information, container, false);
+
+            switch (account.Status) {
+                case 0:
+                    status = "active";
+                    break;
+                case 1:
+                    status = "inactive";
+                    break;
+                case 2:
+                    status = "prospect";
+                    break;
+                case 3:
+                    status = "deleted";
+                    break;
+                default:
+                    status = "I have no freaking clue";
+                    break;
+            }
+
+            switch (account.CCType) {
+                case 1:
+                    cctype = "amex";
+                    break;
+                case 2:
+                    cctype = "disc";
+                    break;
+                case 3:
+                    cctype = "mc";
+                    break;
+                case 4:
+                    cctype = "visa";
+                    break;
+                default:
+                    cctype = "";
+                    break;
+            }
+            if (account.CCTrail.equals(""))
+                ccnum = "";
+            else {
+                for (int j = 4; j > 0; j--) {
+                    ccnum += account.CCTrail.length() - j;
+                }
+            }
+            //Used to make exp date a string so we can use substring to put a / in b/w
+            String test = account.CCExpire.toString();
+            if (test.equals("")) {
+                expdate = "";
+            } else {
+                expdate = test.substring(0, 2) + "/" + test.substring(2, test.length() - 1);
+            }
+
+
+            etFirst = (EditText) rootView.findViewById(R.id.etFirst);
+            etLast = (EditText) rootView.findViewById(R.id.etLast);
+            etAddress = (EditText) rootView.findViewById(R.id.etAddress);
+            etPhone = (EditText) rootView.findViewById(R.id.etPhone);
+            etEmail = (EditText) rootView.findViewById(R.id.etEmail);
+            etCC = (EditText) rootView.findViewById(R.id.etCC);
+            btnEdit = (Button) rootView.findViewById(R.id.btnEdit);
+            btnSave = (Button) rootView.findViewById(R.id.btnSave);
+            accountSwitcher = (ViewSwitcher) rootView.findViewById(R.id.accountSwitcher);
+
 
             TextView acctname = (TextView) rootView.findViewById(R.id.tvacctnamefield);
             acctname.setText(account.FName + " " + account.LName);
@@ -223,8 +306,61 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
             TextView tvemail = (TextView) rootView.findViewById(R.id.tvacctemailfield);
             tvemail.setText(account.EMail);
 
+            TextView tvstatus = (TextView) rootView.findViewById(R.id.tvstatusfield);
+            tvstatus.setText(status);
+
+            TextView type = (TextView) rootView.findViewById(R.id.tvcc);
+            type.setText(cctype);
+
+            TextView tvcc = (TextView) rootView.findViewById(R.id.tvccfield);
+            tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " Exp. " + expdate);
+
+
+            btnEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        accountSwitcher.showNext();
+                        etFirst.setText(account.FName);
+                        etLast.setText(account.LName);
+                        etAddress.setText(account.Address);
+                        etPhone.setText(account.Phone);
+                        etEmail.setText(account.EMail);
+                        AccountStatusSpinner = (Spinner) findViewById(R.id.AccountStatusSpinner);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            btnSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        accountSwitcher.showNext();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
             return rootView;
         }
     }
+
+    public void OnFragmentInteraction(int id) {
+
+        /* Starting a new activity (AccountInformation) which is handled by intents in the manifest.
+        The position is saved to fill a matching account in the listarray.
+         */
+
+        // _appPrefs = new AppPreferences(getApplicationContext());
+        // _appPrefs.saveAccountListPosition(id);
+        Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.AccountInformation");
+        startActivity(openMainPage);
+
+
+    }
+
 
 }

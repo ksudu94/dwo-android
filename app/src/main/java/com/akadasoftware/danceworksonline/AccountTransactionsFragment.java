@@ -6,9 +6,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ListView;
 
-import com.akadasoftware.danceworksonline.classes.Account;
+import com.akadasoftware.danceworksonline.classes.AccountTransactions;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.User;
 
@@ -29,56 +30,45 @@ import java.util.ArrayList;
  * Activities containing this fragment MUST implement the {@link Callbacks}
  * interface.
  */
-public class AccountListFragment extends ListFragment {
+public class AccountTransactionsFragment extends ListFragment {
 
-    ArrayList<Account> AccountsArray = new ArrayList<Account>();
-    private AppPreferences _appPrefs;
+
+    ArrayList<AccountTransactions> TransactionArray = new ArrayList<AccountTransactions>();
+    private static AppPreferences _appPrefs;
     String METHOD_NAME = "";
-    static String SOAP_ACTION = "getAccounts";
+    static String SOAP_ACTION = "getAccountTransactions";
     static SoapSerializationEnvelope envelopeOutput;
     Activity activity;
     static User user;
 
+
+    private OnFragmentInteractionListener mListener;
+
     /**
-     * Listener to handle clicks on the list
+     * The fragment's ListView/GridView.
      */
-    private OnAccountSelectedListener mListener;
+    private AbsListView mListView;
 
     /**
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
-    AccountListAdapater acctListAdpater;
+    private AccountTransactionAdapter transAdapter;
 
 
-    /**
-     * Creates a new instance of the Accountlist fragment and sets the arguments of that fragment to
-     * a list of accounts. Creating a new AccountListFragment runs the onCreate method which then
-     * checks wether the accountsarray is populated or not and takes the appropriate action. Bundle
-     * args is used to send in arguments to the onCreate method (we think).
-     */
-    public interface OnAccountSelectedListener {
+    public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void OnAccountSelected(int id);
+        public void OnFragmentInteraction(int id);
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        _appPrefs = new AppPreferences(getActivity());
-        AccountsArray = _appPrefs.getAccounts();
-        user = _appPrefs.getUser();
 
-        if (AccountsArray.size() > 0) {
-            acctListAdpater = new AccountListAdapater(getActivity(),
-                    R.layout.item_accountlist, AccountsArray);
-            setListAdapter(acctListAdpater);
-            acctListAdpater.setNotifyOnChange(true);
-        } else {
-            getAccountsList accountlist = new getAccountsList();
-            accountlist.execute();
-        }
+        super.onCreate(savedInstanceState);
+        activity = getActivity();
+        _appPrefs = new AppPreferences(activity);
+        getAccountTransactions trans = new getAccountTransactions();
+        trans.execute();
 
     }
 
@@ -86,10 +76,10 @@ public class AccountListFragment extends ListFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnAccountSelectedListener) activity;
+            mListener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnAccountSelectedListener");
+                    + " must implement OnFragmentInteractionListener");
         }
     }
 
@@ -99,11 +89,10 @@ public class AccountListFragment extends ListFragment {
         mListener = null;
     }
 
-
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Notify the parent activity of selected item
-        mListener.OnAccountSelected(position);
+        mListener.OnFragmentInteraction(position);
 
         // Set the item as checked to be highlighted when in two-pane layout
         getListView().setItemChecked(position, true);
@@ -117,48 +106,34 @@ public class AccountListFragment extends ListFragment {
         holder.setBackgroundColor(Color.BLUE);
     }
 
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-
     class Data {
 
         private static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
         private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
     }
 
-    private class getAccountsList extends
-            AsyncTask<Data, Void, ArrayList<Account>> {
+    public class getAccountTransactions extends
+            AsyncTask<Data, Void, ArrayList<AccountTransactions>> {
 
         @Override
-        protected ArrayList<Account> doInBackground(Data... data) {
+        protected ArrayList<AccountTransactions> doInBackground(Data... data) {
 
-            return getAccounts();
+            return getTransactions();
         }
 
-        protected void onPostExecute(ArrayList<Account> result) {
+        protected void onPostExecute(ArrayList<AccountTransactions> result) {
 
-            AccountsArray = result;
-            acctListAdpater = new AccountListAdapater(getActivity(),
-                    R.layout.item_accountlist, AccountsArray);
-            setListAdapter(acctListAdpater);
-            _appPrefs.saveAccounts(result);
-            acctListAdpater.setNotifyOnChange(true);
-
+            TransactionArray = result;
+            transAdapter = new AccountTransactionAdapter(getActivity(),
+                    R.layout.item_transactionlist, TransactionArray);
+            setListAdapter(transAdapter);
+            transAdapter.setNotifyOnChange(true);
 
         }
     }
 
-    public static ArrayList<Account> getAccounts() {
-        String MethodName = "getAccounts";
+    public static ArrayList<AccountTransactions> getTransactions() {
+        String MethodName = "getAccountTransactions";
         SoapObject response = InvokeMethod(Data.URL, MethodName);
         return RetrieveFromSoap(response);
 
@@ -167,21 +142,22 @@ public class AccountListFragment extends ListFragment {
     public static SoapObject InvokeMethod(String URL, String MethodName) {
 
         SoapObject request = GetSoapObject(MethodName);
+        user = _appPrefs.getUser();
 
         PropertyInfo Order = new PropertyInfo();
         Order.setType("STRING_CLASS");
         Order.setName("Order");
-        Order.setValue(" ORDER BY LName,FName,AcctID");
+        Order.setValue(" ORDER BY TDate");
         request.addProperty(Order);
 
-        PropertyInfo SchID = new PropertyInfo();
-        SchID.setName("SchID");
-        SchID.setValue(user.SchID);
-        request.addProperty(SchID);
+        PropertyInfo AcctID = new PropertyInfo();
+        AcctID.setName("AcctID");
+        AcctID.setValue(_appPrefs.getAcctID());
+        request.addProperty(AcctID);
 
         PropertyInfo UserID = new PropertyInfo();
         UserID.setName("UserID");
-        UserID.setValue(user.UserID);
+        UserID.setValue(_appPrefs.getUserID());
         request.addProperty(UserID);
 
         PropertyInfo UserGUID = new PropertyInfo();
@@ -206,37 +182,40 @@ public class AccountListFragment extends ListFragment {
                                       String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
         try {
-            envelope.addMapping(Data.NAMESPACE, "Account",
-                    new Account().getClass());
+            envelope.addMapping(Data.NAMESPACE, "AccountTransactions",
+                    new AccountTransactions().getClass());
             HttpTransport.call(SOAP_ACTION, envelope);
             envelopeOutput = envelope;
             SoapObject response = (SoapObject) envelope.getResponse();
 
             return response;
         } catch (Exception e) {
+            e.printStackTrace();
 
         }
         return null;
     }
 
-    public static ArrayList<Account> RetrieveFromSoap(SoapObject soap) {
+    public static ArrayList<AccountTransactions> RetrieveFromSoap(SoapObject soap) {
 
-        ArrayList<Account> Accounts = new ArrayList<Account>();
+        ArrayList<AccountTransactions> AccountTrans = new ArrayList<AccountTransactions>();
         for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
 
-            SoapObject accountlistitem = (SoapObject) soap.getProperty(i);
-            Account account = new Account();
-            for (int j = 0; j < accountlistitem.getPropertyCount() - 1; j++) {
-                account.setProperty(j, accountlistitem.getProperty(j)
+            SoapObject accounttransitem = (SoapObject) soap.getProperty(i);
+
+            AccountTransactions trans = new AccountTransactions();
+            for (int j = 0; j < accounttransitem.getPropertyCount() - 1; j++) {
+                trans.setProperty(j, accounttransitem.getProperty(j)
                         .toString());
-                if (accountlistitem.getProperty(j).equals("anyType{}")) {
-                    accountlistitem.setProperty(j, "");
+                if (accounttransitem.getProperty(j).equals("anyType{}")) {
+                    accounttransitem.setProperty(j, "");
                 }
 
             }
-            Accounts.add(i, account);
+            AccountTrans.add(i, trans);
         }
 
-        return Accounts;
+        return AccountTrans;
     }
+
 }

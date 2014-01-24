@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <!--
@@ -8,5 +9,9 @@
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     -->
     <item name="fragment_accountlist" type="layout">@layout/fragment_accountlist_list</item>
+    <item name="fragment_accounttransactions" type="layout">
+        @layout/fragment_accounttransactions_list
+    </item>
+
 
 </resources>
