@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:paddingBottom="5dp"
+                android:paddingBottom="10dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -73,8 +73,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="5dp"
-                android:paddingTop="5dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -93,8 +93,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -114,8 +114,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -134,8 +134,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -154,8 +154,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
                 android:orientation="horizontal">
 
                 <TextView
@@ -169,6 +169,19 @@
                     android:id="@+id/tvccfield"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/etcard"/>
+
+                <Button
+                    android:id="@+id/btnSaveCard"
+                    android:layout_width="75dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="right"
+                    android:clickable="true"
+                    android:text="save" />
             </LinearLayout>
 
 

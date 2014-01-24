@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -24,6 +25,7 @@ import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener, AccountTransactionsFragment.OnFragmentInteractionListener {
@@ -45,10 +47,10 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     private AppPreferences _appPrefs;
     Account account;
     ArrayList<Account> accounts;
-    String status, expdate, cctype, ccnum;
+    String status, expdate, cctype;
 
-    Button btnEdit, btnSave;
-    EditText etFirst, etLast, etAddress, etPhone, etEmail, etCC;
+    Button btnEdit, btnSave, btnSaveCard;
+    EditText etFirst, etLast, etAddress, etPhone, etEmail, etCC, etcard;
     ViewSwitcher accountSwitcher;
     Spinner AccountStatusSpinner;
 
@@ -267,11 +269,12 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                     cctype = "";
                     break;
             }
+            String ccnum = "";
             if (account.CCTrail.equals(""))
-                ccnum = "";
+                ccnum = " ";
             else {
                 for (int j = 4; j > 0; j--) {
-                    ccnum += account.CCTrail.length() - j;
+                    ccnum += account.CCTrail.charAt(account.CCTrail.length()-j);
                 }
             }
             //Used to make exp date a string so we can use substring to put a / in b/w
@@ -310,10 +313,32 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
             tvstatus.setText(status);
 
             TextView type = (TextView) rootView.findViewById(R.id.tvcc);
-            type.setText(cctype);
+            if(cctype.length() > 0)
+            type.setText(cctype + ": ");
 
             TextView tvcc = (TextView) rootView.findViewById(R.id.tvccfield);
-            tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " Exp. " + expdate);
+            etcard = (EditText) rootView.findViewById(R.id.etcard);
+            btnSaveCard = (Button) rootView.findViewById(R.id.btnSaveCard);
+
+
+            tvcc.setVisibility(View.VISIBLE);
+            etcard.setVisibility(View.VISIBLE);
+            btnSaveCard.setVisibility(View.VISIBLE);
+            if (account.CCConsentID == 0) {
+                tvcc.setVisibility(View.GONE);
+
+                btnSaveCard.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                    }
+                });
+
+            } else {
+                etcard.setVisibility(View.GONE);
+                btnSaveCard.setVisibility(View.GONE);
+                tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " - Exp. " + expdate);
+            }
 
 
             btnEdit.setOnClickListener(new View.OnClickListener() {
@@ -326,7 +351,21 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                         etAddress.setText(account.Address);
                         etPhone.setText(account.Phone);
                         etEmail.setText(account.EMail);
+
+                        List<String> spinnerlist =new ArrayList<String>();
+                        spinnerlist.add("active");
+                        spinnerlist.add("inactive");
+                        spinnerlist.add("deleted");
+                        if(status.equals("prospect"))
+                            spinnerlist.add("prospect");
+
                         AccountStatusSpinner = (Spinner) findViewById(R.id.AccountStatusSpinner);
+                        ArrayAdapter<String> spinneradapter= new ArrayAdapter<String>(getActivity(),
+                                android.R.layout.simple_list_item_1,spinnerlist);
+
+                        spinneradapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        AccountStatusSpinner.setAdapter(spinneradapter);
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

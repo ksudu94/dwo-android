@@ -16,6 +16,7 @@ public class Home extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks, AccountListFragment.OnAccountSelectedListener {
 
     /**
+     *
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private static SharedPreferences loginPreferences;

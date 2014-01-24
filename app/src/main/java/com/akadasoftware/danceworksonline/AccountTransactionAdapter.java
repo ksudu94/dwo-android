@@ -80,13 +80,14 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
 
         AccountTransactions trans = transactions.get(position);
 
-        holder.tvDate.setText(trans.TDate);
+        String date = trans.TDate.substring(0,10);
+        holder.tvDate.setText(date);
         holder.tvDate.setTag(position);
 
         holder.tvType.setText(trans.Type);
         holder.tvDescription.setText(trans.TDesc);
-        holder.tvAmount.setText(String.valueOf(trans.Amount));
-        holder.tvBalance.setText(String.valueOf(trans.Balance));
+        holder.tvAmount.setText(String.valueOf("$ " + trans.Amount));
+        holder.tvBalance.setText(String.valueOf("$ " + trans.Balance));
 
 
         return convertView;
