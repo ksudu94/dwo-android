@@ -27,5 +27,6 @@
     <string name="title_account_charge">Charge</string>
     <string name="title_activity_splash">Splash</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_student">Student</string>
 
 </resources>

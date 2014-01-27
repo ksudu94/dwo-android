@@ -12,6 +12,8 @@ import android.widget.TextView;
 import com.akadasoftware.danceworksonline.classes.AccountTransactions;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
+import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.util.List;
 
 /**
@@ -23,7 +25,7 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
     Activity activity;
     int resource;
     private int selectedPos;
-    String response;
+    String response, kind, type;
     Context context;
     List<AccountTransactions> transactions;
 
@@ -79,15 +81,69 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
         }
 
         AccountTransactions trans = transactions.get(position);
+        NumberFormat format = NumberFormat.getCurrencyInstance();
+        DateFormat dateformat = DateFormat.getDateInstance();
 
-        String date = trans.TDate.substring(0,10);
-        holder.tvDate.setText(date);
+        if (trans.Kind.equals("$")) {
+            kind = "CASH";
+
+        } else if (trans.Kind.equals("C")) {
+            kind = "CHECK";
+
+        } else if (trans.Kind.equals("V")) {
+            kind = "VISA";
+
+        } else if (trans.Kind.equals("M")) {
+            kind = "M/C";
+
+        } else if (trans.Kind.equals("D")) {
+            kind = "DISC";
+
+        } else if (trans.Kind.equals("A")) {
+            kind = "AMEX";
+
+        } else if (trans.Kind.equals("O")) {
+            kind = "OTHER";
+
+        } else {
+            kind = "Refund";
+
+        }
+
+        if (trans.Type.equals("C")) {
+            type = "Charge";
+
+        } else if (trans.Type.equals("P")) {
+            type = "Payment";
+
+        } else if (trans.Type.equals("R")) {
+            type = "Refund";
+
+        } else if (trans.Type.equals("M")) {
+            type = "Credit";
+
+        } else {
+            type = "I have no freaking clue";
+
+        }
+
+        //String date with time portion chopped off
+        String date = trans.TDate.substring(0, 10);
+        //Switching order around so that mm/dd/yyyy
+        String testdate = date.substring(5, date.length()) + "/" + date.substring(0, 4);
+        String finaldate = testdate.replace("-", "/");
+
+        holder.tvDate.setText(finaldate + " ");
         holder.tvDate.setTag(position);
 
-        holder.tvType.setText(trans.Type);
-        holder.tvDescription.setText(trans.TDesc);
-        holder.tvAmount.setText(String.valueOf("$ " + trans.Amount));
-        holder.tvBalance.setText(String.valueOf("$ " + trans.Balance));
+        if (trans.Type.contains("P") || trans.Type.contains("R"))
+            holder.tvType.setText(type + " - " + kind + " ");
+        else
+            holder.tvType.setText(type + " ");
+
+        holder.tvDescription.setText(trans.TDesc + " ");
+        holder.tvBalance.setText(String.valueOf(format.format(trans.Balance)));
+        holder.tvAmount.setText(" " + String.valueOf(format.format(trans.Amount)));
 
 
         return convertView;

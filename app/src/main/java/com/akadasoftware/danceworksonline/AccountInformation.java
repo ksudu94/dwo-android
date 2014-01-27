@@ -1,6 +1,8 @@
 package com.akadasoftware.danceworksonline;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -19,11 +21,21 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+import org.xmlpull.v1.XmlPullParserException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -47,10 +59,11 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     private AppPreferences _appPrefs;
     Account account;
     ArrayList<Account> accounts;
-    String status, expdate, cctype;
+    String status, expdate, cctype, SOAP_ACTION, METHOD_NAME;
+    int acctid;
 
     Button btnEdit, btnSave, btnSaveCard;
-    EditText etFirst, etLast, etAddress, etPhone, etEmail, etCC, etcard;
+    EditText etFirst, etLast, etAddress, etCity, etState, etZip, etPhone, etEmail, etCC, etcard;
     ViewSwitcher accountSwitcher;
     Spinner AccountStatusSpinner;
 
@@ -104,6 +117,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                             .setTabListener(this));
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -289,9 +303,11 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
             etFirst = (EditText) rootView.findViewById(R.id.etFirst);
             etLast = (EditText) rootView.findViewById(R.id.etLast);
             etAddress = (EditText) rootView.findViewById(R.id.etAddress);
+            etCity = (EditText) rootView.findViewById(R.id.etCity);
+            etState = (EditText) rootView.findViewById(R.id.etState);
+            etZip = (EditText) rootView.findViewById(R.id.etZip);
             etPhone = (EditText) rootView.findViewById(R.id.etPhone);
             etEmail = (EditText) rootView.findViewById(R.id.etEmail);
-            etCC = (EditText) rootView.findViewById(R.id.etCC);
             btnEdit = (Button) rootView.findViewById(R.id.btnEdit);
             btnSave = (Button) rootView.findViewById(R.id.btnSave);
             accountSwitcher = (ViewSwitcher) rootView.findViewById(R.id.accountSwitcher);
@@ -349,6 +365,9 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                         etFirst.setText(account.FName);
                         etLast.setText(account.LName);
                         etAddress.setText(account.Address);
+                        etAddress.setText(account.City);
+                        etAddress.setText(account.State);
+                        etAddress.setText(account.ZipCode);
                         etPhone.setText(account.Phone);
                         etEmail.setText(account.EMail);
 
@@ -376,6 +395,8 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                 @Override
                 public void onClick(View view) {
                     try {
+                        saveAccountChanges save = new saveAccountChanges();
+                        save.execute();
                         accountSwitcher.showNext();
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -385,6 +406,167 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
             return rootView;
         }
+
+        class Data {
+
+            static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
+            private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
+        }
+
+        public class saveAccountChanges extends AsyncTask<Data, Void, String> {
+
+            ProgressDialog dialog;
+
+            protected void onPreExecute() {
+                dialog = new ProgressDialog(getActivity());
+                dialog.setProgress(ProgressDialog.STYLE_HORIZONTAL);
+                dialog.setMax(100);
+                dialog.show();
+            }
+
+            @Override
+            protected String doInBackground(Data... data) {
+                publishProgress();
+                return saveAccountChanges();
+            }
+
+            protected void onProgressUpdate(Integer... progress) {
+                dialog.incrementProgressBy(progress[0]);
+            }
+
+            protected void onPostExecute(String result) {
+                dialog.dismiss();
+
+                Toast toast = Toast.makeText(getActivity(), result, Toast.LENGTH_LONG);
+                toast.show();
+                //getAccount getAccount = new getAccount();
+                //getAccount.execute();
+            }
+        }
+
+        public String saveAccountChanges() {
+
+            SOAP_ACTION = "saveAccountInformation";
+            METHOD_NAME = "saveAccountInformation";
+
+            SoapObject Request = new SoapObject(Data.NAMESPACE, METHOD_NAME);
+
+            acctid = _appPrefs.getAcctID();
+
+            PropertyInfo AcctID = new PropertyInfo();
+            AcctID.setName("AcctID");
+            AcctID.setValue(acctid);
+            Request.addProperty(AcctID);
+
+            PropertyInfo first = new PropertyInfo();
+            first.setName("FName");
+            first.setValue(etFirst.getText().toString());
+            Request.addProperty(first);
+
+            PropertyInfo last = new PropertyInfo();
+            last.setName("LName");
+            last.setValue(etLast.getText().toString());
+            Request.addProperty(last);
+
+            String address;
+            if (etAddress.getText().toString().trim().equals(""))
+                address = account.Address;
+            else
+                address = etAddress.getText().toString().trim();
+            PropertyInfo Address = new PropertyInfo();
+            Address.setName("Address");
+            Address.setValue(address);
+            Request.addProperty(Address);
+
+            String city;
+            if (etCity.getText().toString().trim().equals(""))
+                city = account.City;
+            else
+                city = etCity.getText().toString().trim();
+            PropertyInfo City = new PropertyInfo();
+            City.setName("City");
+            City.setValue(city);
+            Request.addProperty(City);
+
+            String state;
+            if (etState.getText().toString().trim().equals(""))
+                state = account.State;
+            else
+                state = etState.getText().toString().trim();
+            PropertyInfo State = new PropertyInfo();
+            State.setName("State");
+            State.setValue(state);
+            Request.addProperty(State);
+
+            String zip;
+            if (etZip.getText().toString().trim().equals(""))
+                zip = account.ZipCode;
+            else
+                zip = etZip.getText().toString().trim();
+            PropertyInfo ZipCode = new PropertyInfo();
+            ZipCode.setName("ZipCode");
+            ZipCode.setValue(zip);
+            Request.addProperty(ZipCode);
+
+            String phone;
+            if (etPhone.getText().toString().trim().equals(""))
+                phone = account.Phone;
+            else
+                phone = etEmail.getText().toString().trim();
+            PropertyInfo Phone = new PropertyInfo();
+            Phone.setName("Phone");
+            Phone.setValue(phone);
+            Request.addProperty(Phone);
+
+            String email;
+            if (etEmail.getText().toString().trim().equals(""))
+                email = account.EMail;
+            else
+                email = etEmail.getText().toString().trim();
+            PropertyInfo emailinfo = new PropertyInfo();
+            emailinfo.setName("EMail");
+            emailinfo.setValue(email);
+            Request.addProperty(emailinfo);
+
+            PropertyInfo checkName = new PropertyInfo();
+            checkName.setName("checkName");
+            checkName.setValue(true);
+            Request.addProperty(checkName);
+
+
+            SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                    SoapEnvelope.VER11);
+
+            envelope.dotNet = true;
+            envelope.setOutputSoapObject(Request);
+
+            SoapPrimitive response = null;
+            HttpTransportSE HttpTransport = new HttpTransportSE(Data.URL);
+            try {
+                HttpTransport.call(SOAP_ACTION, envelope);
+
+                response = (SoapPrimitive) envelope.getResponse();
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                Toast toast = Toast.makeText(getActivity(), e.toString(),
+                        Toast.LENGTH_LONG);
+                toast.show();
+            } catch (XmlPullParserException e) {
+                // TODO Auto-generated catch block
+                Toast toast = Toast.makeText(getActivity(), e.toString(),
+                        Toast.LENGTH_LONG);
+                toast.show();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                Toast toast = Toast.makeText(getActivity(), e.toString(),
+                        Toast.LENGTH_LONG);
+                toast.show();
+            }
+            return response.toString();
+
+        }
+
     }
 
     public void OnFragmentInteraction(int id) {

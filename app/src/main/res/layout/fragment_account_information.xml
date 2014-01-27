@@ -204,7 +204,7 @@
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/etcard"/>
+                    android:id="@+id/etcard" />
 
                 <Button
                     android:id="@+id/btnSaveCard"
@@ -283,7 +283,55 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="2dip"
-                android:hint="First Name"
+                android:hint="Street Address"
+                android:padding="5dip" />
+
+            <TextView
+                android:id="@+id/tvCity"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip"
+                android:textStyle="bold"
+                android:text="City: " />
+
+            <EditText
+                android:id="@+id/etCity"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dip"
+                android:hint="City"
+                android:padding="5dip" />
+
+            <TextView
+                android:id="@+id/tvState"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip"
+                android:textStyle="bold"
+                android:text="State: " />
+
+            <EditText
+                android:id="@+id/etState"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dip"
+                android:hint="State"
+                android:padding="5dip" />
+
+            <TextView
+                android:id="@+id/tvZip"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip"
+                android:textStyle="bold"
+                android:text="Zip Code: " />
+
+            <EditText
+                android:id="@+id/etZip"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="2dip"
+                android:hint="Zip Code"
                 android:padding="5dip" />
 
             <TextView
@@ -316,22 +364,6 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="2dip"
                 android:hint="Email"
-                android:padding="5dip" />
-
-            <TextView
-                android:id="@+id/tvcc"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dip"
-                android:textStyle="bold"
-                android:text="Credit Card:" />
-
-            <EditText
-                android:id="@+id/etCC"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dip"
-                android:hint="Credit Card"
                 android:padding="5dip" />
 
             <Spinner
