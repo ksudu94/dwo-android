@@ -602,7 +602,6 @@ public class Account implements KvmSerializable {
                 else{
                     Address = value.toString();
                 }
-                Address = value.toString();
                 break;
             case 6:
                 if(value.equals("anyType{}")){
