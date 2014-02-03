@@ -135,15 +135,18 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
 
         holder.tvDate.setText(finaldate + " ");
         holder.tvDate.setTag(position);
+        holder.tvDate.setWidth(175);
 
         if (trans.Type.contains("P") || trans.Type.contains("R"))
-            holder.tvType.setText(type + " - " + kind + " ");
+            holder.tvType.setText(type + "\n" + kind);
         else
             holder.tvType.setText(type + " ");
+        holder.tvType.setWidth(175);
 
         holder.tvDescription.setText(trans.TDesc + " ");
-        holder.tvBalance.setText(String.valueOf(format.format(trans.Balance)));
+        holder.tvDescription.setWidth(175);
         holder.tvAmount.setText(" " + String.valueOf(format.format(trans.Amount)));
+        holder.tvAmount.setWidth(160);
 
 
         return convertView;

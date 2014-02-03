@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="Gradle: ksoap2-android-assembly-3.0.0-jar-with-dependencies">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/build/libs/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/libs/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
