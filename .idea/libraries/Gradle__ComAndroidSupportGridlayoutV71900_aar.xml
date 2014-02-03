@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: ComAndroidSupportGridlayoutV71900.aar">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/app/build/exploded-bundles/ComAndroidSupportGridlayoutV71900.aar/res" />
+      <root url="jar://$PROJECT_DIR$/app/build/exploded-bundles/ComAndroidSupportGridlayoutV71900.aar/classes.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
