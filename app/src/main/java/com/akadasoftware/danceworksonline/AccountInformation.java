@@ -146,6 +146,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
             super(fm);
         }
 
+        //Handles the tabs and which fragments fill them
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
@@ -171,7 +172,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                     newFragment = new ChargeCodeFragment();
                     break;
                 default:
-                    newFragment = new AccountTransactionsFragment();
+                    newFragment = new AccountInformationFragment();
                     break;
             }
 

@@ -233,9 +233,12 @@ public class Login extends ActionBarActivity {
                     }
                     ArrayList<User> userarray = new ArrayList<User>();
                     userarray.add(0, user);
+                    //If the user logged in before it will not hit this break point but instead
+                    // go to the splash page
                     if (user.SchID > 0) {
                         _appPrefs.saveSchID(user.SchID);
                         _appPrefs.saveUserID(user.UserID);
+                        _appPrefs.saveUserGUID(user.UserGUID);
                         _appPrefs.saveUser(userarray);
                         ArrayList<Account> AccountsArray = new ArrayList<Account>();
                         _appPrefs.saveAccounts(AccountsArray);

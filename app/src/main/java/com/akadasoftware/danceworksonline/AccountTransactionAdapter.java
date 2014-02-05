@@ -18,6 +18,13 @@ import java.util.List;
 
 /**
  * Created by Kyle on 1/15/14.
+ * In Android development, any time you want to show a list of items vertically you will want to use
+ * a ListView and an Adapter. The simplest adapter is called an ArrayAdapter because the adapter
+ * takes an Array and converts the items into View objects to be loaded into the ListView container.
+ * The ArrayAdapter fits in the middle between the Array (data source) and the List View
+ * (representation) and describes two things:
+ * Which array to use as the data source
+ * How to convert any item in the array to a View object
  */
 public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions> {
 
