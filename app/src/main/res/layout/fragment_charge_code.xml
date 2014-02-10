@@ -61,6 +61,12 @@
                 android:hint="Amount" />
 
             <TextView
+                android:id="@+id/tvDiscAmount"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="DiscountAmount" />
+
+            <TextView
                 android:id="@+id/tvTotal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -21,6 +22,7 @@ import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.ChargeCodes;
 
 import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.MarshalFloat;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
@@ -39,6 +41,8 @@ import java.util.ArrayList;
  * Use the {@link ChargeCodeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+
+
 public class ChargeCodeFragment extends Fragment {
     private static String ARG_SECTION_NUMBER = "section_number";
     // TODO: Rename parameter arguments, choose names that match
@@ -51,11 +55,12 @@ public class ChargeCodeFragment extends Fragment {
     private AppPreferences _appPrefs;
     Account account;
     Activity activity;
+    ArrayList<Account> accounts;
     ArrayList<ChargeCodes> codeArray = new ArrayList<ChargeCodes>();
     ChargeCodeAdapter chargeAdapter;
     ChargeCodes chargeCode;
 
-    TextView tvDescription, tvAmount, tvTotal;
+    TextView tvDescription, tvAmount, tvTotal, tvDiscAmount;
     EditText etDescription, etAmount, etTotal;
     DatePicker datePicker;
     Spinner chargecodespinner;
@@ -71,6 +76,10 @@ public class ChargeCodeFragment extends Fragment {
 
         activity = getActivity();
         _appPrefs = new AppPreferences(activity);
+
+        accounts = _appPrefs.getAccounts();
+
+        account = accounts.get(_appPrefs.getAccountListPosition());
 
         getAccountChargeCodes codes = new getAccountChargeCodes();
         codes.execute();
@@ -169,7 +178,7 @@ public class ChargeCodeFragment extends Fragment {
         protected void onPostExecute(ArrayList<ChargeCodes> result) {
             dialog.dismiss();
             codeArray = result;
-            addItemsOnSpinner(result);
+            addItemsOnSpinner(codeArray);
 
         }
     }
@@ -256,6 +265,19 @@ public class ChargeCodeFragment extends Fragment {
         return codes;
     }
 
+
+    public static Float[] RetrieveChargeCodeFromSoap(SoapObject soap) {
+
+        Float[] codes = new Float[3];
+
+        SoapObject charge = (SoapObject) soap.getProperty(0);
+        codes[0] = Float.parseFloat(charge.getProperty(0).toString());
+        codes[1] = Float.parseFloat(charge.getProperty(1).toString());
+        codes[2] = Float.parseFloat(charge.getProperty(2).toString());
+
+        return codes;
+    }
+
     //Adds all items from the ChgDesc field to the spinner
     public void addItemsOnSpinner(ArrayList<ChargeCodes> codes) {
 
@@ -263,26 +285,163 @@ public class ChargeCodeFragment extends Fragment {
                 R.layout.fragment_charge_code, codes);
 
         chargecodespinner.setAdapter(chargeAdapter);
-        setSelectedSession(chargecodespinner);
+
+        chargecodespinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                setSelectedCharge(chargecodespinner);
+
+                getChargeCodesFromSpinner newCodes = new getChargeCodesFromSpinner();
+                newCodes.execute();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
     }
 
     //Handles if the selected field for the spinner
-    public void setSelectedSession(Spinner spinnerChargeCode) {
-        ChargeCodeAdapter adapter = (ChargeCodeAdapter) spinnerChargeCode.getAdapter();
+    public void setSelectedCharge(Spinner spinnerChargeCode) {
 
-        for (int position = 0; position < adapter.getCount(); position++) {
-            try {
-                chargeCode = (ChargeCodes) spinnerChargeCode.getItemAtPosition(position);
-                etDescription.setText(chargeCode.ChgDesc);
-                etAmount.setText(String.valueOf(chargeCode.Amount));
-            } catch (Exception e) {
-                Toast toast = Toast.makeText(activity, e.toString(),
-                        Toast.LENGTH_LONG);
-                toast.show();
-            }
-        }
+        int selected = spinnerChargeCode.getSelectedItemPosition();
+        chargeCode = (ChargeCodes) spinnerChargeCode.getItemAtPosition(selected);
+        etDescription.setText(chargeCode.ChgDesc);
+        etAmount.setText(String.valueOf(chargeCode.Amount));
 
     }
+
+
+    public class getChargeCodesFromSpinner extends
+            AsyncTask<Data, Void, Float[]> {
+
+        ProgressDialog dialog;
+
+        protected void onPreExecute() {
+          /*  dialog = new ProgressDialog(activity);
+            dialog.setProgress(ProgressDialog.STYLE_HORIZONTAL);
+            dialog.setMax(100);
+            dialog.show();*/
+        }
+
+        @Override
+        protected Float[] doInBackground(Data... data) {
+            SoapObject newCodes = null;
+            if (chargeCode.Kind.equals("T")) {
+                if (Integer.parseInt(chargeCode.ChgNo) < 4) {
+
+                    newCodes = getChargeAmount(userid, userguid, chargeCode.ChgID, account.AcctID, account.BillingFreq, account.MTuition, account.TuitionSel, account.AccountFeeAmount, _appPrefs.getST1Rate(), _appPrefs.getST2Rate());
+                }
+            } else {
+                newCodes = getChargeAmount(userid, userguid, chargeCode.ChgID, account.AcctID, account.BillingFreq, chargeCode.Amount, account.TuitionSel, account.AccountFeeAmount, _appPrefs.getST1Rate(), _appPrefs.getST2Rate());
+            }
+            return RetrieveChargeCodeFromSoap(newCodes);
+
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+            // dialog.incrementProgressBy(progress[0]);
+
+        }
+
+
+        protected void onPostExecute(ArrayList<ChargeCodes> result) {
+            //dialog.dismiss();
+
+
+        }
+    }
+
+    public SoapObject getChargeAmount(int UserID, String UserGUID, int ChgID, int AcctID, int BillingFreq, float Amount, int TuitionSel, float AccountFeeAmount, float ST1Rate, float ST2Rate) {
+
+        SOAP_ACTION = "getChargeCodes";
+        METHOD_NAME = "getChargeCodes";
+
+        SoapObject RequestCodes = new SoapObject(Data.NAMESPACE, METHOD_NAME);
+
+        PropertyInfo userID = new PropertyInfo();
+        userID.setName("UserID");
+        userID.setValue(UserID);
+        RequestCodes.addProperty(userID);
+
+        PropertyInfo userGUID = new PropertyInfo();
+        userGUID.setName("UserGUID");
+        userGUID.setValue(UserGUID);
+        RequestCodes.addProperty(userGUID);
+
+        PropertyInfo chgID = new PropertyInfo();
+        chgID.setName("ChgID");
+        chgID.setValue(ChgID);
+        RequestCodes.addProperty(chgID);
+
+
+        PropertyInfo acctid = new PropertyInfo();
+        acctid.setName("AcctID");
+        acctid.setValue(AcctID);
+        RequestCodes.addProperty(acctid);
+
+        PropertyInfo billingfreq = new PropertyInfo();
+        billingfreq.setName("BillingFreq");
+        billingfreq.setValue(BillingFreq);
+        RequestCodes.addProperty(billingfreq);
+
+        PropertyInfo amount = new PropertyInfo();
+        amount.setName("Amount");
+        amount.setType(Float.class);
+        amount.setValue(Amount);
+        RequestCodes.addProperty(amount);
+
+        PropertyInfo tuitionsel = new PropertyInfo();
+        tuitionsel.setName("TuitionSel");
+        tuitionsel.setValue(TuitionSel);
+        RequestCodes.addProperty(tuitionsel);
+
+
+        PropertyInfo accountfeeamount = new PropertyInfo();
+        accountfeeamount.setName("AccountFeeAmount");
+        accountfeeamount.setType(Float.class);
+        accountfeeamount.setValue(AccountFeeAmount);
+        RequestCodes.addProperty(accountfeeamount);
+
+        PropertyInfo st1rate = new PropertyInfo();
+        st1rate.setName("ST1Rate");
+        st1rate.setType(Float.class);
+        st1rate.setValue(ST1Rate);
+        RequestCodes.addProperty(st1rate);
+
+        PropertyInfo st2rate = new PropertyInfo();
+        st2rate.setName("ST2Rate");
+        st2rate.setType(Float.class);
+        st2rate.setValue(ST2Rate);
+        RequestCodes.addProperty(st2rate);
+
+        SoapSerializationEnvelope envelopeCodes = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+        MarshalFloat mf = new MarshalFloat();
+        mf.register(envelopeCodes);
+
+        envelopeCodes.dotNet = true;
+        envelopeCodes.setOutputSoapObject(RequestCodes);
+
+        SoapObject responseCodes = null;
+        HttpTransportSE HttpTransport = new HttpTransportSE(Data.URL);
+        try {
+            HttpTransport.call(SOAP_ACTION, envelopeCodes);
+
+            responseCodes = (SoapObject) envelopeCodes.getResponse();
+
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            //Toast toast = Toast.makeText(getActivity(), e2.toString(), Toast.LENGTH_LONG);
+            //toast.show();
+            e.printStackTrace();
+        }
+
+        return responseCodes;
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this

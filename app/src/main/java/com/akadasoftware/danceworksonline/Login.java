@@ -270,6 +270,8 @@ public class Login extends ActionBarActivity {
 
                         _appPrefs.saveSessionID(school.SessionID);
                         _appPrefs.saveCCProcessor(school.CCProcessor);
+                        _appPrefs.saveST1Rate(school.ST1Rate);
+                        _appPrefs.saveST2Rate(school.ST2Rate);
                     }
 
                 } catch (Exception exception) {
