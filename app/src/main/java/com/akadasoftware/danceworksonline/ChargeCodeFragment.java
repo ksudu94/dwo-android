@@ -55,9 +55,9 @@ public class ChargeCodeFragment extends Fragment {
     private AppPreferences _appPrefs;
     Account account;
     Activity activity;
-    ArrayList<Account> accounts;
-    ArrayList<ChargeCodes> codeArray = new ArrayList<ChargeCodes>();
-    ChargeCodeAdapter chargeAdapter;
+    ArrayList<Account> arrayAccounts;
+    ArrayList<ChargeCodes> arrayChargeCodes = new ArrayList<ChargeCodes>();
+    ChargeCodeAdapter adapterChargeCodes;
     ChargeCodes chargeCode;
 
     TextView tvDescription, tvAmount, tvTotal, tvDiscAmount;
@@ -77,14 +77,12 @@ public class ChargeCodeFragment extends Fragment {
         activity = getActivity();
         _appPrefs = new AppPreferences(activity);
 
-        accounts = _appPrefs.getAccounts();
+        arrayAccounts = _appPrefs.getAccounts();
 
-        account = accounts.get(_appPrefs.getAccountListPosition());
+        account = arrayAccounts.get(_appPrefs.getAccountListPosition());
 
-        getAccountChargeCodes codes = new getAccountChargeCodes();
-        codes.execute();
-
-
+        getChargeCodesAsync chargeCodes = new getChargeCodesAsync();
+        chargeCodes.execute();
     }
 
     /**
@@ -150,7 +148,7 @@ public class ChargeCodeFragment extends Fragment {
     }
 
     //Asygn task to get the ChgDesc field to be used to populate the spinner
-    public class getAccountChargeCodes extends
+    public class getChargeCodesAsync extends
             AsyncTask<Data, Void, ArrayList<ChargeCodes>> {
 
         ProgressDialog dialog;
@@ -165,7 +163,7 @@ public class ChargeCodeFragment extends Fragment {
         @Override
         protected ArrayList<ChargeCodes> doInBackground(Data... data) {
             SoapObject codes = getChargeCodes();
-            return RetrieveFromSoap(codes);
+            return RetrieveChargeCodesFromSoap(codes);
 
         }
 
@@ -177,8 +175,8 @@ public class ChargeCodeFragment extends Fragment {
 
         protected void onPostExecute(ArrayList<ChargeCodes> result) {
             dialog.dismiss();
-            codeArray = result;
-            addItemsOnSpinner(codeArray);
+            arrayChargeCodes = result;
+            addItemsOnSpinner(arrayChargeCodes);
 
         }
     }
@@ -243,37 +241,24 @@ public class ChargeCodeFragment extends Fragment {
 
     }
 
-    public static ArrayList<ChargeCodes> RetrieveFromSoap(SoapObject soap) {
+    public static ArrayList<ChargeCodes> RetrieveChargeCodesFromSoap(SoapObject soap){
 
         ArrayList<ChargeCodes> codes = new ArrayList<ChargeCodes>();
         for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
 
             SoapObject accountchargecodes = (SoapObject) soap.getProperty(i);
 
-            ChargeCodes chgcodes = new ChargeCodes();
+            ChargeCodes chargeCode = new ChargeCodes();
             for (int j = 0; j < accountchargecodes.getPropertyCount() - 1; j++) {
-                chgcodes.setProperty(j, accountchargecodes.getProperty(j)
+                chargeCode.setProperty(j, accountchargecodes.getProperty(j)
                         .toString());
                 if (accountchargecodes.getProperty(j).equals("anyType{}")) {
                     accountchargecodes.setProperty(j, "");
                 }
 
             }
-            codes.add(i, chgcodes);
+            codes.add(i, chargeCode);
         }
-
-        return codes;
-    }
-
-
-    public static Float[] RetrieveChargeCodeFromSoap(SoapObject soap) {
-
-        Float[] codes = new Float[3];
-
-        SoapObject charge = (SoapObject) soap.getProperty(0);
-        codes[0] = Float.parseFloat(charge.getProperty(0).toString());
-        codes[1] = Float.parseFloat(charge.getProperty(1).toString());
-        codes[2] = Float.parseFloat(charge.getProperty(2).toString());
 
         return codes;
     }
@@ -281,18 +266,18 @@ public class ChargeCodeFragment extends Fragment {
     //Adds all items from the ChgDesc field to the spinner
     public void addItemsOnSpinner(ArrayList<ChargeCodes> codes) {
 
-        chargeAdapter = new ChargeCodeAdapter(activity,
+        adapterChargeCodes = new ChargeCodeAdapter(activity,
                 R.layout.fragment_charge_code, codes);
 
-        chargecodespinner.setAdapter(chargeAdapter);
+        chargecodespinner.setAdapter(adapterChargeCodes);
 
         chargecodespinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 setSelectedCharge(chargecodespinner);
 
-                getChargeCodesFromSpinner newCodes = new getChargeCodesFromSpinner();
-                newCodes.execute();
+                getChargeAmountAsync ChargeAmount = new getChargeAmountAsync();
+                ChargeAmount.execute();
             }
 
             @Override
@@ -313,7 +298,7 @@ public class ChargeCodeFragment extends Fragment {
     }
 
 
-    public class getChargeCodesFromSpinner extends
+    public class getChargeAmountAsync extends
             AsyncTask<Data, Void, Float[]> {
 
         ProgressDialog dialog;
@@ -355,8 +340,8 @@ public class ChargeCodeFragment extends Fragment {
 
     public SoapObject getChargeAmount(int UserID, String UserGUID, int ChgID, int AcctID, int BillingFreq, float Amount, int TuitionSel, float AccountFeeAmount, float ST1Rate, float ST2Rate) {
 
-        SOAP_ACTION = "getChargeCodes";
-        METHOD_NAME = "getChargeCodes";
+        SOAP_ACTION = "getChargeAmount";
+        METHOD_NAME = "getChargeAmount";
 
         SoapObject RequestCodes = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
@@ -442,6 +427,17 @@ public class ChargeCodeFragment extends Fragment {
         return responseCodes;
     }
 
+
+    public static Float[] RetrieveChargeCodeFromSoap(SoapObject soap) {
+
+        Float[] codes = new Float[3];
+
+        codes[0] = Float.parseFloat(soap.getProperty(0).toString());
+        codes[1] = Float.parseFloat(soap.getProperty(1).toString());
+        codes[2] = Float.parseFloat(soap.getProperty(2).toString());
+
+        return codes;
+    }
 
     /**
      * This interface must be implemented by activities that contain this
