@@ -18,9 +18,12 @@ public class AppPreferences {
     public static final String putCCProcessor = "";
     public static final String putSchID = "SchID";
     public static final String putUserID = "UserID";
+    public static final String putUserGUID = "UserGUID";
     public static final String putStuID = "StuID";
     public static final String putAcctID = "AcctID";
     public static final String putSessionID = "SessionID";
+    public static final String putST1Rate = "ST1Rate";
+    public static final String putST2Rate = "ST2Rate";
     public static final String putAccountListPosition = "AccountListPosition";
     private SharedPreferences sharedPrefs;
     private SharedPreferences.Editor prefsEditor;
@@ -73,6 +76,16 @@ public class AppPreferences {
         return sharedPrefs.getInt(putUserID, 0);
     }
 
+    public void saveUserGUID(String UserGUID) {
+        prefsEditor.putString(putUserGUID, UserGUID);
+        prefsEditor.commit();
+    }
+
+    public String getUserGUID() {
+        return sharedPrefs.getString(putUserGUID, "");
+    }
+
+
     public int getStuID() {
         return sharedPrefs.getInt(putStuID, 0);
     }
@@ -97,6 +110,24 @@ public class AppPreferences {
 
     public void saveSessionID(int SessionID) {
         prefsEditor.putInt(putSessionID, SessionID);
+        prefsEditor.commit();
+    }
+
+    public float getST1Rate() {
+        return sharedPrefs.getFloat(putST1Rate, 0);
+    }
+
+    public void saveST1Rate(float ST1Rate) {
+        prefsEditor.putFloat(putST1Rate, ST1Rate);
+        prefsEditor.commit();
+    }
+
+    public float getST2Rate() {
+        return sharedPrefs.getFloat(putST2Rate, 0);
+    }
+
+    public void saveST2Rate(float ST2Rate) {
+        prefsEditor.putFloat(putST2Rate, ST2Rate);
         prefsEditor.commit();
     }
 

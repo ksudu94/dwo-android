@@ -1,8 +1,6 @@
 package com.akadasoftware.danceworksonline;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,33 +9,17 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapPrimitive;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
-import org.xmlpull.v1.XmlPullParserException;
-
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 
 public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener, AccountTransactionsFragment.OnFragmentInteractionListener {
@@ -164,6 +146,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
             super(fm);
         }
 
+        //Handles the tabs and which fragments fill them
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
@@ -182,8 +165,14 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                 case 2:
                     newFragment = new AccountTransactionsFragment();
                     break;
-                default:
+                case 3:
                     newFragment = new AccountTransactionsFragment();
+                    break;
+                case 4:
+                    newFragment = new ChargeCodeFragment();
+                    break;
+                default:
+                    newFragment = new AccountInformationFragment();
                     break;
             }
 
@@ -219,17 +208,19 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     /**
      * A fragment containing a textviews for misc. account informations such as Name and address etc.
      */
-    public class AccountInformationFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
+    /*public class AccountInformationFragment extends Fragment {
+        *//**
+     * The fragment argument representing the section number for this
+     * fragment.
+     *//*
         private final String ARG_SECTION_NUMBER = "section_number";
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
+        */
+
+    /**
+     * Returns a new instance of this fragment for the given section
+     * number.
+     *//*
         public AccountInformationFragment newInstance(int sectionNumber) {
             AccountInformationFragment fragment = new AccountInformationFragment();
             Bundle args = new Bundle();
@@ -567,8 +558,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
         }
 
-    }
-
+    }*/
     public void OnFragmentInteraction(int id) {
 
         /* Starting a new activity (AccountInformation) which is handled by intents in the manifest.

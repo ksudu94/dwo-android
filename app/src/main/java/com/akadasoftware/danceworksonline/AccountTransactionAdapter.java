@@ -18,6 +18,13 @@ import java.util.List;
 
 /**
  * Created by Kyle on 1/15/14.
+ * In Android development, any time you want to show a list of items vertically you will want to use
+ * a ListView and an Adapter. The simplest adapter is called an ArrayAdapter because the adapter
+ * takes an Array and converts the items into View objects to be loaded into the ListView container.
+ * The ArrayAdapter fits in the middle between the Array (data source) and the List View
+ * (representation) and describes two things:
+ * Which array to use as the data source
+ * How to convert any item in the array to a View object
  */
 public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions> {
 
@@ -135,15 +142,18 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
 
         holder.tvDate.setText(finaldate + " ");
         holder.tvDate.setTag(position);
+        holder.tvDate.setWidth(175);
 
         if (trans.Type.contains("P") || trans.Type.contains("R"))
-            holder.tvType.setText(type + " - " + kind + " ");
+            holder.tvType.setText(type + "\n" + kind);
         else
             holder.tvType.setText(type + " ");
+        holder.tvType.setWidth(175);
 
         holder.tvDescription.setText(trans.TDesc + " ");
-        holder.tvBalance.setText(String.valueOf(format.format(trans.Balance)));
+        holder.tvDescription.setWidth(175);
         holder.tvAmount.setText(" " + String.valueOf(format.format(trans.Amount)));
+        holder.tvAmount.setWidth(160);
 
 
         return convertView;
