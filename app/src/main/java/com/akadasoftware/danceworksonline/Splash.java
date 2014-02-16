@@ -128,6 +128,7 @@ public class Splash extends ActionBarActivity {
                 if (user.SchID > 0) {
                     _appPrefs.saveSchID(user.SchID);
                     _appPrefs.saveUserID(user.UserID);
+                    _appPrefs.saveUserGUID(user.UserGUID);
                     _appPrefs.saveUser(userarray);
                     ArrayList<Account> AccountsArray = new ArrayList<Account>();
                     _appPrefs.saveAccounts(AccountsArray);

@@ -26,11 +26,15 @@ public class Home extends ActionBarActivity
     private AppPreferences _appPrefs;
 
 
-    /**
-     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
-     */
     private CharSequence mTitle;
 
+    /**
+     * Used to store the last screen title. For use in {@link #restoreActionBar()}.
+     * Called to do initial creation of a fragment. This is called after onAttach(Activity) and
+     before onCreateView(LayoutInflater, ViewGroup, Bundle).Note that this can be called while
+     the fragment's activity is still in the process of being created. As such, you can not rely
+     on things like the activity's content view hierarchy being initialized at this point.
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,6 +153,7 @@ public class Home extends ActionBarActivity
         _appPrefs = new AppPreferences(getApplicationContext());
 
         _appPrefs.saveAccountListPosition(id);
+
         Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.AccountInformation");
         startActivity(openMainPage);
 

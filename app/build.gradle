@@ -35,6 +35,5 @@ dependencies {
     compile 'com.android.support:gridlayout-v7:19.0.0'
     compile 'com.android.support:appcompat-v7:19.0.0'
     compile 'com.google.code.gson:gson:2.2.4'
-    //compile 'ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar'
-    compile files('C:/Users/Kyle/.AndroidStudioPreview/dwo-android/.idea/libraries/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar')
+    compile files('libs/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar')
 }
