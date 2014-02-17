@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,9 +60,10 @@ public class ChargeCodeFragment extends Fragment {
     ArrayList<ChargeCodes> arrayChargeCodes = new ArrayList<ChargeCodes>();
     ChargeCodeAdapter adapterChargeCodes;
     ChargeCodes chargeCode;
+    float[] amountArray;
 
-    TextView tvDescription, tvAmount, tvTotal, tvDiscAmount;
-    EditText etDescription, etAmount, etTotal;
+    TextView tvDescription, tvAmount, tvDiscAmount, tvDiscAmountDisplayed, tvTotal, tvTotalDisplayed;
+    EditText etDescription, etAmount;
     DatePicker datePicker;
     Spinner chargecodespinner;
     Button btnCharge;
@@ -120,14 +122,28 @@ public class ChargeCodeFragment extends Fragment {
         //use inflated view to find elements on page
         tvDescription = (TextView) rootView.findViewById(R.id.tvDescription);
         tvAmount = (TextView) rootView.findViewById(R.id.tvAmount);
-        tvTotal = (TextView) rootView.findViewById(R.id.tvTotal);
         etDescription = (EditText) rootView.findViewById(R.id.etDescription);
         etAmount = (EditText) rootView.findViewById(R.id.etAmount);
-        etTotal = (EditText) rootView.findViewById(R.id.etTotal);
         chargecodespinner = (Spinner) rootView.findViewById(R.id.chargecodespinner);
         datePicker = (DatePicker) rootView.findViewById(R.id.datePicker);
         btnCharge = (Button) rootView.findViewById(R.id.btnCharge);
 
+
+        etAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                Toast toast = Toast.makeText(getActivity(), "Amount changed, other values updated.",
+                        Toast.LENGTH_LONG);
+                toast.show();
+                float newAmount = Float.parseFloat(etAmount.getText().toString());
+                if (newAmount != chargeCode.Amount) {
+
+                    getChargeAmountAsync ChargeAmount = new getChargeAmountAsync();
+                    ChargeAmount.execute();
+                }
+                return false;
+            }
+        });
 
         // Inflate the layout for this fragment
         return rootView;
@@ -241,7 +257,7 @@ public class ChargeCodeFragment extends Fragment {
 
     }
 
-    public static ArrayList<ChargeCodes> RetrieveChargeCodesFromSoap(SoapObject soap){
+    public static ArrayList<ChargeCodes> RetrieveChargeCodesFromSoap(SoapObject soap) {
 
         ArrayList<ChargeCodes> codes = new ArrayList<ChargeCodes>();
         for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
@@ -276,8 +292,11 @@ public class ChargeCodeFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 setSelectedCharge(chargecodespinner);
 
-                getChargeAmountAsync ChargeAmount = new getChargeAmountAsync();
-                ChargeAmount.execute();
+                if (etAmount.getText().toString() != "0.00") {
+                    getChargeAmountAsync ChargeAmount = new getChargeAmountAsync();
+                    ChargeAmount.execute();
+                }
+
             }
 
             @Override
@@ -293,8 +312,13 @@ public class ChargeCodeFragment extends Fragment {
         int selected = spinnerChargeCode.getSelectedItemPosition();
         chargeCode = (ChargeCodes) spinnerChargeCode.getItemAtPosition(selected);
         etDescription.setText(chargeCode.ChgDesc);
-        etAmount.setText(String.valueOf(chargeCode.Amount));
 
+        if (chargeCode.Kind.equals("T") && Integer.parseInt(chargeCode.ChgNo) < 4) {
+
+            etAmount.setText(String.valueOf(account.MTuition));
+        } else {
+            etAmount.setText(String.valueOf(chargeCode.Amount));
+        }
     }
 
 
@@ -313,15 +337,12 @@ public class ChargeCodeFragment extends Fragment {
         @Override
         protected Float[] doInBackground(Data... data) {
             SoapObject newCodes = null;
-            if (chargeCode.Kind.equals("T")) {
-                if (Integer.parseInt(chargeCode.ChgNo) < 4) {
 
-                    newCodes = getChargeAmount(userid, userguid, chargeCode.ChgID, account.AcctID, account.BillingFreq, account.MTuition, account.TuitionSel, account.AccountFeeAmount, _appPrefs.getST1Rate(), _appPrefs.getST2Rate());
-                }
-            } else {
-                newCodes = getChargeAmount(userid, userguid, chargeCode.ChgID, account.AcctID, account.BillingFreq, chargeCode.Amount, account.TuitionSel, account.AccountFeeAmount, _appPrefs.getST1Rate(), _appPrefs.getST2Rate());
-            }
+            float ST1Rate = _appPrefs.getST1Rate();
+            float ST2Rate = _appPrefs.getST2Rate();
+            newCodes = getChargeAmount(userid, userguid, chargeCode.ChgID, account.AcctID, account.BillingFreq, Float.parseFloat(etAmount.getText().toString()), account.TuitionSel, account.AccountFeeAmount, ST1Rate, ST2Rate);
             return RetrieveChargeCodeFromSoap(newCodes);
+
 
         }
 
@@ -331,10 +352,38 @@ public class ChargeCodeFragment extends Fragment {
         }
 
 
-        protected void onPostExecute(ArrayList<ChargeCodes> result) {
+        protected void onPostExecute(Float[] result) {
             //dialog.dismiss();
+            float floatAmount = Float.parseFloat(etAmount.getText().toString());
+            float floatDiscAmount = result[0];
+            float floatSTax1 = result[1];
+            float floatSTax2 = result[2];
 
+            tvDiscAmount = (TextView) activity.findViewById(R.id.tvDiscAmount);
+            tvDiscAmountDisplayed = (TextView) activity.findViewById(R.id.tvDiscAmountDisplayed);
+            tvTotal = (TextView) activity.findViewById(R.id.tvTotal);
+            tvTotalDisplayed = (TextView) activity.findViewById(R.id.tvTotalDisplayed);
 
+            tvDiscAmount.setVisibility(View.GONE);
+            tvDiscAmountDisplayed.setVisibility(View.GONE);
+            tvTotal.setVisibility(View.GONE);
+            tvTotalDisplayed.setVisibility(View.GONE);
+
+            if (floatDiscAmount != floatAmount) {
+                tvDiscAmount.setVisibility(View.VISIBLE);
+                tvDiscAmount.setText("Discounted Amount");
+                tvDiscAmountDisplayed.setVisibility(View.VISIBLE);
+                tvDiscAmountDisplayed.setTextSize(20);
+                tvDiscAmountDisplayed.setText(String.valueOf(floatDiscAmount));
+            }
+            if (floatSTax1 + floatSTax2 > 0) {
+                tvTotal.setVisibility(View.VISIBLE);
+                tvTotal.setText("Total w/ Tax");
+                tvTotalDisplayed.setVisibility(View.VISIBLE);
+                tvTotalDisplayed.setTextSize(20);
+                float total = floatDiscAmount + floatSTax1 + floatSTax2;
+                tvTotalDisplayed.setText(String.valueOf(total));
+            }
         }
     }
 

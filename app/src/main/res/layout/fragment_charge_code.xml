@@ -58,13 +58,21 @@
                 android:id="@+id/etAmount"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
                 android:hint="Amount" />
 
             <TextView
                 android:id="@+id/tvDiscAmount"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="DiscountAmount" />
+                android:text="Discounted Amount" />
+
+            <TextView
+                android:id="@+id/tvDiscAmountDisplayed"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvTotal"
@@ -72,11 +80,12 @@
                 android:layout_height="wrap_content"
                 android:text="Total" />
 
-            <EditText
-                android:id="@+id/etTotal"
+            <TextView
+                android:id="@+id/tvTotalDisplayed"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:hint="Amount w/ Tax" />
+                android:textStyle="bold"
+                android:layout_height="wrap_content" />
+
 
             <Button
                 android:layout_width="wrap_content"

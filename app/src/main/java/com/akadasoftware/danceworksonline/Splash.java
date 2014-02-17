@@ -143,6 +143,16 @@ public class Splash extends ActionBarActivity {
                     piSchID.setValue(user.SchID);
                     requestSchool.addProperty(piSchID);
 
+                    PropertyInfo userid = new PropertyInfo();
+                    userid.setName("UserID");
+                    userid.setValue(user.UserID);
+                    requestSchool.addProperty(userid);
+
+                    PropertyInfo userguid = new PropertyInfo();
+                    userguid.setName("UserGUID");
+                    userguid.setValue(user.UserGUID);
+                    requestSchool.addProperty(userguid);
+
                     SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
                             SoapEnvelope.VER11);
                     envelopeSchool.dotNet = true;
@@ -156,9 +166,15 @@ public class Splash extends ActionBarActivity {
                             .getProperty(3).toString());
                     school.CCProcessor = responseSchool.getProperty(88)
                             .toString();
+                    school.ST1Rate = Float.parseFloat(responseSchool
+                            .getProperty(56).toString());
+                    school.ST2Rate = Float.parseFloat(responseSchool
+                            .getProperty(59).toString());
 
                     _appPrefs.saveSessionID(school.SessionID);
                     _appPrefs.saveCCProcessor(school.CCProcessor);
+                    _appPrefs.saveST1Rate(school.ST1Rate);
+                    _appPrefs.saveST2Rate(school.ST2Rate);
                 }
 
             } catch (Exception exception) {
