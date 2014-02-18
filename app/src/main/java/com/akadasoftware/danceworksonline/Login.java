@@ -267,6 +267,10 @@ public class Login extends ActionBarActivity {
                                 .getProperty(3).toString());
                         school.CCProcessor = responseSchool.getProperty(88)
                                 .toString();
+                        school.ST1Rate = Float.parseFloat(responseSchool
+                                .getProperty(56).toString());
+                        school.ST2Rate = Float.parseFloat(responseSchool
+                                .getProperty(59).toString());
 
                         _appPrefs.saveSessionID(school.SessionID);
                         _appPrefs.saveCCProcessor(school.CCProcessor);
