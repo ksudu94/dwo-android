@@ -1,7 +1,6 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -99,22 +98,18 @@ public class AccountListFragment extends ListFragment {
         mListener = null;
     }
 
+    /*Called when one of the accounts is selected in the accountlist page calling onAccountSelected
+      takes us to the onAccountSelected method on the home page were it saves the account position
+      in the list and then starts our new activity which is opening the AccountInformationFragment
+      page.
+     */
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Notify the parent activity of selected item
         mListener.OnAccountSelected(position);
 
-        // Set the item as checked to be highlighted when in two-pane layout
-        getListView().setItemChecked(position, true);
-        getListView().getAdapter().getItemViewType(position);
 
-        // Gets the tag for the textview containing the information for the
-        // selected account
-        // from the adapter with accountlist.
-        View holder = (View) getListView().getAdapter().getItem(position);
-        holder.getTag();
-        holder.setBackgroundColor(Color.BLUE);
     }
 
 
@@ -171,7 +166,7 @@ public class AccountListFragment extends ListFragment {
         PropertyInfo Order = new PropertyInfo();
         Order.setType("STRING_CLASS");
         Order.setName("Order");
-        Order.setValue(" ORDER BY LName,FName,AcctID");
+        Order.setValue(" AND Status=0 ORDER BY LName,FName,AcctID");
         request.addProperty(Order);
 
         PropertyInfo SchID = new PropertyInfo();

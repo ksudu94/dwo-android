@@ -1,7 +1,6 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -44,7 +43,7 @@ public class AccountTransactionsFragment extends ListFragment {
     static User user;
 
 
-    private OnFragmentInteractionListener mListener;
+    private OnTransactionSelected mListener;
 
     /**
      * The fragment's ListView/GridView.
@@ -57,10 +56,10 @@ public class AccountTransactionsFragment extends ListFragment {
      */
     private AccountTransactionAdapter transAdapter;
 
-
-    public interface OnFragmentInteractionListener {
+    //Method defined in AccountInformation
+    public interface OnTransactionSelected {
         // TODO: Update argument type and name
-        public void OnFragmentInteraction(int id);
+        public void OnTransactionSelected(int id);
     }
 
     @Override
@@ -78,10 +77,10 @@ public class AccountTransactionsFragment extends ListFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnTransactionSelected) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnTransactionSelected");
         }
     }
 
@@ -109,18 +108,7 @@ public class AccountTransactionsFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Notify the parent activity of selected item
-        mListener.OnFragmentInteraction(position);
-
-        // Set the item as checked to be highlighted when in two-pane layout
-        getListView().setItemChecked(position, true);
-        getListView().getAdapter().getItemViewType(position);
-
-        // Gets the tag for the textview containing the information for the
-        // selected account
-        // from the adapter with accountlist.
-        View holder = (View) getListView().getAdapter().getItem(position);
-        holder.getTag();
-        holder.setBackgroundColor(Color.BLUE);
+        mListener.OnTransactionSelected(position);
     }
 
     class Data {

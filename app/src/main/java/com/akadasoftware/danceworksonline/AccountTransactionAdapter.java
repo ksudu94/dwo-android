@@ -51,6 +51,9 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
         TextView tvBalance;
     }
 
+    /*The holder is the container for each list item defined in the ViewHolder class. Below we
+      define them and find out what the equivalent is in our xml file
+    */
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.v("ConertView", String.valueOf(position));
         ViewHolder holder = null;
