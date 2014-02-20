@@ -2,7 +2,6 @@ package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,6 +20,7 @@ import android.widget.Toast;
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.ChargeCodes;
+import com.akadasoftware.danceworksonline.classes.User;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.MarshalFloat;
@@ -35,12 +35,13 @@ import java.util.ArrayList;
 
 
 /**
- * A simple {@link android.support.v4.app.Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ChargeCodeFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ChargeCodeFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * A fragment that is used to run both the getChargeCodes and getChargeAmount web methods.
+ * It gets the account from _appPrefs as a position in the accounts array list and from that
+ * account uses fields like acctid, billingfreq, mtuition etc. It also uses the ChargeCode class
+ * for other values. Those values are retrieved from the web method with the values userid,
+ * userguid and schid which are all in _appPrefs. The end result is a spinner populated by the
+ * ChgDesc field and then values returned with DiscountedAmount and Total w/ tax textviews
+ * only showing up if their values have changed.
  */
 
 
@@ -52,7 +53,7 @@ public class ChargeCodeFragment extends Fragment {
     String SOAP_ACTION, METHOD_NAME, userguid;
     int schid, userid;
 
-    private OnFragmentInteractionListener mListener;
+
     private AppPreferences _appPrefs;
     Account account;
     Activity activity;
@@ -60,7 +61,7 @@ public class ChargeCodeFragment extends Fragment {
     ArrayList<ChargeCodes> arrayChargeCodes = new ArrayList<ChargeCodes>();
     ChargeCodeAdapter adapterChargeCodes;
     ChargeCodes chargeCode;
-    float[] amountArray;
+    float floatAmount, floatDiscAmount, floatSTax1, floatSTax2;
 
     TextView tvDescription, tvAmount, tvDiscAmount, tvDiscAmountDisplayed, tvTotal, tvTotalDisplayed;
     EditText etDescription, etAmount;
@@ -129,6 +130,7 @@ public class ChargeCodeFragment extends Fragment {
         btnCharge = (Button) rootView.findViewById(R.id.btnCharge);
 
 
+        //Handles when values in the Edit Text are changed. After the enter button is pressed
         etAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
@@ -145,15 +147,16 @@ public class ChargeCodeFragment extends Fragment {
             }
         });
 
+        btnCharge.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                enterChargeAsync enter = new enterChargeAsync();
+                enter.execute();
+            }
+        });
+
         // Inflate the layout for this fragment
         return rootView;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
 
@@ -163,7 +166,7 @@ public class ChargeCodeFragment extends Fragment {
         private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
     }
 
-    //Asygn task to get the ChgDesc field to be used to populate the spinner
+    //Asycn task to get the ChgDesc field to be used to populate the spinner
     public class getChargeCodesAsync extends
             AsyncTask<Data, Void, ArrayList<ChargeCodes>> {
 
@@ -354,10 +357,10 @@ public class ChargeCodeFragment extends Fragment {
 
         protected void onPostExecute(Float[] result) {
             //dialog.dismiss();
-            float floatAmount = Float.parseFloat(etAmount.getText().toString());
-            float floatDiscAmount = result[0];
-            float floatSTax1 = result[1];
-            float floatSTax2 = result[2];
+            floatAmount = Float.parseFloat(etAmount.getText().toString());
+            floatDiscAmount = result[0];
+            floatSTax1 = result[1];
+            floatSTax2 = result[2];
 
             tvDiscAmount = (TextView) activity.findViewById(R.id.tvDiscAmount);
             tvDiscAmountDisplayed = (TextView) activity.findViewById(R.id.tvDiscAmountDisplayed);
@@ -488,15 +491,238 @@ public class ChargeCodeFragment extends Fragment {
         return codes;
     }
 
+
+    public class enterChargeAsync extends
+            AsyncTask<Data, Void, Boolean> {
+
+        ProgressDialog dialog;
+
+      /*  protected void onPreExecute() {
+            dialog = new ProgressDialog(activity);
+            dialog.setProgress(ProgressDialog.STYLE_HORIZONTAL);
+            dialog.setMax(100);
+            dialog.show();
+        }*/
+
+        @Override
+        protected Boolean doInBackground(Data... data) {
+            SoapObject enterCharge = null;
+            float totalAmount = 0;
+            float DiscAmount = 0;
+            User user = _appPrefs.getUser();
+            ;
+
+            if (tvDiscAmountDisplayed.isShown()) {
+                totalAmount = floatDiscAmount;
+                DiscAmount = chargeCode.Amount - floatDiscAmount;
+            } else if (tvTotalDisplayed.isShown()) {
+                totalAmount = floatDiscAmount + floatSTax1 + floatSTax2;
+                DiscAmount = 0;
+            } else
+                totalAmount = chargeCode.Amount;
+
+            int day = datePicker.getDayOfMonth();
+            int month = datePicker.getMonth() + 1;
+            int year = datePicker.getYear();
+
+            String date = String.valueOf(year) + "-" + String.valueOf(month) + "-" + String.valueOf(day);
+
+
+            enterCharge = EnterCharge(userid, userguid, schid, account.AcctID, date, chargeCode.ChgDesc,
+                    chargeCode.GLNo, floatDiscAmount, totalAmount, chargeCode.Kind, chargeCode.Tax,
+                    false, 0, chargeCode.PayOnline, 0, _appPrefs.getSessionID(), DiscAmount,
+                    floatSTax1, floatSTax2, user.DisplayName);
+            return EnterChargeFromSoap(enterCharge);
+
+
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+            dialog.incrementProgressBy(progress[0]);
+
+        }
+
+
+        protected void onPostExecute(Boolean result) {
+            //dialog.dismiss();
+
+            if (result) {
+                Toast toast = Toast.makeText(getActivity(), "Charge Successfully entered", Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                Toast toast = Toast.makeText(getActivity(), "Charge failed", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        }
+    }
+
+    public SoapObject EnterCharge(int UserID, String UserGUID, int SchID, int AcctID, String ChgDate,
+                                  String ChgDesc, String GLNo, float Amount, float totalAmount,
+                                  String Kind, int STax, Boolean POSTrans, int POSInv, Boolean PayOnline,
+                                  int TransPostHistID, int SessionID, float DiscAmt, float STax1,
+                                  float STax2, String DisplayName) {
+
+        SOAP_ACTION = "EnterCharge";
+        METHOD_NAME = "EnterCharge";
+
+        SoapObject requestEnterCharge = new SoapObject(Data.NAMESPACE, METHOD_NAME);
+
+        PropertyInfo userID = new PropertyInfo();
+        userID.setName("UserID");
+        userID.setValue(UserID);
+        requestEnterCharge.addProperty(userID);
+
+        PropertyInfo userGUID = new PropertyInfo();
+        userGUID.setName("UserGUID");
+        userGUID.setValue(UserGUID);
+        requestEnterCharge.addProperty(userGUID);
+
+        PropertyInfo schid = new PropertyInfo();
+        schid.setName("SchID");
+        schid.setValue(SchID);
+        requestEnterCharge.addProperty(schid);
+
+
+        PropertyInfo acctid = new PropertyInfo();
+        acctid.setName("AcctID");
+        acctid.setValue(AcctID);
+        requestEnterCharge.addProperty(acctid);
+
+        PropertyInfo chgdate = new PropertyInfo();
+        chgdate.setName("strChgDate");
+        //chgdate.setType(Date.class);
+        //Calendar cal = Calendar.getInstance();
+        //cal.set(Calendar.YEAR, datePicker.getYear());
+        //cal.set(Calendar.MONTH, datePicker.getMonth());
+        //cal.set(Calendar.DATE, datePicker.getDayOfMonth());
+        //Date date = cal.getTime();
+        chgdate.setValue(ChgDate);
+        requestEnterCharge.addProperty(chgdate);
+
+        PropertyInfo chgdesc = new PropertyInfo();
+        chgdesc.setName("ChgDesc");
+        chgdesc.setValue(ChgDesc);
+        requestEnterCharge.addProperty(chgdesc);
+
+        PropertyInfo glno = new PropertyInfo();
+        glno.setName("GLNo");
+        glno.setValue(GLNo);
+        requestEnterCharge.addProperty(glno);
+
+
+        PropertyInfo amount = new PropertyInfo();
+        amount.setName("Amount");
+        amount.setType(Float.class);
+        amount.setValue(Amount);
+        requestEnterCharge.addProperty(amount);
+
+        PropertyInfo totalamount = new PropertyInfo();
+        totalamount.setName("totalAmount");
+        totalamount.setType(Float.class);
+        totalamount.setValue(totalAmount);
+        requestEnterCharge.addProperty(totalamount);
+
+        PropertyInfo kind = new PropertyInfo();
+        kind.setName("Kind");
+        kind.setValue(Kind);
+        requestEnterCharge.addProperty(kind);
+
+        PropertyInfo stax = new PropertyInfo();
+        stax.setName("STax");
+        stax.setValue(STax);
+        requestEnterCharge.addProperty(stax);
+
+        PropertyInfo posttrans = new PropertyInfo();
+        posttrans.setName("POSTrans");
+        posttrans.setValue(POSTrans);
+        requestEnterCharge.addProperty(posttrans);
+
+        PropertyInfo posinv = new PropertyInfo();
+        posinv.setName("POSInv");
+        posinv.setValue(POSInv);
+        requestEnterCharge.addProperty(posinv);
+
+        PropertyInfo payonline = new PropertyInfo();
+        payonline.setName("PayOnline");
+        payonline.setValue(PayOnline);
+        requestEnterCharge.addProperty(payonline);
+
+
+        PropertyInfo transposthistid = new PropertyInfo();
+        transposthistid.setName("TransPostHistID");
+        transposthistid.setValue(TransPostHistID);
+        requestEnterCharge.addProperty(transposthistid);
+
+        PropertyInfo sessionid = new PropertyInfo();
+        sessionid.setName("SessionID");
+        sessionid.setValue(SessionID);
+        requestEnterCharge.addProperty(sessionid);
+
+        PropertyInfo discamt = new PropertyInfo();
+        discamt.setName("DiscAmt");
+        discamt.setType(Float.class);
+        discamt.setValue(DiscAmt);
+        requestEnterCharge.addProperty(discamt);
+
+        PropertyInfo stax1 = new PropertyInfo();
+        stax1.setName("STax1");
+        stax1.setType(Float.class);
+        stax1.setValue(STax1);
+        requestEnterCharge.addProperty(stax1);
+
+
+        PropertyInfo stax2 = new PropertyInfo();
+        stax2.setName("STax2");
+        stax2.setType(Float.class);
+        stax2.setValue(STax2);
+        requestEnterCharge.addProperty(stax2);
+
+        PropertyInfo displayname = new PropertyInfo();
+        displayname.setName("DisplayName");
+        displayname.setValue(DisplayName);
+        requestEnterCharge.addProperty(displayname);
+
+
+        SoapSerializationEnvelope envelopeEnterCharge = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+        MarshalFloat mf = new MarshalFloat();
+        mf.register(envelopeEnterCharge);
+
+        //MarshalDate md = new MarshalDate();
+        //md.register(envelopeCodes);
+
+        envelopeEnterCharge.dotNet = true;
+        envelopeEnterCharge.setOutputSoapObject(requestEnterCharge);
+
+        SoapObject responseEnterCharge = null;
+        HttpTransportSE HttpTransport = new HttpTransportSE(Data.URL);
+        try {
+            HttpTransport.call(SOAP_ACTION, envelopeEnterCharge);
+
+            responseEnterCharge = (SoapObject) envelopeEnterCharge.getResponse();
+
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return responseEnterCharge;
+    }
+
+    public static Boolean EnterChargeFromSoap(SoapObject soap) {
+
+        Boolean success = Boolean.parseBoolean(soap.toString());
+
+        return success;
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
      */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
-    }
+
 
 }
