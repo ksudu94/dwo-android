@@ -168,7 +168,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                     newFragment = new PaymentFragment();
                     break;
                 case 4:
-                    newFragment = new ChargeCodeFragment();
+                    newFragment = new EnterChargeFragment();
                     break;
                 default:
                     newFragment = new AccountInformationFragment();

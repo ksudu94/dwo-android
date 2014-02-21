@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.akadasoftware.danceworksonline.ChargeCodeFragment">
+    tools:context="com.akadasoftware.danceworksonline.EnterChargeFragment">
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -18,8 +18,8 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Enter New Charges"
-                android:textSize="30dp"
+                android:text="Enter Charge"
+                android:textSize="25dp"
                 android:textStyle="bold" />
 
             <DatePicker

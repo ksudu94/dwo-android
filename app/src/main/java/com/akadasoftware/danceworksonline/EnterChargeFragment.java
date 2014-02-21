@@ -26,6 +26,7 @@ import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.MarshalFloat;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
@@ -45,7 +46,7 @@ import java.util.ArrayList;
  */
 
 
-public class ChargeCodeFragment extends Fragment {
+public class EnterChargeFragment extends Fragment {
     private static String ARG_SECTION_NUMBER = "section_number";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -92,15 +93,15 @@ public class ChargeCodeFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static ChargeCodeFragment newInstance(int sectionNumber) {
-        ChargeCodeFragment fragment = new ChargeCodeFragment();
+    public static EnterChargeFragment newInstance(int sectionNumber) {
+        EnterChargeFragment fragment = new EnterChargeFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public ChargeCodeFragment() {
+    public EnterChargeFragment() {
         // Required empty public constructor
     }
 
@@ -118,7 +119,7 @@ public class ChargeCodeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_charge_code, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_entercharge, container, false);
 
         //use inflated view to find elements on page
         tvDescription = (TextView) rootView.findViewById(R.id.tvDescription);
@@ -286,7 +287,7 @@ public class ChargeCodeFragment extends Fragment {
     public void addItemsOnSpinner(ArrayList<ChargeCodes> codes) {
 
         adapterChargeCodes = new ChargeCodeAdapter(activity,
-                R.layout.fragment_charge_code, codes);
+                R.layout.fragment_entercharge, codes);
 
         chargecodespinner.setAdapter(adapterChargeCodes);
 
@@ -506,7 +507,7 @@ public class ChargeCodeFragment extends Fragment {
 
         @Override
         protected Boolean doInBackground(Data... data) {
-            SoapObject enterCharge = null;
+            SoapPrimitive enterCharge = null;
             float totalAmount = 0;
             float DiscAmount = 0;
             User user = _appPrefs.getUser();
@@ -556,14 +557,14 @@ public class ChargeCodeFragment extends Fragment {
         }
     }
 
-    public SoapObject EnterCharge(int UserID, String UserGUID, int SchID, int AcctID, String ChgDate,
+    public SoapPrimitive EnterCharge(int UserID, String UserGUID, int SchID, int AcctID, String ChgDate,
                                   String ChgDesc, String GLNo, float Amount, float totalAmount,
                                   String Kind, int STax, Boolean POSTrans, int POSInv, Boolean PayOnline,
                                   int TransPostHistID, int SessionID, float DiscAmt, float STax1,
                                   float STax2, String DisplayName) {
 
-        SOAP_ACTION = "EnterCharge";
-        METHOD_NAME = "EnterCharge";
+        SOAP_ACTION = "enterCharge";
+        METHOD_NAME = "enterCharge";
 
         SoapObject requestEnterCharge = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
@@ -590,12 +591,6 @@ public class ChargeCodeFragment extends Fragment {
 
         PropertyInfo chgdate = new PropertyInfo();
         chgdate.setName("strChgDate");
-        //chgdate.setType(Date.class);
-        //Calendar cal = Calendar.getInstance();
-        //cal.set(Calendar.YEAR, datePicker.getYear());
-        //cal.set(Calendar.MONTH, datePicker.getMonth());
-        //cal.set(Calendar.DATE, datePicker.getDayOfMonth());
-        //Date date = cal.getTime();
         chgdate.setValue(ChgDate);
         requestEnterCharge.addProperty(chgdate);
 
@@ -694,12 +689,12 @@ public class ChargeCodeFragment extends Fragment {
         envelopeEnterCharge.dotNet = true;
         envelopeEnterCharge.setOutputSoapObject(requestEnterCharge);
 
-        SoapObject responseEnterCharge = null;
+        SoapPrimitive responseEnterCharge = null;
         HttpTransportSE HttpTransport = new HttpTransportSE(Data.URL);
         try {
             HttpTransport.call(SOAP_ACTION, envelopeEnterCharge);
 
-            responseEnterCharge = (SoapObject) envelopeEnterCharge.getResponse();
+            responseEnterCharge = (SoapPrimitive) envelopeEnterCharge.getResponse();
 
 
         } catch (Exception e) {
@@ -710,7 +705,7 @@ public class ChargeCodeFragment extends Fragment {
         return responseEnterCharge;
     }
 
-    public static Boolean EnterChargeFromSoap(SoapObject soap) {
+    public static Boolean EnterChargeFromSoap(SoapPrimitive soap) {
 
         Boolean success = Boolean.parseBoolean(soap.toString());
 

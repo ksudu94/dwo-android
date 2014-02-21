@@ -84,7 +84,7 @@ public class PaymentFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_payment, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_enterpayment, container, false);
 
         tvTitle = (TextView) rootView.findViewById(R.id.tvTitle);
         tvType = (TextView) rootView.findViewById(R.id.tvType);

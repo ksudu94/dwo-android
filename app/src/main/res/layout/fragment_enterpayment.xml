@@ -18,8 +18,8 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Enter New Payment"
-                android:textSize="30dp"
+                android:text="Enter Payment"
+                android:textSize="25dp"
                 android:textStyle="bold" />
 
             <DatePicker
