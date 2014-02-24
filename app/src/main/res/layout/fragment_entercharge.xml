@@ -29,6 +29,13 @@
                 android:calendarViewShown="false"
                 android:layout_gravity="center" />
 
+            <TextView
+                android:id="@+id/tvChargeType"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="Charge Type"
+                android:textStyle="bold" />
+
             <Spinner
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -42,7 +49,8 @@
                 android:id="@+id/tvDescription"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Description" />
+                android:text="Description"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/etDescription"
@@ -54,7 +62,8 @@
                 android:id="@+id/tvAmount"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Amount" />
+                android:text="Amount"
+                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/etAmount"
@@ -68,24 +77,28 @@
                 android:id="@+id/tvDiscAmount"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Discounted Amount" />
+                android:text="Discounted Amount"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvDiscAmountDisplayed"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
+                android:textSize="20dp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvTotal"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="Total" />
+                android:text="Total"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tvTotalDisplayed"
                 android:layout_width="fill_parent"
                 android:textStyle="bold"
+                android:textSize="20dp"
                 android:layout_height="wrap_content" />
 
 

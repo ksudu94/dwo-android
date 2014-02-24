@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.AccountTransactions;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
  * Large screen devices (such as tablets) are supported by replacing the ListView
  * with a GridView.
  * <p/>
- * Activities containing this fragment MUST implement the {@link Callbacks}
+ * Activities containing this fragment MUST implement the CallBacks
  * interface.
  */
 public class AccountTransactionsFragment extends ListFragment {
@@ -56,10 +57,13 @@ public class AccountTransactionsFragment extends ListFragment {
      */
     private AccountTransactionAdapter transAdapter;
 
-    //Method defined in AccountInformation
+    //Interace used to communicate between two fragments. The method OnTrasnactionSelected is
+    //defined in the AccountInformatoin page and the two items are found in the list item click
+    // by getting the position of the Transaction array because it corresponds to the position
+    // in the list.
     public interface OnTransactionSelected {
         // TODO: Update argument type and name
-        public void OnTransactionSelected(int id);
+        public void OnTransactionSelected(float amount, int TID);
     }
 
     @Override
@@ -68,6 +72,7 @@ public class AccountTransactionsFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         activity = getActivity();
         _appPrefs = new AppPreferences(activity);
+        _appPrefs.saveChgID(0);
         getAccountTransactions trans = new getAccountTransactions();
         trans.execute();
 
@@ -105,10 +110,27 @@ public class AccountTransactionsFragment extends ListFragment {
         setListAdapter(null);
     }
 
-    @Override
+    /* Creates a new instance of the AccountTransaction = to the position of the listview
+     */
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Notify the parent activity of selected item
-        mListener.OnTransactionSelected(position);
+
+        AccountTransactions trans = TransactionArray.get(position);
+
+        if (trans.Type.equals("C")) {
+            if (trans.Status.equals("V")) {
+                Toast toast = Toast.makeText(activity, "This is a voided charge and cannot be paid."
+                        , Toast.LENGTH_LONG);
+                toast.show();
+            } else if (trans.Balance == 0) {
+                Toast toast = Toast.makeText(activity, "Balance is $0 and cannot be paid.",
+                        Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                mListener.OnTransactionSelected(trans.Balance, trans.TID);
+            }
+        }
+
     }
 
     class Data {
@@ -152,7 +174,7 @@ public class AccountTransactionsFragment extends ListFragment {
         PropertyInfo Order = new PropertyInfo();
         Order.setType("STRING_CLASS");
         Order.setName("Order");
-        Order.setValue(" ORDER BY TDate");
+        Order.setValue(" ORDER BY TDate DESC");
         request.addProperty(Order);
 
         PropertyInfo AcctID = new PropertyInfo();

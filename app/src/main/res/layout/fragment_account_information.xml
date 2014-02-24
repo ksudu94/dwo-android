@@ -160,7 +160,7 @@
 
                 <TextView
                     android:id="@+id/tvCreditCard"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/information_label"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:textSize="20dp"

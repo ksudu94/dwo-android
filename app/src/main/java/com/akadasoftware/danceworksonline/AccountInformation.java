@@ -10,14 +10,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.ViewSwitcher;
+import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -40,14 +38,6 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     private AppPreferences _appPrefs;
     Account account;
     ArrayList<Account> accounts;
-    String status, expdate, cctype, SOAP_ACTION, METHOD_NAME;
-    int acctid;
-
-    Button btnEdit, btnSave, btnSaveCard;
-    EditText etFirst, etLast, etAddress, etCity, etState, etZip, etPhone, etEmail, etCC, etcard;
-    ViewSwitcher accountSwitcher;
-    Spinner AccountStatusSpinner;
-
 
     /*Uses the saved position from the onAccountSelected method in Home.java to fill an empty
      account with the matching position in the accountlist array.
@@ -125,6 +115,20 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
         mViewPager.setCurrentItem(tab.getPosition());
+        Toast toast = Toast.makeText(getApplicationContext(), String.valueOf(tab.getPosition()), Toast.LENGTH_LONG);
+        toast.show();
+        if (tab.getPosition() == 3) {
+            //PaymentFragment newFragment = new PaymentFragment();
+            //fragmentTransaction.replace(R.id.container, newFragment);
+            //fragmentTransaction.commit();
+            //SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager());
+            //adapter.getItem(3);
+            //PaymentFragment pf = (PaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
+            PaymentFragment pf = new PaymentFragment();
+            pf.newInstance("", Float.parseFloat("0.00"));
+        }
+
+
     }
 
     @Override
@@ -144,7 +148,6 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
-
         //Handles the tabs and which fragments fill them
         @Override
         public Fragment getItem(int position) {
@@ -202,14 +205,22 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
             }
             return null;
         }
+
     }
 
-    public void OnTransactionSelected(int id) {
+    //Interface created on the Transaction page.. Is handled in the on click of a list item
+    // passes in balance and TID from the listview and then does appropriate actions with them
+    public void OnTransactionSelected(float balance, int TID) {
 
         //Change to whatever activity I want to start.
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setSelectedNavigationItem(3);
 
-        //Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.AccountInformation");
-        //startActivity(openMainPage);
+        NumberFormat format = NumberFormat.getCurrencyInstance();
+        PaymentFragment pf = (PaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
+        pf.etAmount.setText(String.valueOf(format.format(balance)));
+        _appPrefs.saveChgID(TID);
+        pf.etDescription.setText(String.valueOf(_appPrefs.getChgID()));
 
 
     }
