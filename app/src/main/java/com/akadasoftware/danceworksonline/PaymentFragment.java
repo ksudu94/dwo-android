@@ -26,7 +26,7 @@ import java.util.ArrayList;
  * Use the {@link PaymentFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PaymentFragment extends Fragment {
+public class PaymentFragment extends Fragment implements AccountTransactionsFragment.OnTransactionSelected {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -55,14 +55,6 @@ public class PaymentFragment extends Fragment {
      * @return A new instance of fragment PaymentFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static PaymentFragment newInstance(int sectionNumber) {
-        PaymentFragment fragment = new PaymentFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     public PaymentFragment() {
         // Required empty public constructor
     }
@@ -99,11 +91,34 @@ public class PaymentFragment extends Fragment {
         btnUseDifferentCard = (Button) rootView.findViewById(R.id.btnUseDifferentCard);
         btnPayment = (Button) rootView.findViewById(R.id.btnPayment);
 
-
+        etDescription.setText(String.valueOf(_appPrefs.getChgID()));
         // Returning the populated layout for this fragment
         return rootView;
     }
 
+    @Override
+    public void OnTransactionSelected(float amount, int TID) {
+
+
+    }
+
+    public static PaymentFragment newInstance(String description, Float amount) {
+        PaymentFragment fragment = new PaymentFragment();
+        Bundle args = new Bundle();
+        args.putFloat("Amount", amount);
+        args.putString("Descrption", description);
+        fragment.setArguments(args);
+        return fragment;
+
+
+    }
+
+
+    class Data {
+
+        static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
+        private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
+    }
 
     /**
      * This interface must be implemented by activities that contain this
