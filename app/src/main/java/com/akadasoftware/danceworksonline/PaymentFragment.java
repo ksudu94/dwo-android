@@ -21,7 +21,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link PaymentFragment.OnFragmentInteractionListener} interface
+ * {@link PaymentFragment} interface
  * to handle interaction events.
  * Use the {@link PaymentFragment#newInstance} factory method to
  * create an instance of this fragment.
