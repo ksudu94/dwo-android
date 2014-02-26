@@ -47,8 +47,6 @@ public class AccountInformationFragment extends Fragment {
      * fragment.
      */
 
-    private final String ARG_SECTION_NUMBER = "section_number";
-    ViewPager mViewPager;
     private AppPreferences _appPrefs;
     Account account;
     Activity activity;
@@ -60,6 +58,19 @@ public class AccountInformationFragment extends Fragment {
     EditText etFirst, etLast, etAddress, etCity, etState, etZip, etPhone, etEmail, etCC, etcard;
     ViewSwitcher accountSwitcher;
     Spinner AccountStatusSpinner;
+
+    /**
+     * Returns a new instance of this fragment for the given section
+     * number.
+     */
+    public static AccountInformationFragment newInstance(int position) {
+        AccountInformationFragment fragment = new AccountInformationFragment();
+        Bundle args = new Bundle();
+        args.putInt("Position", position);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,18 +86,6 @@ public class AccountInformationFragment extends Fragment {
         _appPrefs.saveAcctID(account.AcctID);
     }
 
-    /**
-     * Returns a new instance of this fragment for the given section
-     * number.
-     */
-    public static AccountInformationFragment newInstance(int position) {
-        AccountInformationFragment fragment = new AccountInformationFragment();
-        Bundle args = new Bundle();
-        args.putInt("Position", position);
-        fragment.setArguments(args);
-
-        return fragment;
-    }
 
     // Used to create an instance of this fragment
     public AccountInformationFragment() {

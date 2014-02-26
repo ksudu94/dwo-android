@@ -87,9 +87,14 @@ public class EnterChargeFragment extends Fragment {
 
         account = arrayAccounts.get(position);
 
-        getChargeCodesAsync chargeCodes = new getChargeCodesAsync();
-        chargeCodes.execute();
     }
+
+        @Override
+        public void onResume(){
+            super.onResume();
+            getChargeCodesAsync chargeCodes = new getChargeCodesAsync();
+            chargeCodes.execute();
+        }
 
     /**
      * Use this factory method to create a new instance of

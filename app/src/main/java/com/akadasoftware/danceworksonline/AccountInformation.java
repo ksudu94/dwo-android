@@ -54,7 +54,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
-        //mViewPager.setOffscreenPageLimit(5);
+        mViewPager.setOffscreenPageLimit(0);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         // When swiping between different sections, select the corresponding
@@ -118,7 +118,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
         int position = tab.getPosition();
-        mViewPager.setCurrentItem(position);
+        mViewPager.setCurrentItem(position, true);
 
     }
 
@@ -212,11 +212,11 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setSelectedNavigationItem(3);
 
-        NumberFormat format = NumberFormat.getCurrencyInstance();
-        EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
-        pf.etAmount.setText(String.valueOf(format.format(balance)));
-        _appPrefs.saveChgID(TID);
-        pf.etDescription.setText(String.valueOf(_appPrefs.getChgID()));
+        //NumberFormat format = NumberFormat.getCurrencyInstance();
+        //EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
+        //pf.etAmount.setText(String.valueOf(format.format(balance)));
+        //_appPrefs.saveChgID(TID);
+        //pf.etDescription.setText(String.valueOf(_appPrefs.getChgID()));
 
 
     }
