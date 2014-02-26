@@ -71,15 +71,6 @@ public class EnterPaymentFragment extends Fragment {
         return fragment;
     }
 
-    public static EnterPaymentFragment newInstance(int position, float balance, int TID) {
-        EnterPaymentFragment fragment = new EnterPaymentFragment();
-        Bundle args = new Bundle();
-        args.putFloat("Balance", balance);
-        args.putInt("TID", TID);
-        args.putInt("Position", position);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

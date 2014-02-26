@@ -70,7 +70,6 @@
                 android:id="@+id/etDescription"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textStyle="bold"
                 android:hint="Description of Payment" />
 
             <TextView
@@ -83,7 +82,6 @@
             <EditText
                 android:id="@+id/etAmount"
                 android:layout_width="fill_parent"
-                android:textStyle="bold"
                 android:layout_height="wrap_content"
                 android:hint="$0.00 " />
 
@@ -92,6 +90,7 @@
                 android:layout_height="wrap_content"
                 android:text="User Different Card"
                 android:id="@+id/btnUseDifferentCard" />
+
 
             <Button
                 android:layout_width="wrap_content"
