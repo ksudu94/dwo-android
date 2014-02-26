@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.akadasoftware.danceworksonline.PaymentFragment"
+    tools:context="com.akadasoftware.danceworksonline.EnterPaymentFragment"
     android:id="@+id/enterPayment">
 
     <ScrollView

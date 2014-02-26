@@ -11,6 +11,7 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AccountTransactions;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.User;
@@ -36,12 +37,14 @@ public class AccountTransactionsFragment extends ListFragment {
 
 
     ArrayList<AccountTransactions> TransactionArray = new ArrayList<AccountTransactions>();
-    private static AppPreferences _appPrefs;
     String METHOD_NAME = "";
     static String SOAP_ACTION = "getAccountTransactions";
     static SoapSerializationEnvelope envelopeOutput;
-    Activity activity;
     static User user;
+    private AppPreferences _appPrefs;
+    Account account;
+    Activity activity;
+    ArrayList<Account> arrayAccounts;
 
 
     private OnTransactionSelected mListener;
@@ -66,15 +69,25 @@ public class AccountTransactionsFragment extends ListFragment {
         public void OnTransactionSelected(float amount, int TID);
     }
 
+    public static AccountTransactionsFragment newInstance(int position) {
+        AccountTransactionsFragment fragment = new AccountTransactionsFragment();
+        Bundle args = new Bundle();
+        args.putInt("Position", position);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         activity = getActivity();
         _appPrefs = new AppPreferences(activity);
-        _appPrefs.saveChgID(0);
-        getAccountTransactions trans = new getAccountTransactions();
-        trans.execute();
+
+        arrayAccounts = _appPrefs.getAccounts();
+        int position = getArguments().getInt("Position");
+
+        account = arrayAccounts.get(position);
 
     }
 
@@ -87,6 +100,13 @@ public class AccountTransactionsFragment extends ListFragment {
             throw new ClassCastException(activity.toString()
                     + " must implement OnTransactionSelected");
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getAccountTransactions trans = new getAccountTransactions();
+        trans.execute();
     }
 
     @Override
@@ -159,14 +179,14 @@ public class AccountTransactionsFragment extends ListFragment {
         }
     }
 
-    public static ArrayList<AccountTransactions> getTransactions() {
+    public ArrayList<AccountTransactions> getTransactions() {
         String MethodName = "getAccountTransactions";
         SoapObject response = InvokeMethod(Data.URL, MethodName);
         return RetrieveFromSoap(response);
 
     }
 
-    public static SoapObject InvokeMethod(String URL, String MethodName) {
+    public SoapObject InvokeMethod(String URL, String MethodName) {
 
         SoapObject request = GetSoapObject(MethodName);
         user = _appPrefs.getUser();
@@ -179,12 +199,12 @@ public class AccountTransactionsFragment extends ListFragment {
 
         PropertyInfo AcctID = new PropertyInfo();
         AcctID.setName("AcctID");
-        AcctID.setValue(_appPrefs.getAcctID());
+        AcctID.setValue(account.AcctID);
         request.addProperty(AcctID);
 
         PropertyInfo UserID = new PropertyInfo();
         UserID.setName("UserID");
-        UserID.setValue(_appPrefs.getUserID());
+        UserID.setValue(user.UserID);
         request.addProperty(UserID);
 
         PropertyInfo UserGUID = new PropertyInfo();

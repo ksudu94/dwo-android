@@ -10,16 +10,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Locale;
 
-public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener, AccountTransactionsFragment.OnTransactionSelected {
+public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener, AccountTransactionsFragment.OnTransactionSelected, AccountStudentsFragment.OnFragmentInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -29,15 +26,13 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    SectionsPagerAdapter mSectionsPagerAdapter;
+    AccountPagerAdapter mSectionsPagerAdapter;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
     private AppPreferences _appPrefs;
-    Account account;
-    ArrayList<Account> accounts;
 
     /*Uses the saved position from the onAccountSelected method in Home.java to fill an empty
      account with the matching position in the accountlist array.
@@ -48,10 +43,6 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         setContentView(R.layout.activity_account_information);
 
         _appPrefs = new AppPreferences(getApplicationContext());
-        accounts = _appPrefs.getAccounts();
-
-        account = accounts.get(_appPrefs.getAccountListPosition());
-        _appPrefs.saveAcctID(account.AcctID);
 
         // Set up the action bar.
         final ActionBar actionBar = getSupportActionBar();
@@ -59,25 +50,37 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mSectionsPagerAdapter = new AccountPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.pager);
+        //mViewPager.setOffscreenPageLimit(5);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         // When swiping between different sections, select the corresponding
         // tab. We can also use ActionBar.Tab#select() to do this if we have
         // a reference to the Tab.
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i2) {
+
+            }
+
             @Override
             public void onPageSelected(int position) {
                 actionBar.setSelectedNavigationItem(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
             }
         });
 
 
         // For each of the sections in the app, add a tab to the action bar.
-        for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
+        int pageCount = mSectionsPagerAdapter.getCount();
+        for (int i = 0; i < pageCount; i++) {
             // Create a tab with text corresponding to the page title defined by
             // the adapter. Also specify this Activity object, which implements
             // the TabListener interface, as the callback (listener) for when
@@ -114,20 +117,8 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
-        mViewPager.setCurrentItem(tab.getPosition());
-        Toast toast = Toast.makeText(getApplicationContext(), String.valueOf(tab.getPosition()), Toast.LENGTH_LONG);
-        toast.show();
-        if (tab.getPosition() == 3) {
-            //PaymentFragment newFragment = new PaymentFragment();
-            //fragmentTransaction.replace(R.id.container, newFragment);
-            //fragmentTransaction.commit();
-            //SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager());
-            //adapter.getItem(3);
-            //PaymentFragment pf = (PaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
-            PaymentFragment pf = new PaymentFragment();
-            pf.newInstance("", Float.parseFloat("0.00"));
-        }
-
+        int position = tab.getPosition();
+        mViewPager.setCurrentItem(position);
 
     }
 
@@ -139,13 +130,17 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    @Override
+    public void onFragmentInteraction(String id) {
+    }
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class AccountPagerAdapter extends FragmentPagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        public AccountPagerAdapter(FragmentManager fm) {
             super(fm);
         }
         //Handles the tabs and which fragments fill them
@@ -159,22 +154,22 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
             switch (position) {
                 case 0:
-                    newFragment = new AccountInformationFragment();
+                    newFragment = AccountInformationFragment.newInstance(_appPrefs.getAccountListPosition());
                     break;
                 case 1:
-                    newFragment = new AccountTransactionsFragment();
+                    newFragment = AccountStudentsFragment.newInstance(_appPrefs.getAccountListPosition());
                     break;
                 case 2:
-                    newFragment = new AccountTransactionsFragment();
+                    newFragment = AccountTransactionsFragment.newInstance(_appPrefs.getAccountListPosition());
                     break;
                 case 3:
-                    newFragment = new PaymentFragment();
+                    newFragment = EnterPaymentFragment.newInstance(_appPrefs.getAccountListPosition(), "", Float.parseFloat("0.00"));
                     break;
                 case 4:
-                    newFragment = new EnterChargeFragment();
+                    newFragment = EnterChargeFragment.newInstance(_appPrefs.getAccountListPosition());
                     break;
                 default:
-                    newFragment = new AccountInformationFragment();
+                    newFragment = AccountInformationFragment.newInstance(_appPrefs.getAccountListPosition());
                     break;
             }
 
@@ -202,8 +197,9 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                     return getString(R.string.title_account_payment).toUpperCase(l);
                 case 4:
                     return getString(R.string.title_account_charge).toUpperCase(l);
+                default:
+                    return "";
             }
-            return null;
         }
 
     }
@@ -217,7 +213,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         actionBar.setSelectedNavigationItem(3);
 
         NumberFormat format = NumberFormat.getCurrencyInstance();
-        PaymentFragment pf = (PaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
+        EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
         pf.etAmount.setText(String.valueOf(format.format(balance)));
         _appPrefs.saveChgID(TID);
         pf.etDescription.setText(String.valueOf(_appPrefs.getChgID()));

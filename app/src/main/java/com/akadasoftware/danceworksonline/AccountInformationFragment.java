@@ -68,8 +68,9 @@ public class AccountInformationFragment extends Fragment {
 
         _appPrefs = new AppPreferences(activity);
         accounts = _appPrefs.getAccounts();
+        int position = getArguments().getInt("Position");
 
-        account = accounts.get(_appPrefs.getAccountListPosition());
+        account = accounts.get(position);
         acctid = account.AcctID;
         _appPrefs.saveAcctID(account.AcctID);
     }
@@ -78,12 +79,11 @@ public class AccountInformationFragment extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public AccountInformationFragment newInstance(int sectionNumber) {
+    public static AccountInformationFragment newInstance(int position) {
         AccountInformationFragment fragment = new AccountInformationFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        args.putInt("Position", position);
         fragment.setArguments(args);
-
 
         return fragment;
     }

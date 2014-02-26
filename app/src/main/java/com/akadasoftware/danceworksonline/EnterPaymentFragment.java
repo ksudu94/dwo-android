@@ -21,12 +21,12 @@ import java.util.ArrayList;
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link PaymentFragment} interface
+ * {@link EnterPaymentFragment} interface
  * to handle interaction events.
- * Use the {@link PaymentFragment#newInstance} factory method to
+ * Use the {@link EnterPaymentFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PaymentFragment extends Fragment implements AccountTransactionsFragment.OnTransactionSelected {
+public class EnterPaymentFragment extends Fragment implements AccountTransactionsFragment.OnTransactionSelected {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -52,11 +52,21 @@ public class PaymentFragment extends Fragment implements AccountTransactionsFrag
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment PaymentFragment.
+     * @return A new instance of fragment EnterPaymentFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public PaymentFragment() {
+    public EnterPaymentFragment() {
         // Required empty public constructor
+    }
+
+    public static EnterPaymentFragment newInstance(int position, String description, Float amount) {
+        EnterPaymentFragment fragment = new EnterPaymentFragment();
+        Bundle args = new Bundle();
+        args.putFloat("Amount", amount);
+        args.putString("Description", description);
+        args.putInt("Position", position);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -67,8 +77,9 @@ public class PaymentFragment extends Fragment implements AccountTransactionsFrag
         _appPrefs = new AppPreferences(activity);
 
         arrayAccounts = _appPrefs.getAccounts();
+        int position = getArguments().getInt("Position");
 
-        account = arrayAccounts.get(_appPrefs.getAccountListPosition());
+        account = arrayAccounts.get(position);
     }
 
     @Override
@@ -98,17 +109,6 @@ public class PaymentFragment extends Fragment implements AccountTransactionsFrag
 
     @Override
     public void OnTransactionSelected(float amount, int TID) {
-
-
-    }
-
-    public static PaymentFragment newInstance(String description, Float amount) {
-        PaymentFragment fragment = new PaymentFragment();
-        Bundle args = new Bundle();
-        args.putFloat("Amount", amount);
-        args.putString("Descrption", description);
-        fragment.setArguments(args);
-        return fragment;
 
 
     }

@@ -83,7 +83,9 @@ public class EnterChargeFragment extends Fragment {
 
         arrayAccounts = _appPrefs.getAccounts();
 
-        account = arrayAccounts.get(_appPrefs.getAccountListPosition());
+        int position = getArguments().getInt("Position");
+
+        account = arrayAccounts.get(position);
 
         getChargeCodesAsync chargeCodes = new getChargeCodesAsync();
         chargeCodes.execute();
@@ -93,10 +95,10 @@ public class EnterChargeFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static EnterChargeFragment newInstance(int sectionNumber) {
+    public static EnterChargeFragment newInstance(int position) {
         EnterChargeFragment fragment = new EnterChargeFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        args.putInt("Position", position);
         fragment.setArguments(args);
         return fragment;
     }
