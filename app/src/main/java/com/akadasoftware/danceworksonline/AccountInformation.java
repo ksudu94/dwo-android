@@ -108,10 +108,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return id == R.id.action_settings || super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -119,6 +116,13 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         // When the given tab is selected, switch to the corresponding page in
         // the ViewPager.
         int position = tab.getPosition();
+        /*if (position==3){
+            Fragment f = this.getSupportFragmentManager().findFragmentByTag("android:switcher:"+R.id.pager+":"+position);
+            if (f!=null){
+                ((EnterPaymentFragment) f).onPause();
+                ((EnterPaymentFragment) f).refreshEnterPayment();
+            }
+        }*/
         mViewPager.setCurrentItem(position, true);
 
     }
