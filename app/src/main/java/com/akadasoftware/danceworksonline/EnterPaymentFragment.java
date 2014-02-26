@@ -3,6 +3,7 @@ package com.akadasoftware.danceworksonline;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
@@ -26,7 +28,7 @@ import java.util.ArrayList;
  * Use the {@link EnterPaymentFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class EnterPaymentFragment extends Fragment implements AccountTransactionsFragment.OnTransactionSelected {
+public class EnterPaymentFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -34,7 +36,7 @@ public class EnterPaymentFragment extends Fragment implements AccountTransaction
 
 
     String SOAP_ACTION, METHOD_NAME, userguid;
-    int schid, userid;
+    int schid, userid, chgid;
 
     private AppPreferences _appPrefs;
     Account account;
@@ -69,6 +71,16 @@ public class EnterPaymentFragment extends Fragment implements AccountTransaction
         return fragment;
     }
 
+    public static EnterPaymentFragment newInstance(int position, float balance, int TID) {
+        EnterPaymentFragment fragment = new EnterPaymentFragment();
+        Bundle args = new Bundle();
+        args.putFloat("Balance", balance);
+        args.putInt("TID", TID);
+        args.putInt("Position", position);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +92,33 @@ public class EnterPaymentFragment extends Fragment implements AccountTransaction
         int position = getArguments().getInt("Position");
 
         account = arrayAccounts.get(position);
+
+        ViewPager mViewPager = (ViewPager) activity.findViewById(R.id.pager);
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i2) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Toast toast = Toast.makeText(getActivity(), "This works", Toast.LENGTH_LONG);
+                toast.show();
+                refreshEnterPayment();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
+    }
+
+    public void refreshEnterPayment() {
+        chgid = 0;
+        etDescription.getText().clear();
+        etAmount.getText().clear();
     }
 
     @Override
@@ -102,15 +141,8 @@ public class EnterPaymentFragment extends Fragment implements AccountTransaction
         btnUseDifferentCard = (Button) rootView.findViewById(R.id.btnUseDifferentCard);
         btnPayment = (Button) rootView.findViewById(R.id.btnPayment);
 
-        etDescription.setText(String.valueOf(_appPrefs.getChgID()));
         // Returning the populated layout for this fragment
         return rootView;
-    }
-
-    @Override
-    public void OnTransactionSelected(float amount, int TID) {
-
-
     }
 
 

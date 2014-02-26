@@ -66,7 +66,7 @@ public class AccountTransactionsFragment extends ListFragment {
     // in the list.
     public interface OnTransactionSelected {
         // TODO: Update argument type and name
-        public void OnTransactionSelected(float amount, int TID);
+        public void OnTransactionSelected(float amount, int TID, String description);
     }
 
     public static AccountTransactionsFragment newInstance(int position) {
@@ -147,7 +147,7 @@ public class AccountTransactionsFragment extends ListFragment {
                         Toast.LENGTH_LONG);
                 toast.show();
             } else {
-                mListener.OnTransactionSelected(trans.Balance, trans.TID);
+                mListener.OnTransactionSelected(trans.Balance, trans.TID, trans.TDesc);
             }
         }
 

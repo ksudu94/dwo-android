@@ -70,7 +70,8 @@
                 android:id="@+id/etDescription"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:hint="Description of Payment" />
 
             <TextView
                 android:id="@+id/tvAmount"
@@ -83,7 +84,8 @@
                 android:id="@+id/etAmount"
                 android:layout_width="fill_parent"
                 android:textStyle="bold"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:hint="$0.00 " />
 
             <Button
                 android:layout_width="wrap_content"

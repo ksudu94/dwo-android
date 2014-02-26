@@ -52,9 +52,10 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         // primary sections of the activity.
         mSectionsPagerAdapter = new AccountPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
+        // Set up the ViewPager with the sections adapter. setOFfScreenPageLimit handles the number
+        // of tabs that are preloaded
         mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setOffscreenPageLimit(0);
+        mViewPager.setOffscreenPageLimit(1);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         // When swiping between different sections, select the corresponding
@@ -143,6 +144,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         public AccountPagerAdapter(FragmentManager fm) {
             super(fm);
         }
+
         //Handles the tabs and which fragments fill them
         @Override
         public Fragment getItem(int position) {
@@ -151,25 +153,27 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
             Fragment newFragment;
 
+            int listPosition = _appPrefs.getAccountListPosition();
+
 
             switch (position) {
                 case 0:
-                    newFragment = AccountInformationFragment.newInstance(_appPrefs.getAccountListPosition());
+                    newFragment = AccountInformationFragment.newInstance(listPosition);
                     break;
                 case 1:
-                    newFragment = AccountStudentsFragment.newInstance(_appPrefs.getAccountListPosition());
+                    newFragment = AccountStudentsFragment.newInstance(listPosition);
                     break;
                 case 2:
-                    newFragment = AccountTransactionsFragment.newInstance(_appPrefs.getAccountListPosition());
+                    newFragment = AccountTransactionsFragment.newInstance(listPosition);
                     break;
                 case 3:
-                    newFragment = EnterPaymentFragment.newInstance(_appPrefs.getAccountListPosition(), "", Float.parseFloat("0.00"));
+                    newFragment = EnterPaymentFragment.newInstance(listPosition, "", Float.parseFloat("0.00"));
                     break;
                 case 4:
-                    newFragment = EnterChargeFragment.newInstance(_appPrefs.getAccountListPosition());
+                    newFragment = EnterChargeFragment.newInstance(listPosition);
                     break;
                 default:
-                    newFragment = AccountInformationFragment.newInstance(_appPrefs.getAccountListPosition());
+                    newFragment = AccountInformationFragment.newInstance(listPosition);
                     break;
             }
 
@@ -204,19 +208,20 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
     }
 
-    //Interface created on the Transaction page.. Is handled in the on click of a list item
+    // Interface created on the Transaction page.. Is handled in the on click of a list item
     // passes in balance and TID from the listview and then does appropriate actions with them
-    public void OnTransactionSelected(float balance, int TID) {
+    public void OnTransactionSelected(float balance, int TID, String description) {
 
         //Change to whatever activity I want to start.
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setSelectedNavigationItem(3);
 
-        //NumberFormat format = NumberFormat.getCurrencyInstance();
-        //EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
-        //pf.etAmount.setText(String.valueOf(format.format(balance)));
-        //_appPrefs.saveChgID(TID);
-        //pf.etDescription.setText(String.valueOf(_appPrefs.getChgID()));
+        NumberFormat format = NumberFormat.getCurrencyInstance();
+        EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
+        pf.etAmount.setText(String.valueOf(format.format(balance)));
+        _appPrefs.saveChgID(TID);
+        pf.chgid = TID;
+        pf.etDescription.setText("Payment - " + description);
 
 
     }
