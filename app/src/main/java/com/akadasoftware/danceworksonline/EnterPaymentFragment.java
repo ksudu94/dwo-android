@@ -3,6 +3,7 @@ package com.akadasoftware.danceworksonline;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
@@ -21,12 +23,12 @@ import java.util.ArrayList;
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link PaymentFragment.OnFragmentInteractionListener} interface
+ * {@link EnterPaymentFragment} interface
  * to handle interaction events.
- * Use the {@link PaymentFragment#newInstance} factory method to
+ * Use the {@link EnterPaymentFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PaymentFragment extends Fragment {
+public class EnterPaymentFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -34,7 +36,7 @@ public class PaymentFragment extends Fragment {
 
 
     String SOAP_ACTION, METHOD_NAME, userguid;
-    int schid, userid;
+    int schid, userid, chgid;
 
     private AppPreferences _appPrefs;
     Account account;
@@ -52,20 +54,23 @@ public class PaymentFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @return A new instance of fragment PaymentFragment.
+     * @return A new instance of fragment EnterPaymentFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static PaymentFragment newInstance(int sectionNumber) {
-        PaymentFragment fragment = new PaymentFragment();
+    public EnterPaymentFragment() {
+        // Required empty public constructor
+    }
+
+    public static EnterPaymentFragment newInstance(int position, String description, Float amount) {
+        EnterPaymentFragment fragment = new EnterPaymentFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        args.putFloat("Amount", amount);
+        args.putString("Description", description);
+        args.putInt("Position", position);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public PaymentFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,8 +80,36 @@ public class PaymentFragment extends Fragment {
         _appPrefs = new AppPreferences(activity);
 
         arrayAccounts = _appPrefs.getAccounts();
+        int position = getArguments().getInt("Position");
 
-        account = arrayAccounts.get(_appPrefs.getAccountListPosition());
+        account = arrayAccounts.get(position);
+
+        ViewPager mViewPager = (ViewPager) activity.findViewById(R.id.pager);
+        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i2) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                Toast toast = Toast.makeText(getActivity(), "This works", Toast.LENGTH_LONG);
+                toast.show();
+                refreshEnterPayment();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
+    }
+
+    public void refreshEnterPayment() {
+        chgid = 0;
+        etDescription.getText().clear();
+        etAmount.getText().clear();
     }
 
     @Override
@@ -84,7 +117,7 @@ public class PaymentFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_payment, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_enterpayment, container, false);
 
         tvTitle = (TextView) rootView.findViewById(R.id.tvTitle);
         tvType = (TextView) rootView.findViewById(R.id.tvType);
@@ -99,11 +132,16 @@ public class PaymentFragment extends Fragment {
         btnUseDifferentCard = (Button) rootView.findViewById(R.id.btnUseDifferentCard);
         btnPayment = (Button) rootView.findViewById(R.id.btnPayment);
 
-
         // Returning the populated layout for this fragment
         return rootView;
     }
 
+
+    class Data {
+
+        static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
+        private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
+    }
 
     /**
      * This interface must be implemented by activities that contain this

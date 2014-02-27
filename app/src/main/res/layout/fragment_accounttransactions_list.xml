@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.akadasoftware.danceworksonline.AccountTransactionsFragment">
+    tools:context="com.akadasoftware.danceworksonline.AccountTransactionsFragment"
+    android:id="@+id/transactions">
 
     <LinearLayout
         android:layout_width="fill_parent"

@@ -47,8 +47,6 @@ public class AccountInformationFragment extends Fragment {
      * fragment.
      */
 
-    private final String ARG_SECTION_NUMBER = "section_number";
-    ViewPager mViewPager;
     private AppPreferences _appPrefs;
     Account account;
     Activity activity;
@@ -56,10 +54,23 @@ public class AccountInformationFragment extends Fragment {
     String status, expdate, cctype, SOAP_ACTION, METHOD_NAME;
     int acctid;
 
-    Button btnEdit, btnSave, btnSaveCard;
+    Button btnEdit, btnSave, btnSaveCard, btnEditCreditCard;
     EditText etFirst, etLast, etAddress, etCity, etState, etZip, etPhone, etEmail, etCC, etcard;
     ViewSwitcher accountSwitcher;
     Spinner AccountStatusSpinner;
+
+    /**
+     * Returns a new instance of this fragment for the given section
+     * number.
+     */
+    public static AccountInformationFragment newInstance(int position) {
+        AccountInformationFragment fragment = new AccountInformationFragment();
+        Bundle args = new Bundle();
+        args.putInt("Position", position);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,25 +79,13 @@ public class AccountInformationFragment extends Fragment {
 
         _appPrefs = new AppPreferences(activity);
         accounts = _appPrefs.getAccounts();
+        int position = getArguments().getInt("Position");
 
-        account = accounts.get(_appPrefs.getAccountListPosition());
+        account = accounts.get(position);
         acctid = account.AcctID;
         _appPrefs.saveAcctID(account.AcctID);
     }
 
-    /**
-     * Returns a new instance of this fragment for the given section
-     * number.
-     */
-    public AccountInformationFragment newInstance(int sectionNumber) {
-        AccountInformationFragment fragment = new AccountInformationFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-        fragment.setArguments(args);
-
-
-        return fragment;
-    }
 
     // Used to create an instance of this fragment
     public AccountInformationFragment() {
@@ -160,6 +159,7 @@ public class AccountInformationFragment extends Fragment {
         etEmail = (EditText) rootView.findViewById(R.id.etEmail);
         btnEdit = (Button) rootView.findViewById(R.id.btnEdit);
         btnSave = (Button) rootView.findViewById(R.id.btnSave);
+        btnEditCreditCard = (Button) rootView.findViewById(R.id.btnEditCreditCard);
         accountSwitcher = (ViewSwitcher) rootView.findViewById(R.id.accountSwitcher);
 
 
@@ -190,9 +190,10 @@ public class AccountInformationFragment extends Fragment {
         tvcc.setVisibility(View.VISIBLE);
         etcard.setVisibility(View.VISIBLE);
         btnSaveCard.setVisibility(View.VISIBLE);
+        btnEditCreditCard.setVisibility(View.VISIBLE);
         if (account.CCConsentID == 0) {
             tvcc.setVisibility(View.GONE);
-
+            btnEditCreditCard.setVisibility(View.GONE);
             btnSaveCard.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

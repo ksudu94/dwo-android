@@ -22,6 +22,7 @@ public class AppPreferences {
     public static final String putStuID = "StuID";
     public static final String putAcctID = "AcctID";
     public static final String putSessionID = "SessionID";
+    public static final String putChgID = "ChgID";
     public static final String putST1Rate = "ST1Rate";
     public static final String putST2Rate = "ST2Rate";
     public static final String putAccountListPosition = "AccountListPosition";
@@ -110,6 +111,15 @@ public class AppPreferences {
 
     public void saveSessionID(int SessionID) {
         prefsEditor.putInt(putSessionID, SessionID);
+        prefsEditor.commit();
+    }
+
+    public int getChgID() {
+        return sharedPrefs.getInt(putChgID, 0);
+    }
+
+    public void saveChgID(int ChgID) {
+        prefsEditor.putInt(putChgID, ChgID);
         prefsEditor.commit();
     }
 

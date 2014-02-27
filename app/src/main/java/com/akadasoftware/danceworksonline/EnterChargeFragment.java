@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,11 +25,13 @@ import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.MarshalFloat;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 
@@ -45,7 +46,7 @@ import java.util.ArrayList;
  */
 
 
-public class ChargeCodeFragment extends Fragment {
+public class EnterChargeFragment extends Fragment {
     private static String ARG_SECTION_NUMBER = "section_number";
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -82,25 +83,32 @@ public class ChargeCodeFragment extends Fragment {
 
         arrayAccounts = _appPrefs.getAccounts();
 
-        account = arrayAccounts.get(_appPrefs.getAccountListPosition());
+        int position = getArguments().getInt("Position");
 
-        getChargeCodesAsync chargeCodes = new getChargeCodesAsync();
-        chargeCodes.execute();
+        account = arrayAccounts.get(position);
+
     }
+
+        @Override
+        public void onResume(){
+            super.onResume();
+            getChargeCodesAsync chargeCodes = new getChargeCodesAsync();
+            chargeCodes.execute();
+        }
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      */
-    public static ChargeCodeFragment newInstance(int sectionNumber) {
-        ChargeCodeFragment fragment = new ChargeCodeFragment();
+    public static EnterChargeFragment newInstance(int position) {
+        EnterChargeFragment fragment = new EnterChargeFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        args.putInt("Position", position);
         fragment.setArguments(args);
         return fragment;
     }
 
-    public ChargeCodeFragment() {
+    public EnterChargeFragment() {
         // Required empty public constructor
     }
 
@@ -118,7 +126,7 @@ public class ChargeCodeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_charge_code, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_entercharge, container, false);
 
         //use inflated view to find elements on page
         tvDescription = (TextView) rootView.findViewById(R.id.tvDescription);
@@ -128,30 +136,39 @@ public class ChargeCodeFragment extends Fragment {
         chargecodespinner = (Spinner) rootView.findViewById(R.id.chargecodespinner);
         datePicker = (DatePicker) rootView.findViewById(R.id.datePicker);
         btnCharge = (Button) rootView.findViewById(R.id.btnCharge);
+        tvDiscAmount = (TextView) rootView.findViewById(R.id.tvDiscAmount);
+        tvDiscAmountDisplayed = (TextView) rootView.findViewById(R.id.tvDiscAmountDisplayed);
+        tvTotal = (TextView) rootView.findViewById(R.id.tvTotal);
+        tvTotalDisplayed = (TextView) rootView.findViewById(R.id.tvTotalDisplayed);
+
+        setTotalsDisplay(false, false);
 
 
-        //Handles when values in the Edit Text are changed. After the enter button is pressed
-        etAmount.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                Toast toast = Toast.makeText(getActivity(), "Amount changed, other values updated.",
-                        Toast.LENGTH_LONG);
-                toast.show();
-                float newAmount = Float.parseFloat(etAmount.getText().toString());
-                if (newAmount != chargeCode.Amount) {
-
-                    getChargeAmountAsync ChargeAmount = new getChargeAmountAsync();
-                    ChargeAmount.execute();
-                }
-                return false;
-            }
-        });
-
+        //Handles when values are changed and a new charge is to be added
         btnCharge.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                enterChargeAsync enter = new enterChargeAsync();
-                enter.execute();
+                if (etAmount.getText().toString().trim().length() > 0) {
+                    Float floatAmount = Float.parseFloat(etAmount.getText().toString());
+                    if (floatAmount == 0) {
+                        Toast toast = Toast.makeText(getActivity(), "Cannot enter a charge with an amount of $0 ",
+                                Toast.LENGTH_LONG);
+                        toast.show();
+                    } else if (etDescription.getText().toString().trim().length() == 0) {
+                        Toast toast = Toast.makeText(getActivity(), "Cannot enter a charge with a blank Description",
+                                Toast.LENGTH_LONG);
+                        toast.show();
+                    } else {
+                        enterChargeAsync enter = new enterChargeAsync();
+                        enter.execute();
+                    }
+                } else {
+                    Toast toast = Toast.makeText(getActivity(), "Cannot enter a charge with an amount of $0 ",
+                            Toast.LENGTH_LONG);
+                    toast.show();
+                }
+
+
             }
         });
 
@@ -263,6 +280,13 @@ public class ChargeCodeFragment extends Fragment {
     public static ArrayList<ChargeCodes> RetrieveChargeCodesFromSoap(SoapObject soap) {
 
         ArrayList<ChargeCodes> codes = new ArrayList<ChargeCodes>();
+        ChargeCodes defaultCC = new ChargeCodes();
+        defaultCC.ChgDesc = "Select Charge Type";
+        defaultCC.Kind = "X";
+        defaultCC.ChgNo = "0";
+        defaultCC.ChgID = 0;
+        defaultCC.Amount = 0;
+        codes.add(0, defaultCC);
         for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
 
             SoapObject accountchargecodes = (SoapObject) soap.getProperty(i);
@@ -276,7 +300,7 @@ public class ChargeCodeFragment extends Fragment {
                 }
 
             }
-            codes.add(i, chargeCode);
+            codes.add(i + 1, chargeCode);
         }
 
         return codes;
@@ -286,7 +310,7 @@ public class ChargeCodeFragment extends Fragment {
     public void addItemsOnSpinner(ArrayList<ChargeCodes> codes) {
 
         adapterChargeCodes = new ChargeCodeAdapter(activity,
-                R.layout.fragment_charge_code, codes);
+                R.layout.fragment_entercharge, codes);
 
         chargecodespinner.setAdapter(adapterChargeCodes);
 
@@ -295,7 +319,7 @@ public class ChargeCodeFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 setSelectedCharge(chargecodespinner);
 
-                if (etAmount.getText().toString() != "0.00") {
+                if (!etAmount.getText().toString().equals("0.00")) {
                     getChargeAmountAsync ChargeAmount = new getChargeAmountAsync();
                     ChargeAmount.execute();
                 }
@@ -314,13 +338,19 @@ public class ChargeCodeFragment extends Fragment {
 
         int selected = spinnerChargeCode.getSelectedItemPosition();
         chargeCode = (ChargeCodes) spinnerChargeCode.getItemAtPosition(selected);
-        etDescription.setText(chargeCode.ChgDesc);
 
-        if (chargeCode.Kind.equals("T") && Integer.parseInt(chargeCode.ChgNo) < 4) {
+
+        if (chargeCode.ChgID == 0) {
+            etAmount.setText("0.00");
+            etDescription.setText("");
+
+        } else if (chargeCode.Kind.equals("T") && Integer.parseInt(chargeCode.ChgNo) < 4) {
 
             etAmount.setText(String.valueOf(account.MTuition));
+            etDescription.setText(chargeCode.ChgDesc);
         } else {
             etAmount.setText(String.valueOf(chargeCode.Amount));
+            etDescription.setText(chargeCode.ChgDesc);
         }
     }
 
@@ -357,36 +387,26 @@ public class ChargeCodeFragment extends Fragment {
 
         protected void onPostExecute(Float[] result) {
             //dialog.dismiss();
+            NumberFormat format = NumberFormat.getCurrencyInstance();
             floatAmount = Float.parseFloat(etAmount.getText().toString());
             floatDiscAmount = result[0];
             floatSTax1 = result[1];
             floatSTax2 = result[2];
 
-            tvDiscAmount = (TextView) activity.findViewById(R.id.tvDiscAmount);
-            tvDiscAmountDisplayed = (TextView) activity.findViewById(R.id.tvDiscAmountDisplayed);
-            tvTotal = (TextView) activity.findViewById(R.id.tvTotal);
-            tvTotalDisplayed = (TextView) activity.findViewById(R.id.tvTotalDisplayed);
-
-            tvDiscAmount.setVisibility(View.GONE);
-            tvDiscAmountDisplayed.setVisibility(View.GONE);
-            tvTotal.setVisibility(View.GONE);
-            tvTotalDisplayed.setVisibility(View.GONE);
+            Boolean discount = false;
+            Boolean tax = false;
 
             if (floatDiscAmount != floatAmount) {
-                tvDiscAmount.setVisibility(View.VISIBLE);
-                tvDiscAmount.setText("Discounted Amount");
-                tvDiscAmountDisplayed.setVisibility(View.VISIBLE);
-                tvDiscAmountDisplayed.setTextSize(20);
-                tvDiscAmountDisplayed.setText(String.valueOf(floatDiscAmount));
+                discount = true;
+                tvDiscAmountDisplayed.setText(String.valueOf(format.format(floatDiscAmount)));
             }
             if (floatSTax1 + floatSTax2 > 0) {
-                tvTotal.setVisibility(View.VISIBLE);
-                tvTotal.setText("Total w/ Tax");
-                tvTotalDisplayed.setVisibility(View.VISIBLE);
-                tvTotalDisplayed.setTextSize(20);
+                tax = true;
                 float total = floatDiscAmount + floatSTax1 + floatSTax2;
-                tvTotalDisplayed.setText(String.valueOf(total));
+                tvTotalDisplayed.setText(String.valueOf(format.format(total)));
             }
+
+            setTotalsDisplay(discount, tax);
         }
     }
 
@@ -497,16 +517,16 @@ public class ChargeCodeFragment extends Fragment {
 
         ProgressDialog dialog;
 
-      /*  protected void onPreExecute() {
+        protected void onPreExecute() {
             dialog = new ProgressDialog(activity);
             dialog.setProgress(ProgressDialog.STYLE_HORIZONTAL);
             dialog.setMax(100);
             dialog.show();
-        }*/
+        }
 
         @Override
         protected Boolean doInBackground(Data... data) {
-            SoapObject enterCharge = null;
+            SoapPrimitive enterCharge = null;
             float totalAmount = 0;
             float DiscAmount = 0;
             User user = _appPrefs.getUser();
@@ -544,11 +564,13 @@ public class ChargeCodeFragment extends Fragment {
 
 
         protected void onPostExecute(Boolean result) {
-            //dialog.dismiss();
+            dialog.dismiss();
 
             if (result) {
                 Toast toast = Toast.makeText(getActivity(), "Charge Successfully entered", Toast.LENGTH_LONG);
                 toast.show();
+                chargecodespinner.setSelection(0);
+                setTotalsDisplay(false, false);
             } else {
                 Toast toast = Toast.makeText(getActivity(), "Charge failed", Toast.LENGTH_LONG);
                 toast.show();
@@ -556,14 +578,14 @@ public class ChargeCodeFragment extends Fragment {
         }
     }
 
-    public SoapObject EnterCharge(int UserID, String UserGUID, int SchID, int AcctID, String ChgDate,
-                                  String ChgDesc, String GLNo, float Amount, float totalAmount,
-                                  String Kind, int STax, Boolean POSTrans, int POSInv, Boolean PayOnline,
-                                  int TransPostHistID, int SessionID, float DiscAmt, float STax1,
-                                  float STax2, String DisplayName) {
+    public SoapPrimitive EnterCharge(int UserID, String UserGUID, int SchID, int AcctID, String ChgDate,
+                                     String ChgDesc, String GLNo, float Amount, float totalAmount,
+                                     String Kind, int STax, Boolean POSTrans, int POSInv, Boolean PayOnline,
+                                     int TransPostHistID, int SessionID, float DiscAmt, float STax1,
+                                     float STax2, String DisplayName) {
 
-        SOAP_ACTION = "EnterCharge";
-        METHOD_NAME = "EnterCharge";
+        SOAP_ACTION = "enterCharge";
+        METHOD_NAME = "enterCharge";
 
         SoapObject requestEnterCharge = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
@@ -590,12 +612,6 @@ public class ChargeCodeFragment extends Fragment {
 
         PropertyInfo chgdate = new PropertyInfo();
         chgdate.setName("strChgDate");
-        //chgdate.setType(Date.class);
-        //Calendar cal = Calendar.getInstance();
-        //cal.set(Calendar.YEAR, datePicker.getYear());
-        //cal.set(Calendar.MONTH, datePicker.getMonth());
-        //cal.set(Calendar.DATE, datePicker.getDayOfMonth());
-        //Date date = cal.getTime();
         chgdate.setValue(ChgDate);
         requestEnterCharge.addProperty(chgdate);
 
@@ -694,12 +710,12 @@ public class ChargeCodeFragment extends Fragment {
         envelopeEnterCharge.dotNet = true;
         envelopeEnterCharge.setOutputSoapObject(requestEnterCharge);
 
-        SoapObject responseEnterCharge = null;
+        SoapPrimitive responseEnterCharge = null;
         HttpTransportSE HttpTransport = new HttpTransportSE(Data.URL);
         try {
             HttpTransport.call(SOAP_ACTION, envelopeEnterCharge);
 
-            responseEnterCharge = (SoapObject) envelopeEnterCharge.getResponse();
+            responseEnterCharge = (SoapPrimitive) envelopeEnterCharge.getResponse();
 
 
         } catch (Exception e) {
@@ -710,7 +726,26 @@ public class ChargeCodeFragment extends Fragment {
         return responseEnterCharge;
     }
 
-    public static Boolean EnterChargeFromSoap(SoapObject soap) {
+    public void setTotalsDisplay(Boolean discount, Boolean tax) {
+        if (discount) {
+
+            tvDiscAmount.setVisibility(View.VISIBLE);
+            tvDiscAmountDisplayed.setVisibility(View.VISIBLE);
+        } else {
+            tvDiscAmount.setVisibility(View.GONE);
+            tvDiscAmountDisplayed.setVisibility(View.GONE);
+        }
+
+        if (tax) {
+            tvTotal.setVisibility(View.VISIBLE);
+            tvTotalDisplayed.setVisibility(View.VISIBLE);
+        } else {
+            tvTotal.setVisibility(View.GONE);
+            tvTotalDisplayed.setVisibility(View.GONE);
+        }
+    }
+
+    public static Boolean EnterChargeFromSoap(SoapPrimitive soap) {
 
         Boolean success = Boolean.parseBoolean(soap.toString());
 

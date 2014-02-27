@@ -74,6 +74,7 @@
     <orderEntry type="library" exported="" name="appcompat-v7-19.0.0" level="project" />
     <orderEntry type="library" exported="" name="ksoap2-android-assembly-3.0.0-jar-with-dependencies" level="project" />
     <orderEntry type="library" exported="" name="gson-2.2.4" level="project" />
+    <orderEntry type="library" exported="" name="library" level="project" />
     <orderEntry type="library" exported="" name="support-v4-19.0.0" level="project" />
     <orderEntry type="library" exported="" name="gridlayout-v7-19.0.0" level="project" />
   </component>
