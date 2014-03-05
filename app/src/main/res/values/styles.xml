@@ -4,9 +4,10 @@
     <color name="hyperlink">#0645AD</color>
     <color name="warning">#ffff0000</color>
     <color name="blankspace">#000000</color>
+    <color name="grey">#7A7A7A</color>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
+    <style name="ActionBarCompact" parent="Theme.AppCompat.Light">
         <!-- Customize your theme here. -->
     </style>
 

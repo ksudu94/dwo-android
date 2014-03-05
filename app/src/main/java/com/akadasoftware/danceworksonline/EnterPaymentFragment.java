@@ -12,7 +12,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
@@ -93,8 +92,7 @@ public class EnterPaymentFragment extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
-                Toast toast = Toast.makeText(getActivity(), "This works", Toast.LENGTH_LONG);
-                toast.show();
+
                 refreshEnterPayment();
             }
 

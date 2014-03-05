@@ -16,7 +16,12 @@ import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener, AccountTransactionsFragment.OnTransactionSelected, AccountStudentsFragment.OnFragmentInteractionListener {
+
+public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener,
+        AccountTransactionsFragment.OnTransactionSelected,
+        AccountStudentsFragment.OnFragmentInteractionListener,
+        EnterChargeFragment.onEditAmountDialog,
+        EditAmountDialog.EditAmountDialogListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -99,7 +104,8 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.account_information, menu);
-        return true;
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -176,6 +182,9 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                 case 4:
                     newFragment = EnterChargeFragment.newInstance(listPosition);
                     break;
+                case 5:
+                    newFragment = PullFragment.newInstance(listPosition);
+                    break;
                 default:
                     newFragment = AccountInformationFragment.newInstance(listPosition);
                     break;
@@ -187,7 +196,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         @Override
         public int getCount() {
             // Show x number of pages.
-            return 5;
+            return 6;
         }
 
         //Tab titles
@@ -205,6 +214,8 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                     return getString(R.string.title_account_payment).toUpperCase(l);
                 case 4:
                     return getString(R.string.title_account_charge).toUpperCase(l);
+                case 5:
+                    return "PullFragment".toUpperCase(l);
                 default:
                     return "";
             }
@@ -227,8 +238,26 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         pf.chgid = TID;
         pf.etDescription.setText("Payment - " + description);
 
-
     }
 
+    //Passes info from fragment to dialog so that you can pre-fill the dialog with the stored value
+    //for amount using the bundle
+    public void onEditAmountDialog(String input) {
 
+        FragmentManager fm = getSupportFragmentManager();
+        EditAmountDialog editAmountDialog = new EditAmountDialog();
+        Bundle args = new Bundle();
+        args.putString("Input", input);
+        editAmountDialog.setArguments(args);
+        editAmountDialog.show(fm, input);
+    }
+
+    //The inputText is the value from the edit text from the dialog which we then use set tvChangeAmount
+    //and then run the async task.
+    @Override
+    public void onFinishEditAmountDialog(String inputText) {
+        EnterChargeFragment cf = (EnterChargeFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 4);
+        cf.tvChangeAmount.setText(inputText);
+        cf.runChargeAmountAsync();
+    }
 }

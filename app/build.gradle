@@ -17,7 +17,7 @@ android {
     buildToolsVersion '19.0.0'
 
     defaultConfig {
-        minSdkVersion 7
+        minSdkVersion 10
         targetSdkVersion 19
         versionCode 1
         versionName "1.0"
@@ -35,6 +35,6 @@ dependencies {
     compile 'com.android.support:gridlayout-v7:19.0.0'
     compile 'com.android.support:appcompat-v7:19.0.0'
     compile 'com.google.code.gson:gson:2.2.4'
+    compile 'com.github.chrisbanes.actionbarpulltorefresh:extra-abc:+'
     compile files('libs/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar')
-
 }

@@ -47,9 +47,7 @@ import java.util.ArrayList;
 
 
 public class EnterChargeFragment extends Fragment {
-    private static String ARG_SECTION_NUMBER = "section_number";
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
 
     String SOAP_ACTION, METHOD_NAME, userguid;
     int schid, userid;
@@ -64,11 +62,13 @@ public class EnterChargeFragment extends Fragment {
     ChargeCodes chargeCode;
     float floatAmount, floatDiscAmount, floatSTax1, floatSTax2;
 
-    TextView tvDescription, tvAmount, tvDiscAmount, tvDiscAmountDisplayed, tvTotal, tvTotalDisplayed;
-    EditText etDescription, etAmount;
+    TextView tvDescription, tvAmount, tvChangeAmount, tvAmountHint, tvDiscAmount, tvDiscAmountDisplayed, tvTotal, tvTotalDisplayed;
+    EditText etDescription;
     DatePicker datePicker;
     Spinner chargecodespinner;
     Button btnCharge;
+    //Listener for the interace used to handle the dialog pop-up
+    private onEditAmountDialog mListener;
 
     //Called to do initial creation of a fragment. This is called after onAttach(Activity) and
     // before onCreateView(LayoutInflater, ViewGroup, Bundle).Note that this can be called while
@@ -89,12 +89,41 @@ public class EnterChargeFragment extends Fragment {
 
     }
 
-        @Override
-        public void onResume(){
-            super.onResume();
-            getChargeCodesAsync chargeCodes = new getChargeCodesAsync();
-            chargeCodes.execute();
+    @Override
+    public void onResume() {
+        super.onResume();
+        getChargeCodesAsync chargeCodes = new getChargeCodesAsync();
+        chargeCodes.execute();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (onEditAmountDialog) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement onEditAmountDialog");
         }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    /*Uses a interface so that it can communicate with the parent activity which is AccountInformation
+    * First it comes here and then goes to AccountInformation where it is then created with the
+    * onEditAmountDialog method.. That method goes to the EditAmountDialog class which takes the
+    * new Amount from the dialog and returns it to the onFinishEditAmountDialog method that from there
+    * runs the runChargeAmountAsync method because we could not access it otherwise from outside this
+    * class.
+    */
+    public interface onEditAmountDialog {
+        // TODO: Update argument type and name
+        public void onEditAmountDialog(String input);
+    }
 
     /**
      * Use this factory method to create a new instance of
@@ -131,8 +160,9 @@ public class EnterChargeFragment extends Fragment {
         //use inflated view to find elements on page
         tvDescription = (TextView) rootView.findViewById(R.id.tvDescription);
         tvAmount = (TextView) rootView.findViewById(R.id.tvAmount);
+        tvChangeAmount = (TextView) rootView.findViewById(R.id.tvChangeAmount);
+        tvAmountHint = (TextView) rootView.findViewById(R.id.tvAmountHint);
         etDescription = (EditText) rootView.findViewById(R.id.etDescription);
-        etAmount = (EditText) rootView.findViewById(R.id.etAmount);
         chargecodespinner = (Spinner) rootView.findViewById(R.id.chargecodespinner);
         datePicker = (DatePicker) rootView.findViewById(R.id.datePicker);
         btnCharge = (Button) rootView.findViewById(R.id.btnCharge);
@@ -148,8 +178,8 @@ public class EnterChargeFragment extends Fragment {
         btnCharge.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (etAmount.getText().toString().trim().length() > 0) {
-                    Float floatAmount = Float.parseFloat(etAmount.getText().toString());
+                if (tvChangeAmount.getText().toString().trim().length() > 0) {
+                    Float floatAmount = Float.parseFloat(tvChangeAmount.getText().toString());
                     if (floatAmount == 0) {
                         Toast toast = Toast.makeText(getActivity(), "Cannot enter a charge with an amount of $0 ",
                                 Toast.LENGTH_LONG);
@@ -168,14 +198,19 @@ public class EnterChargeFragment extends Fragment {
                     toast.show();
                 }
 
+            }
+        });
 
+        tvChangeAmount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onEditAmountDialog(tvChangeAmount.getText().toString());
             }
         });
 
         // Inflate the layout for this fragment
         return rootView;
     }
-
 
     class Data {
 
@@ -202,12 +237,6 @@ public class EnterChargeFragment extends Fragment {
             return RetrieveChargeCodesFromSoap(codes);
 
         }
-
-        protected void onProgressUpdate(Integer... progress) {
-            dialog.incrementProgressBy(progress[0]);
-
-        }
-
 
         protected void onPostExecute(ArrayList<ChargeCodes> result) {
             dialog.dismiss();
@@ -319,9 +348,8 @@ public class EnterChargeFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 setSelectedCharge(chargecodespinner);
 
-                if (!etAmount.getText().toString().equals("0.00")) {
-                    getChargeAmountAsync ChargeAmount = new getChargeAmountAsync();
-                    ChargeAmount.execute();
+                if (!tvChangeAmount.getText().toString().equals("0.00")) {
+                    runChargeAmountAsync();
                 }
 
             }
@@ -333,6 +361,14 @@ public class EnterChargeFragment extends Fragment {
         });
     }
 
+    /*We need this method so that we can run it form onFinishEditAmoutnDialog which is in the parent
+    activity.
+    */
+    public void runChargeAmountAsync() {
+        getChargeAmountAsync ChargeAmount = new getChargeAmountAsync();
+        ChargeAmount.execute();
+    }
+
     //Handles if the selected field for the spinner
     public void setSelectedCharge(Spinner spinnerChargeCode) {
 
@@ -341,15 +377,15 @@ public class EnterChargeFragment extends Fragment {
 
 
         if (chargeCode.ChgID == 0) {
-            etAmount.setText("0.00");
+            tvChangeAmount.setText("0.00");
             etDescription.setText("");
 
         } else if (chargeCode.Kind.equals("T") && Integer.parseInt(chargeCode.ChgNo) < 4) {
 
-            etAmount.setText(String.valueOf(account.MTuition));
+            tvChangeAmount.setText(String.valueOf(account.MTuition));
             etDescription.setText(chargeCode.ChgDesc);
         } else {
-            etAmount.setText(String.valueOf(chargeCode.Amount));
+            tvChangeAmount.setText(String.valueOf(chargeCode.Amount));
             etDescription.setText(chargeCode.ChgDesc);
         }
     }
@@ -373,7 +409,7 @@ public class EnterChargeFragment extends Fragment {
 
             float ST1Rate = _appPrefs.getST1Rate();
             float ST2Rate = _appPrefs.getST2Rate();
-            newCodes = getChargeAmount(userid, userguid, chargeCode.ChgID, account.AcctID, account.BillingFreq, Float.parseFloat(etAmount.getText().toString()), account.TuitionSel, account.AccountFeeAmount, ST1Rate, ST2Rate);
+            newCodes = getChargeAmount(userid, userguid, chargeCode.ChgID, account.AcctID, account.BillingFreq, Float.parseFloat(tvChangeAmount.getText().toString()), account.TuitionSel, account.AccountFeeAmount, ST1Rate, ST2Rate);
             return RetrieveChargeCodeFromSoap(newCodes);
 
 
@@ -388,7 +424,7 @@ public class EnterChargeFragment extends Fragment {
         protected void onPostExecute(Float[] result) {
             //dialog.dismiss();
             NumberFormat format = NumberFormat.getCurrencyInstance();
-            floatAmount = Float.parseFloat(etAmount.getText().toString());
+            floatAmount = Float.parseFloat(tvChangeAmount.getText().toString());
             floatDiscAmount = result[0];
             floatSTax1 = result[1];
             floatSTax2 = result[2];
