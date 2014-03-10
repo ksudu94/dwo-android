@@ -34,7 +34,7 @@ public class EditAmountDialog extends DialogFragment implements TextView.OnEdito
         etAmount = (EditText) view.findViewById(R.id.etAmount);
         String input = getArguments().getString("Input");
         etAmount.setText(input);
-        getDialog().setTitle("Edit the amount");
+        getDialog().setTitle("Enter Charge Amount");
         etAmount.setOnEditorActionListener(this);
         return view;
     }

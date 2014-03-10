@@ -14,14 +14,23 @@ import android.view.MenuItem;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
 import java.text.NumberFormat;
+import java.util.Calendar;
 import java.util.Locale;
 
-
+/**
+ * This is the parent activity from which all fragments are linked and where all of the interfaces
+ * are linked. In the case of dates both the dialog and the fragment itself have things that need
+ * to be implemented.
+ */
 public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener,
         AccountTransactionsFragment.OnTransactionSelected,
         AccountStudentsFragment.OnFragmentInteractionListener,
         EnterChargeFragment.onEditAmountDialog,
-        EditAmountDialog.EditAmountDialogListener {
+        EnterChargeFragment.onEditDateDialog,
+        EnterPaymentFragment.onEditDatePaymentDialog,
+        EditDatePaymentDialog.EditDatePaymentDialogListener,
+        EditAmountDialog.EditAmountDialogListener,
+        EditDateDialog.EditDateDialogListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -145,6 +154,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     public void onFragmentInteraction(String id) {
     }
 
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -240,8 +250,12 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
     }
 
-    //Passes info from fragment to dialog so that you can pre-fill the dialog with the stored value
-    //for amount using the bundle
+    /**
+     * Passes info from fragment to dialog so that you can pre-fill the dialog with the stored value
+     * for amount using the bundle
+     */
+
+
     public void onEditAmountDialog(String input) {
 
         FragmentManager fm = getSupportFragmentManager();
@@ -249,15 +263,73 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         Bundle args = new Bundle();
         args.putString("Input", input);
         editAmountDialog.setArguments(args);
-        editAmountDialog.show(fm, input);
+        //Just the name of the dialog. Has no effect on it.
+        editAmountDialog.show(fm, "");
     }
 
-    //The inputText is the value from the edit text from the dialog which we then use set tvChangeAmount
-    //and then run the async task.
+    /**
+     * The inputText is the value from the edit text from the dialog which we then use set tvChangeAmount
+     * and then run the async task.
+     */
+
     @Override
     public void onFinishEditAmountDialog(String inputText) {
         EnterChargeFragment cf = (EnterChargeFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 4);
         cf.tvChangeAmount.setText(inputText);
         cf.runChargeAmountAsync();
     }
+
+    /**
+     * The date is the value from the datePicker from the dialog which we then use set tvDate in the
+     * EnterCharge Fragment.
+     */
+
+    public void onEditDateDialog(String date) {
+
+        FragmentManager fm = getSupportFragmentManager();
+        EditDateDialog editDateDialog = new EditDateDialog();
+        Bundle args = new Bundle();
+        args.putString("Date", date);
+        editDateDialog.setArguments(args);
+        editDateDialog.show(fm, date);
+    }
+
+    /**
+     * After we get the date from the datepicker dialog we use the interface to pass that value back
+     * to EnterCharge to set the date to be used for various other methods
+     */
+
+    @Override
+    public void onFinishEditDateDialog(String date) {
+        EnterChargeFragment cf = (EnterChargeFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 4);
+        cf.tvDate.setText(date);
+    }
+
+    @Override
+    public void onEditDatePaymentDialog(Calendar date) {
+
+        FragmentManager fm = getSupportFragmentManager();
+        EditDatePaymentDialog editDateDialog = new EditDatePaymentDialog();
+
+
+        getIntent().putExtra("Calendar", date);
+        /*        Bundle args = new Bundle();
+        int year = date.get(Calendar.YEAR);
+        int month = date.get(Calendar.MONTH);
+        int day = date.get(Calendar.DAY_OF_MONTH);
+        args.putInt("Year", year);
+        args.putInt("Month", month);
+        args.putInt("Day", day);
+        editDateDialog.setArguments(args);*/
+        editDateDialog.show(fm, "");
+    }
+
+    @Override
+    public void onFinishEditDatePaymentDialog(Calendar dateSelected) {
+        EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
+        pf.setDate(dateSelected);
+
+
+    }
+
 }

@@ -16,7 +16,10 @@ import android.widget.TextView;
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 /**
@@ -42,11 +45,14 @@ public class EnterPaymentFragment extends Fragment {
     Activity activity;
     ArrayList<Account> arrayAccounts;
 
-    TextView tvTitle, tvType, tvReference, tvDescription, tvAmount;
+    TextView tvDate, tvTitle, tvType, tvReference, tvDescription, tvAmount;
     EditText etReference, etDescription, etAmount;
     Button btnUseDifferentCard, btnPayment;
     DatePicker datePicker;
     Spinner typeSpinner;
+    Calendar cal;
+
+    private onEditDatePaymentDialog dateListener;
 
 
     /**
@@ -58,6 +64,11 @@ public class EnterPaymentFragment extends Fragment {
     // TODO: Rename and change types and number of parameters
     public EnterPaymentFragment() {
         // Required empty public constructor
+    }
+
+    public interface onEditDatePaymentDialog {
+        // TODO: Update argument type and name
+        public void onEditDatePaymentDialog(Calendar today);
     }
 
     public static EnterPaymentFragment newInstance(int position, String description, Float amount) {
@@ -118,6 +129,7 @@ public class EnterPaymentFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_enterpayment, container, false);
 
         tvTitle = (TextView) rootView.findViewById(R.id.tvTitle);
+        tvDate = (TextView) rootView.findViewById(R.id.tvDate);
         tvType = (TextView) rootView.findViewById(R.id.tvType);
         tvReference = (TextView) rootView.findViewById(R.id.tvReference);
         tvDescription = (TextView) rootView.findViewById(R.id.tvDescription);
@@ -130,11 +142,45 @@ public class EnterPaymentFragment extends Fragment {
         btnUseDifferentCard = (Button) rootView.findViewById(R.id.btnUseDifferentCard);
         btnPayment = (Button) rootView.findViewById(R.id.btnPayment);
 
+
+        cal = Calendar.getInstance();
+        setDate(cal);
+        tvDate.setTextSize(25);
+        tvDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dateListener.onEditDatePaymentDialog(cal);
+            }
+        });
+
         // Returning the populated layout for this fragment
         return rootView;
     }
 
+    public void setDate(Calendar calinput) {
+        cal = calinput;
+        DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+        String today = dateFormat.format(cal.getTime());
+        tvDate.setText(today);
+    }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        try {
+            dateListener = (onEditDatePaymentDialog) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement onEditDatePaymentDialog");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        dateListener = null;
+    }
     class Data {
 
         static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";

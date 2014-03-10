@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -33,6 +32,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 /**
@@ -40,7 +40,8 @@ import java.util.ArrayList;
  * It gets the account from _appPrefs as a position in the accounts array list and from that
  * account uses fields like acctid, billingfreq, mtuition etc. It also uses the ChargeCode class
  * for other values. Those values are retrieved from the web method with the values userid,
- * userguid and schid which are all in _appPrefs. The end result is a spinner populated by the
+ * userguid and schid which are all in _appPrefs. It uses two interfaces to be able to run
+ * editAmount and editDate dialogs. The end result is a spinner populated by the
  * ChgDesc field and then values returned with DiscountedAmount and Total w/ tax textviews
  * only showing up if their values have changed.
  */
@@ -49,7 +50,7 @@ import java.util.ArrayList;
 public class EnterChargeFragment extends Fragment {
 
 
-    String SOAP_ACTION, METHOD_NAME, userguid;
+    String SOAP_ACTION, METHOD_NAME, userguid, date;
     int schid, userid;
 
 
@@ -62,15 +63,17 @@ public class EnterChargeFragment extends Fragment {
     ChargeCodes chargeCode;
     float floatAmount, floatDiscAmount, floatSTax1, floatSTax2;
 
-    TextView tvDescription, tvAmount, tvChangeAmount, tvAmountHint, tvDiscAmount, tvDiscAmountDisplayed, tvTotal, tvTotalDisplayed;
+    TextView tvDate, tvDescription, tvAmount, tvChangeAmount, tvAmountHint, tvDiscAmount, tvDiscAmountDisplayed, tvTotal, tvTotalDisplayed;
     EditText etDescription;
-    DatePicker datePicker;
+
     Spinner chargecodespinner;
     Button btnCharge;
-    //Listener for the interace used to handle the dialog pop-up
-    private onEditAmountDialog mListener;
 
-    //Called to do initial creation of a fragment. This is called after onAttach(Activity) and
+    // Listeners for the interface used to handle the dialog pop-ups
+    private onEditAmountDialog mListener;
+    private onEditDateDialog dateListener;
+
+    // Called to do initial creation of a fragment. This is called after onAttach(Activity) and
     // before onCreateView(LayoutInflater, ViewGroup, Bundle).Note that this can be called while
     // the fragment's activity is still in the process of being created. As such, you can not rely
     // on things like the activity's content view hierarchy being initialized at this point.
@@ -105,12 +108,19 @@ public class EnterChargeFragment extends Fragment {
             throw new ClassCastException(activity.toString()
                     + " must implement onEditAmountDialog");
         }
+        try {
+            dateListener = (onEditDateDialog) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement onEditDateDialog");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        dateListener = null;
     }
 
     /*Uses a interface so that it can communicate with the parent activity which is AccountInformation
@@ -124,6 +134,12 @@ public class EnterChargeFragment extends Fragment {
         // TODO: Update argument type and name
         public void onEditAmountDialog(String input);
     }
+
+    public interface onEditDateDialog {
+        // TODO: Update argument type and name
+        public void onEditDateDialog(String input);
+    }
+
 
     /**
      * Use this factory method to create a new instance of
@@ -159,12 +175,13 @@ public class EnterChargeFragment extends Fragment {
 
         //use inflated view to find elements on page
         tvDescription = (TextView) rootView.findViewById(R.id.tvDescription);
+        tvDate = (TextView) rootView.findViewById(R.id.tvDate);
         tvAmount = (TextView) rootView.findViewById(R.id.tvAmount);
         tvChangeAmount = (TextView) rootView.findViewById(R.id.tvChangeAmount);
         tvAmountHint = (TextView) rootView.findViewById(R.id.tvAmountHint);
         etDescription = (EditText) rootView.findViewById(R.id.etDescription);
         chargecodespinner = (Spinner) rootView.findViewById(R.id.chargecodespinner);
-        datePicker = (DatePicker) rootView.findViewById(R.id.datePicker);
+
         btnCharge = (Button) rootView.findViewById(R.id.btnCharge);
         tvDiscAmount = (TextView) rootView.findViewById(R.id.tvDiscAmount);
         tvDiscAmountDisplayed = (TextView) rootView.findViewById(R.id.tvDiscAmountDisplayed);
@@ -201,12 +218,35 @@ public class EnterChargeFragment extends Fragment {
             }
         });
 
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        String currentDate = String.valueOf(month + 1) + "-" + String.valueOf(day) + "-" + String.valueOf(year);
+
+        /**
+         *  Use a listener to interact with interface on EditDateDialog. Sends this date value in to
+         *  to se the current date to that value.
+         */
+
         tvChangeAmount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mListener.onEditAmountDialog(tvChangeAmount.getText().toString());
             }
         });
+
+
+        tvDate.setText(currentDate);
+        tvDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dateListener.onEditDateDialog(tvDate.getText().toString());
+                date = tvDate.getText().toString();
+            }
+        });
+
 
         // Inflate the layout for this fragment
         return rootView;
@@ -576,12 +616,6 @@ public class EnterChargeFragment extends Fragment {
                 DiscAmount = 0;
             } else
                 totalAmount = chargeCode.Amount;
-
-            int day = datePicker.getDayOfMonth();
-            int month = datePicker.getMonth() + 1;
-            int year = datePicker.getYear();
-
-            String date = String.valueOf(year) + "-" + String.valueOf(month) + "-" + String.valueOf(day);
 
 
             enterCharge = EnterCharge(userid, userguid, schid, account.AcctID, date, chargeCode.ChgDesc,
