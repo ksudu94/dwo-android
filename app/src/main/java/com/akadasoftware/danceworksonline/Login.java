@@ -233,7 +233,7 @@ public class Login extends ActionBarActivity {
                     }
                     ArrayList<User> userarray = new ArrayList<User>();
                     userarray.add(0, user);
-                    //If the user logged in before it will not hit this break point but instead
+                    // If the user logged in before it will not hit this break point but instead
                     // go to the splash page
                     if (user.SchID > 0) {
                         _appPrefs.saveSchID(user.SchID);
@@ -276,10 +276,12 @@ public class Login extends ActionBarActivity {
                         _appPrefs.saveCCProcessor(school.CCProcessor);
                         _appPrefs.saveST1Rate(school.ST1Rate);
                         _appPrefs.saveST2Rate(school.ST2Rate);
+                        _appPrefs.saveLogoName(school.LogoName);
+
                     }
 
                 } catch (Exception exception) {
-
+                    exception.printStackTrace();
                 }
 
                 return user;

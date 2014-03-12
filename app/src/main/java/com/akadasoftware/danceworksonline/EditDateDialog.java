@@ -6,12 +6,13 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.widget.DatePicker;
 
+import java.util.Calendar;
+
 
 /**
  * Created by Kyle on 3/10/14.
  */
 public class EditDateDialog extends DialogFragment implements DatePickerDialog.OnDateSetListener {
-
 
     public EditDateDialog() {
     }
@@ -21,24 +22,34 @@ public class EditDateDialog extends DialogFragment implements DatePickerDialog.O
         EditDateDialogListener activity = (EditDateDialogListener) getActivity();
 
         datePicker.setCalendarViewShown(false);
-        String date = String.valueOf(month) + "-" + String.valueOf(day) + "-" + String.valueOf(year);
-        activity.onFinishEditDateDialog(date);
+
+        Calendar selectedDate = Calendar.getInstance();
+        selectedDate.set(Calendar.YEAR, year);
+        selectedDate.set(Calendar.MONTH, month);
+        selectedDate.set(Calendar.DATE, day);
+
+        activity.onFinishEditDateDialog(selectedDate);
         this.dismiss();
     }
 
 
     public interface EditDateDialogListener {
-        void onFinishEditDateDialog(String date);
+        void onFinishEditDateDialog(Calendar cal);
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current date as the default date in the picker
-        String date = getArguments().getString("Date");
+
+        Calendar cal = (Calendar) getActivity().getIntent().getSerializableExtra("Calendar");
+
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DATE);
+        int year = cal.get(Calendar.YEAR);
 
 
         // Create a new instance of DatePickerDialog and return it
-        return new DatePickerDialog(getActivity(), this, 2014, 03, 01);
+        return new DatePickerDialog(getActivity(), this, year, month, day);
     }
 
 }

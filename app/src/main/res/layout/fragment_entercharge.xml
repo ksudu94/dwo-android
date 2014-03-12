@@ -27,7 +27,7 @@
                 android:id="@+id/tvDate"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15dp"
+                android:textSize="25dp"
                 android:textStyle="bold" />
 
 
@@ -86,7 +86,7 @@
                     android:textColor="@color/grey"
                     android:gravity="right"
                     android:paddingRight="5px"
-                    android:text="Tap to edit amount" />
+                    android:text="Tap the amount to edit" />
             </LinearLayout>
 
 

@@ -1,10 +1,14 @@
 package com.akadasoftware.danceworksonline;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.widget.FrameLayout;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
@@ -17,6 +21,9 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class Splash extends ActionBarActivity {
@@ -25,18 +32,27 @@ public class Splash extends ActionBarActivity {
     private static SharedPreferences.Editor loginEditor;
     private AppPreferences _appPrefs;
     User user = new User();
-    String METHOD_NAME = "";
-    String SOAP_ACTION = "";
+    String METHOD_NAME, SOAP_ACTION, UserGUID, LogoName;
     Integer UserID = 0;
-    String UserGUID = "";
+    Boolean isTablet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        _appPrefs = new AppPreferences(getApplicationContext());
+        LogoName = _appPrefs.getLogoName();
+
+        if (android.os.Build.VERSION.SDK_INT > 16) {
+            setContentView(R.layout.activity_logo_splash);
+            getBackground bg = new getBackground();
+            bg.execute();
+
+        } else {
+            setContentView(R.layout.activity_default_splash);
+        }
 
         /*
-         *Uses loginPreferences to get the loggedin field to check wether or not the user has a
+         *Uses loginPreferences to get the loggedin field to check whether or not the user has a
          *saved profile. From there it either goes to the login screen or the home screen.
          */
         loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
@@ -77,6 +93,52 @@ public class Splash extends ActionBarActivity {
         };
         timer.start();
 
+    }
+
+    public class getBackground extends AsyncTask<Data, Void, Void> {
+
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+        @Override
+        protected Void doInBackground(Data... datas) {
+            final FrameLayout fm = (FrameLayout) findViewById(R.id.container);
+            final Drawable background = ImageOperations("https://a77f5e8a78b68f5605b7-acb3eef5f1b15" +
+                    "6a5a4173453f521b028.ssl.cf1.rackcdn.com/11-a6136d18-1d02-4387-abb3-3471cf8f4390." +
+                    "png", "company_logo");
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    fm.setBackground(background);
+                    isTablet = getResources().getBoolean(R.bool.isTablet);
+                    if (isTablet) {
+                        fm.setScaleX(1);
+                        fm.setScaleY(1);
+                    } else {
+                        fm.setScaleX(Float.valueOf("0.5"));
+                        fm.setScaleY(Float.valueOf("0.5"));
+                    }
+                }
+            });
+
+            return null;
+        }
+
+    }
+
+    private Drawable ImageOperations(String url, String saveFilename) {
+        try {
+            InputStream is = (InputStream) this.fetch(url);
+            Drawable d = Drawable.createFromStream(is, saveFilename);
+            return d;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Object fetch(String address) throws IOException {
+        URL url = new URL(address);
+        Object content = url.getContent();
+        return content;
     }
 
     class Data {

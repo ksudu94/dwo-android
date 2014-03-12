@@ -30,7 +30,9 @@ import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -68,6 +70,7 @@ public class EnterChargeFragment extends Fragment {
 
     Spinner chargecodespinner;
     Button btnCharge;
+    Calendar cal;
 
     // Listeners for the interface used to handle the dialog pop-ups
     private onEditAmountDialog mListener;
@@ -123,13 +126,14 @@ public class EnterChargeFragment extends Fragment {
         dateListener = null;
     }
 
-    /*Uses a interface so that it can communicate with the parent activity which is AccountInformation
-    * First it comes here and then goes to AccountInformation where it is then created with the
-    * onEditAmountDialog method.. That method goes to the EditAmountDialog class which takes the
-    * new Amount from the dialog and returns it to the onFinishEditAmountDialog method that from there
-    * runs the runChargeAmountAsync method because we could not access it otherwise from outside this
-    * class.
-    */
+    /**
+     * Uses a interface so that it can communicate with the parent activity which is AccountInformation
+     * First it comes here and then goes to AccountInformation where it is then created with the
+     * onEditAmountDialog method.. That method goes to the EditAmountDialog class which takes the
+     * new Amount from the dialog and returns it to the onFinishEditAmountDialog method that from there
+     * runs the runChargeAmountAsync method because we could not access it otherwise from outside this
+     * class.
+     */
     public interface onEditAmountDialog {
         // TODO: Update argument type and name
         public void onEditAmountDialog(String input);
@@ -137,7 +141,7 @@ public class EnterChargeFragment extends Fragment {
 
     public interface onEditDateDialog {
         // TODO: Update argument type and name
-        public void onEditDateDialog(String input);
+        public void onEditDateDialog(Calendar today);
     }
 
 
@@ -218,32 +222,33 @@ public class EnterChargeFragment extends Fragment {
             }
         });
 
-        final Calendar c = Calendar.getInstance();
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-
-        String currentDate = String.valueOf(month + 1) + "-" + String.valueOf(day) + "-" + String.valueOf(year);
 
         /**
-         *  Use a listener to interact with interface on EditDateDialog. Sends this date value in to
-         *  to se the current date to that value.
+         *  Use a listener to interact with interface on EditDateDialog and EditAmountDialogs. Sends
+         *  the value in to be pre set on the dialogs. For the amount dialog, changing to 0 amount
+         *  with the default charge type selected cause the app the crash.
          */
 
         tvChangeAmount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.onEditAmountDialog(tvChangeAmount.getText().toString());
+                if (chargecodespinner.getSelectedItemPosition() == 0) {
+                    Toast toast = Toast.makeText(getActivity(), "Please select a charge type. ",
+                            Toast.LENGTH_LONG);
+                    toast.show();
+                } else
+                    mListener.onEditAmountDialog(tvChangeAmount.getText().toString());
             }
         });
 
 
-        tvDate.setText(currentDate);
+        cal = Calendar.getInstance();
+        setDate(cal);
+        tvDate.setTextSize(25);
         tvDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dateListener.onEditDateDialog(tvDate.getText().toString());
-                date = tvDate.getText().toString();
+                dateListener.onEditDateDialog(cal);
             }
         });
 
@@ -251,6 +256,14 @@ public class EnterChargeFragment extends Fragment {
         // Inflate the layout for this fragment
         return rootView;
     }
+
+    public void setDate(Calendar calinput) {
+        cal = calinput;
+        DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+        String today = dateFormat.format(cal.getTime());
+        tvDate.setText(today);
+    }
+
 
     class Data {
 
@@ -401,9 +414,10 @@ public class EnterChargeFragment extends Fragment {
         });
     }
 
-    /*We need this method so that we can run it form onFinishEditAmoutnDialog which is in the parent
-    activity.
-    */
+    /**
+     * We need this method so that we can run it form onFinishEditAmoutnDialog which is in the parent
+     * activity.
+     */
     public void runChargeAmountAsync() {
         getChargeAmountAsync ChargeAmount = new getChargeAmountAsync();
         ChargeAmount.execute();
@@ -437,10 +451,12 @@ public class EnterChargeFragment extends Fragment {
         ProgressDialog dialog;
 
         protected void onPreExecute() {
-          /*  dialog = new ProgressDialog(activity);
-            dialog.setProgress(ProgressDialog.STYLE_HORIZONTAL);
-            dialog.setMax(100);
-            dialog.show();*/
+            /**
+             * dialog = new ProgressDialog(activity);
+             * dialog.setProgress(ProgressDialog.STYLE_HORIZONTAL);
+             * dialog.setMax(100);
+             * dialog.show();
+             * */
         }
 
         @Override

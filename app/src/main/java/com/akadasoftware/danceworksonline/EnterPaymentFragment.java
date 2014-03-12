@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -45,14 +44,15 @@ public class EnterPaymentFragment extends Fragment {
     Activity activity;
     ArrayList<Account> arrayAccounts;
 
-    TextView tvDate, tvTitle, tvType, tvReference, tvDescription, tvAmount;
-    EditText etReference, etDescription, etAmount;
+    TextView tvDate, tvTitle, tvType, tvReference, tvDescription, tvAmount, tvChangeAmount;
+    EditText etReference, etDescription;
     Button btnUseDifferentCard, btnPayment;
-    DatePicker datePicker;
     Spinner typeSpinner;
     Calendar cal;
 
-    private onEditDatePaymentDialog dateListener;
+    // Listeners for the interface used to handle the dialog pop-ups
+    private onEditAmountDialog mListener;
+    private onEditDateDialog dateListener;
 
 
     /**
@@ -66,9 +66,22 @@ public class EnterPaymentFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public interface onEditDatePaymentDialog {
+    /**
+     * Uses a interface so that it can communicate with the parent activity which is AccountInformation
+     * First it comes here and then goes to AccountInformation where it is then created with the
+     * onEditAmountDialog method.. That method goes to the EditAmountDialog class which takes the
+     * new Amount from the dialog and returns it to the onFinishEditAmountDialog method that from there
+     * runs the runChargeAmountAsync method because we could not access it otherwise from outside this
+     * class.
+     */
+    public interface onEditAmountDialog {
         // TODO: Update argument type and name
-        public void onEditDatePaymentDialog(Calendar today);
+        public void onEditAmountDialog(String input);
+    }
+
+    public interface onEditDateDialog {
+        // TODO: Update argument type and name
+        public void onEditDateDialog(Calendar today);
     }
 
     public static EnterPaymentFragment newInstance(int position, String description, Float amount) {
@@ -118,7 +131,7 @@ public class EnterPaymentFragment extends Fragment {
     public void refreshEnterPayment() {
         chgid = 0;
         etDescription.getText().clear();
-        etAmount.getText().clear();
+        tvChangeAmount.setText("0.00");
     }
 
     @Override
@@ -134,22 +147,30 @@ public class EnterPaymentFragment extends Fragment {
         tvReference = (TextView) rootView.findViewById(R.id.tvReference);
         tvDescription = (TextView) rootView.findViewById(R.id.tvDescription);
         tvAmount = (TextView) rootView.findViewById(R.id.tvAmount);
+        tvChangeAmount = (TextView) rootView.findViewById(R.id.tvChangeAmount);
         etReference = (EditText) rootView.findViewById(R.id.etReference);
         etDescription = (EditText) rootView.findViewById(R.id.etDescription);
-        etAmount = (EditText) rootView.findViewById(R.id.etAmount);
         typeSpinner = (Spinner) rootView.findViewById(R.id.typeSpinner);
-        datePicker = (DatePicker) rootView.findViewById(R.id.datePicker);
         btnUseDifferentCard = (Button) rootView.findViewById(R.id.btnUseDifferentCard);
         btnPayment = (Button) rootView.findViewById(R.id.btnPayment);
 
 
+        tvChangeAmount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onEditAmountDialog(tvChangeAmount.getText().toString());
+            }
+        });
+
+
         cal = Calendar.getInstance();
         setDate(cal);
+
         tvDate.setTextSize(25);
         tvDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dateListener.onEditDatePaymentDialog(cal);
+                dateListener.onEditDateDialog(cal);
             }
         });
 
@@ -167,20 +188,28 @@ public class EnterPaymentFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-
         try {
-            dateListener = (onEditDatePaymentDialog) activity;
+            mListener = (onEditAmountDialog) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement onEditDatePaymentDialog");
+                    + " must implement onEditAmountDialog");
+        }
+        try {
+            dateListener = (onEditDateDialog) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement onEditDateDialog");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        mListener = null;
         dateListener = null;
     }
+
+
     class Data {
 
         static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";

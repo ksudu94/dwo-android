@@ -26,6 +26,7 @@ public class AppPreferences {
     public static final String putST1Rate = "ST1Rate";
     public static final String putST2Rate = "ST2Rate";
     public static final String putAccountListPosition = "AccountListPosition";
+    public static final String putLogoName = "LogoName";
     private SharedPreferences sharedPrefs;
     private SharedPreferences.Editor prefsEditor;
     Gson gson = new Gson();
@@ -147,6 +148,16 @@ public class AppPreferences {
 
     public void saveAccountListPosition(int position) {
         prefsEditor.putInt(putAccountListPosition, position);
+        prefsEditor.commit();
+    }
+
+
+    public String getLogoName() {
+        return sharedPrefs.getString(putLogoName, "");
+    }
+
+    public void saveLogoName(String LogoName) {
+        prefsEditor.putString(putLogoName, LogoName);
         prefsEditor.commit();
     }
 

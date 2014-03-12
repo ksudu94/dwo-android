@@ -27,10 +27,10 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         AccountStudentsFragment.OnFragmentInteractionListener,
         EnterChargeFragment.onEditAmountDialog,
         EnterChargeFragment.onEditDateDialog,
-        EnterPaymentFragment.onEditDatePaymentDialog,
-        EditDatePaymentDialog.EditDatePaymentDialogListener,
-        EditAmountDialog.EditAmountDialogListener,
-        EditDateDialog.EditDateDialogListener {
+        EnterPaymentFragment.onEditAmountDialog,
+        EnterPaymentFragment.onEditDateDialog,
+        EditDateDialog.EditDateDialogListener,
+        EditAmountDialog.EditAmountDialogListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -103,7 +103,8 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
             actionBar.addTab(
                     actionBar.newTab()
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
-                            .setTabListener(this));
+                            .setTabListener(this)
+            );
         }
     }
 
@@ -243,7 +244,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
         NumberFormat format = NumberFormat.getCurrencyInstance();
         EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
-        pf.etAmount.setText(String.valueOf(format.format(balance)));
+        pf.tvChangeAmount.setText(String.valueOf(format.format(balance)));
         _appPrefs.saveChgID(TID);
         pf.chgid = TID;
         pf.etDescription.setText("Payment - " + description);
@@ -274,9 +275,18 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
     @Override
     public void onFinishEditAmountDialog(String inputText) {
-        EnterChargeFragment cf = (EnterChargeFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 4);
-        cf.tvChangeAmount.setText(inputText);
-        cf.runChargeAmountAsync();
+
+        int position = getActionBar().getSelectedTab().getPosition();
+
+        if (position == 3) {
+            EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
+            pf.tvChangeAmount.setText(inputText);
+        } else {
+            EnterChargeFragment cf = (EnterChargeFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 4);
+            cf.tvChangeAmount.setText(inputText);
+            cf.runChargeAmountAsync();
+        }
+
     }
 
     /**
@@ -284,51 +294,45 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
      * EnterCharge Fragment.
      */
 
-    public void onEditDateDialog(String date) {
-
-        FragmentManager fm = getSupportFragmentManager();
-        EditDateDialog editDateDialog = new EditDateDialog();
-        Bundle args = new Bundle();
-        args.putString("Date", date);
-        editDateDialog.setArguments(args);
-        editDateDialog.show(fm, date);
-    }
 
     /**
      * After we get the date from the datepicker dialog we use the interface to pass that value back
      * to EnterCharge to set the date to be used for various other methods
      */
 
-    @Override
-    public void onFinishEditDateDialog(String date) {
-        EnterChargeFragment cf = (EnterChargeFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 4);
-        cf.tvDate.setText(date);
-    }
 
     @Override
-    public void onEditDatePaymentDialog(Calendar date) {
+    public void onEditDateDialog(Calendar date) {
 
         FragmentManager fm = getSupportFragmentManager();
-        EditDatePaymentDialog editDateDialog = new EditDatePaymentDialog();
+        EditDateDialog editDateDialog = new EditDateDialog();
 
 
         getIntent().putExtra("Calendar", date);
-        /*        Bundle args = new Bundle();
-        int year = date.get(Calendar.YEAR);
-        int month = date.get(Calendar.MONTH);
-        int day = date.get(Calendar.DAY_OF_MONTH);
-        args.putInt("Year", year);
-        args.putInt("Month", month);
-        args.putInt("Day", day);
-        editDateDialog.setArguments(args);*/
+        /**
+         * Bundle args = new Bundle();
+         * int year = date.get(Calendar.YEAR);
+         * int month = date.get(Calendar.MONTH);
+         * int day = date.get(Calendar.DAY_OF_MONTH);
+         * args.putInt("Year", year);
+         * args.putInt("Month", month);
+         * args.putInt("Day", day);
+         * editDateDialog.setArguments(args);
+         */
         editDateDialog.show(fm, "");
     }
 
     @Override
-    public void onFinishEditDatePaymentDialog(Calendar dateSelected) {
-        EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
-        pf.setDate(dateSelected);
+    public void onFinishEditDateDialog(Calendar dateSelected) {
+        int position = getActionBar().getSelectedTab().getPosition();
 
+        if (position == 3) {
+            EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
+            pf.setDate(dateSelected);
+        } else {
+            EnterChargeFragment cf = (EnterChargeFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 4);
+            cf.setDate(dateSelected);
+        }
 
     }
 
