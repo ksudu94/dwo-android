@@ -161,9 +161,11 @@ public class EnterChargeFragment extends Fragment {
         // Required empty public constructor
     }
 
-    //This method is to handle if your activity is every paused by a semi-transparent activity starts
-    //ie opening an app drawer. Here you would handle such things as pausing a video or stopping
-    //an animation.
+    /**
+     * This method is to handle if your activity is every paused by a semi-transparent activity starts
+     * ie opening an app drawer. Here you would handle such things as pausing a video or stopping
+     * an animation.
+     */
     @Override
     public void onPause() {
         super.onPause();  // Always call the superclass method first
@@ -448,8 +450,6 @@ public class EnterChargeFragment extends Fragment {
     public class getChargeAmountAsync extends
             AsyncTask<Data, Void, Float[]> {
 
-        ProgressDialog dialog;
-
         protected void onPreExecute() {
             /**
              * dialog = new ProgressDialog(activity);
@@ -471,14 +471,9 @@ public class EnterChargeFragment extends Fragment {
 
         }
 
-        protected void onProgressUpdate(Integer... progress) {
-            // dialog.incrementProgressBy(progress[0]);
-
-        }
-
 
         protected void onPostExecute(Float[] result) {
-            //dialog.dismiss();
+
             NumberFormat format = NumberFormat.getCurrencyInstance();
             floatAmount = Float.parseFloat(tvChangeAmount.getText().toString());
             floatDiscAmount = result[0];

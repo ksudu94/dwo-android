@@ -32,8 +32,9 @@ public class Splash extends ActionBarActivity {
     private static SharedPreferences.Editor loginEditor;
     private AppPreferences _appPrefs;
     User user = new User();
-    String METHOD_NAME, SOAP_ACTION, UserGUID, LogoName;
-    Integer UserID = 0;
+    String METHOD_NAME, SOAP_ACTION, UserGUID, newLogoName, LogoName, logoUrl;
+
+    int UserID, SchID;
     Boolean isTablet;
 
     @Override
@@ -42,6 +43,10 @@ public class Splash extends ActionBarActivity {
         _appPrefs = new AppPreferences(getApplicationContext());
         LogoName = _appPrefs.getLogoName();
 
+        /**
+         * Test if they have an api high enough to be able to set their own icon otherwise goes to
+         * spalsh page with default
+         */
         if (android.os.Build.VERSION.SDK_INT > 16) {
             setContentView(R.layout.activity_logo_splash);
             getBackground bg = new getBackground();
@@ -51,13 +56,12 @@ public class Splash extends ActionBarActivity {
             setContentView(R.layout.activity_default_splash);
         }
 
-        /*
-         *Uses loginPreferences to get the loggedin field to check whether or not the user has a
-         *saved profile. From there it either goes to the login screen or the home screen.
+        /**
+         * Uses loginPreferences to get the loggedin field to check whether or not the user has a
+         * saved profile. From there it either goes to the login screen or the home screen.
          */
         loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
         loginEditor = loginPreferences.edit();
-        Boolean loggedin = loginPreferences.getBoolean("loggedin", false);
         _appPrefs = new AppPreferences(getApplicationContext());
 
 
@@ -101,18 +105,30 @@ public class Splash extends ActionBarActivity {
         @Override
         protected Void doInBackground(Data... datas) {
             final FrameLayout fm = (FrameLayout) findViewById(R.id.container);
-            final Drawable background = ImageOperations("https://a77f5e8a78b68f5605b7-acb3eef5f1b15" +
-                    "6a5a4173453f521b028.ssl.cf1.rackcdn.com/11-a6136d18-1d02-4387-abb3-3471cf8f4390." +
-                    "png", "company_logo");
+
+            /**
+             * Here we test the newLogoName(logo name gotten from web service) with the LogoName which
+             * is stored with app Prefs. If they are different the logo has changed and we need to
+             * create a new link. Otherwise continue using the same logo, we then save the new
+             * logo name for future reference
+             */
+
+            logoUrl = "https://a77f5e8a78b68f5605b7-acb3eef5f1b156a5a4173453f521b028.ssl.cf1.rackcdn.com/" + LogoName;
+
+            final Drawable background = ImageOperations(logoUrl, "company_logo");
+
+
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    fm.setBackground(background);
+                    if (LogoName.equals("") || LogoName.equals("anyType{}")) {
+                        fm.setBackground(getResources().getDrawable(R.drawable.logo_danceworks_online));
+                    } else {
+                        fm.setBackground(background);
+                    }
+
                     isTablet = getResources().getBoolean(R.bool.isTablet);
                     if (isTablet) {
-                        fm.setScaleX(1);
-                        fm.setScaleY(1);
-                    } else {
                         fm.setScaleX(Float.valueOf("0.5"));
                         fm.setScaleY(Float.valueOf("0.5"));
                     }
@@ -183,7 +199,7 @@ public class Splash extends ActionBarActivity {
                 for (int i = 0; i < responseUser.getPropertyCount(); i++) {
                     user.setProperty(i, responseUser.getProperty(i).toString());
                 }
-                                            /*_appPrefs.saveEmail(strEmail);*/
+
 
                 ArrayList<User> userarray = new ArrayList<User>();
                 userarray.add(0, user);
@@ -232,15 +248,22 @@ public class Splash extends ActionBarActivity {
                             .getProperty(56).toString());
                     school.ST2Rate = Float.parseFloat(responseSchool
                             .getProperty(59).toString());
+                    school.LogoName = responseSchool.getProperty(116)
+                            .toString();
+
 
                     _appPrefs.saveSessionID(school.SessionID);
                     _appPrefs.saveCCProcessor(school.CCProcessor);
                     _appPrefs.saveST1Rate(school.ST1Rate);
                     _appPrefs.saveST2Rate(school.ST2Rate);
+                    newLogoName = school.LogoName;
+                    if (newLogoName != LogoName)
+                        _appPrefs.saveLogoName(newLogoName);
+
                 }
 
             } catch (Exception exception) {
-
+                exception.printStackTrace();
             }
 
             return user;
@@ -260,6 +283,4 @@ public class Splash extends ActionBarActivity {
         }
 
     }
-
-
 }

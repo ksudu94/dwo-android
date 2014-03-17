@@ -1274,8 +1274,11 @@ public class School implements KvmSerializable {
                 MercuryCVVCheck = Integer.parseInt(value.toString());
                 break;
             case 116:
-                LogoName = value.toString();
-                break;
+                if (value.equals("anyType{}")) {
+                    LogoName = "";
+                } else {
+                    LogoName = value.toString();
+                }
             default:
                 break;
         }

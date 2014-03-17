@@ -1,6 +1,7 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -11,9 +12,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.Account;
+import com.akadasoftware.danceworksonline.classes.AccountTransactions;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.User;
+
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.MarshalFloat;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,18 +43,21 @@ import java.util.Calendar;
  */
 public class EnterPaymentFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static String ARG_SECTION_NUMBER = "section_number";
 
+    String SOAP_ACTION, METHOD_NAME, UserGUID, PDate, PDesc, ChkNo, Kind, CCard, CCDate, CCAuth,
+            PaymentID, ProcessData, RefNo, AuthCode, Invoice, AcqRefData, CardHolderName, CCToken;
 
-    String SOAP_ACTION, METHOD_NAME, userguid;
-    int schid, userid, chgid;
+    int SchID, UserID, chgid, AcctID, CCRecNo, TransPostHistID, SessionID, ConsentID;
 
+    Boolean POSTrans;
+
+    Float Amount;
     private AppPreferences _appPrefs;
     Account account;
+    User user;
     Activity activity;
     ArrayList<Account> arrayAccounts;
+    ArrayList<AccountTransactions> TransactionArray;
 
     TextView tvDate, tvTitle, tvType, tvReference, tvDescription, tvAmount, tvChangeAmount;
     EditText etReference, etDescription;
@@ -54,17 +69,6 @@ public class EnterPaymentFragment extends Fragment {
     private onEditAmountDialog mListener;
     private onEditDateDialog dateListener;
 
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment EnterPaymentFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public EnterPaymentFragment() {
-        // Required empty public constructor
-    }
 
     /**
      * Uses a interface so that it can communicate with the parent activity which is AccountInformation
@@ -92,6 +96,16 @@ public class EnterPaymentFragment extends Fragment {
         args.putInt("Position", position);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment EnterPaymentFragment.
+     */
+    public EnterPaymentFragment() {
+        // Required empty public constructor
     }
 
 
@@ -174,6 +188,37 @@ public class EnterPaymentFragment extends Fragment {
             }
         });
 
+
+        /**
+         * Button click to submit payment to database. Makes sure there are no 0 payments and there
+         * description field is not blank.
+         */
+        btnPayment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (tvChangeAmount.getText().toString().trim().length() > 0) {
+                    Float floatAmount = Float.parseFloat(tvChangeAmount.getText().toString());
+                    if (floatAmount == 0) {
+                        Toast toast = Toast.makeText(getActivity(), "Cannot enter a payment with an amount of $0 ",
+                                Toast.LENGTH_LONG);
+                        toast.show();
+                    } else if (etDescription.getText().toString().trim().length() == 0) {
+                        Toast toast = Toast.makeText(getActivity(), "Cannot enter a payment with a blank Description",
+                                Toast.LENGTH_LONG);
+                        toast.show();
+                    } else {
+                        enterPaymentAsync enter = new enterPaymentAsync();
+                        enter.execute();
+                    }
+                } else {
+                    Toast toast = Toast.makeText(getActivity(), "Cannot enter a payment with an amount of $0 ",
+                            Toast.LENGTH_LONG);
+                    toast.show();
+                }
+
+            }
+        });
+
         // Returning the populated layout for this fragment
         return rootView;
     }
@@ -213,9 +258,218 @@ public class EnterPaymentFragment extends Fragment {
     class Data {
 
         static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
-        private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
+        static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
     }
 
+    public class enterPaymentAsync extends AsyncTask<Data, Void, Boolean> {
+
+        public Boolean doInBackground(Data... data) {
+            SoapPrimitive enterPayment = null;
+
+            UserID = _appPrefs.getUserID();
+            UserGUID = _appPrefs.getUserGUID();
+            SchID = account.SchID;
+            AcctID = account.AcctID;
+            SessionID = _appPrefs.getSessionID();
+            Amount = Float.valueOf(tvChangeAmount.getText().toString());
+            POSTrans = false;
+            Kind = "C";
+
+            enterPayment = EnterPayment(UserID, UserGUID, SchID, AcctID, PDate, PDesc, ChkNo, Amount, Kind, CCard, CCDate, CCAuth,
+                    CCRecNo, POSTrans, TransPostHistID, SessionID, ConsentID, PaymentID, ProcessData, RefNo,
+                    AuthCode, Invoice, AcqRefData, CardHolderName, CCToken);
+            return EnterPaymentFromSoap(enterPayment);
+        }
+
+        protected void onPostExecute(Boolean result) {
+
+            if (result) {
+                Toast toast = Toast.makeText(getActivity(), "Payment Successfully entered", Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                Toast toast = Toast.makeText(getActivity(), "Payment failed", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        }
+    }
+
+    /**
+     * Some of the variables aren't being used because they end up being 0/"" anyway so i just set
+     * that manually in the property info side to save time. I just left them in there so it'd match
+     * our webmethod. They can easily be removed later.
+     *
+     * @return Returns a soap object which is basically a success or fail message.
+     */
+    public SoapPrimitive EnterPayment(int UserID, String UserGUID, int SchID, int AcctID, String PDate, String PDesc, String ChkNo, float Amount, String Kind, String CCard, String CCDate, String CCAuth,
+                                      int CCRecNo, Boolean POSTrans, int TransPostHistID, int SessionID, int ConsentID, String PaymentID, String ProcessData, String RefNo,
+                                      String AuthCode, String Invoice, String AcqRefData, String CardHolderName, String CCToken) {
+        SOAP_ACTION = "enterPayment";
+        METHOD_NAME = "enterPayment";
+
+        SoapObject requestEnterPayment = new SoapObject(Data.NAMESPACE, METHOD_NAME);
+
+        PropertyInfo userID = new PropertyInfo();
+        userID.setName("UserID");
+        userID.setValue(UserID);
+        requestEnterPayment.addProperty(userID);
+
+        PropertyInfo userGUID = new PropertyInfo();
+        userGUID.setName("UserGUID");
+        userGUID.setValue(UserGUID);
+        requestEnterPayment.addProperty(userGUID);
+
+        PropertyInfo schid = new PropertyInfo();
+        schid.setName("SchID");
+        schid.setValue(SchID);
+        requestEnterPayment.addProperty(schid);
+
+
+        PropertyInfo acctid = new PropertyInfo();
+        acctid.setName("AcctID");
+        acctid.setValue(AcctID);
+        requestEnterPayment.addProperty(acctid);
+
+        PropertyInfo pdate = new PropertyInfo();
+        pdate.setName("PDate");
+        pdate.setValue("");
+        requestEnterPayment.addProperty(pdate);
+
+        PropertyInfo pdesc = new PropertyInfo();
+        pdesc.setName("PDesc");
+        pdesc.setValue("");
+        requestEnterPayment.addProperty(pdesc);
+
+        PropertyInfo chkno = new PropertyInfo();
+        chkno.setName("ChkNo");
+        chkno.setValue("");
+        requestEnterPayment.addProperty(chkno);
+
+
+        PropertyInfo amount = new PropertyInfo();
+        amount.setName("Amount");
+        amount.setType(Float.class);
+        amount.setValue(Amount);
+        requestEnterPayment.addProperty(amount);
+
+        PropertyInfo kind = new PropertyInfo();
+        kind.setName("Kind");
+        kind.setValue(Kind);
+        requestEnterPayment.addProperty(kind);
+
+        PropertyInfo ccard = new PropertyInfo();
+        ccard.setName("CCard");
+        ccard.setValue("");
+        requestEnterPayment.addProperty(ccard);
+
+        PropertyInfo ccdate = new PropertyInfo();
+        ccdate.setName("CCDate");
+        ccdate.setValue("");
+        requestEnterPayment.addProperty(ccdate);
+
+        PropertyInfo ccauth = new PropertyInfo();
+        ccauth.setName("CCAuth");
+        ccauth.setValue("");
+        requestEnterPayment.addProperty(ccauth);
+
+        PropertyInfo ccrecno = new PropertyInfo();
+        ccrecno.setName("CCRecNo");
+        ccrecno.setValue(0);
+        requestEnterPayment.addProperty(ccrecno);
+
+        PropertyInfo postrans = new PropertyInfo();
+        postrans.setName("POSTrans");
+        postrans.setValue(POSTrans);
+        requestEnterPayment.addProperty(postrans);
+
+
+        PropertyInfo transposthistid = new PropertyInfo();
+        transposthistid.setName("TransPostHistID");
+        transposthistid.setValue(0);
+        requestEnterPayment.addProperty(transposthistid);
+
+        PropertyInfo sessionid = new PropertyInfo();
+        sessionid.setName("SessionID");
+        sessionid.setValue(SessionID);
+        requestEnterPayment.addProperty(sessionid);
+
+        PropertyInfo consentid = new PropertyInfo();
+        consentid.setName("ConsentID");
+        consentid.setValue(0);
+        requestEnterPayment.addProperty(consentid);
+
+        PropertyInfo paymentid = new PropertyInfo();
+        paymentid.setName("PaymentID");
+        paymentid.setValue(0);
+        requestEnterPayment.addProperty(paymentid);
+
+
+        PropertyInfo processdata = new PropertyInfo();
+        processdata.setName("ProcessData");
+        processdata.setValue("");
+        requestEnterPayment.addProperty(processdata);
+
+        PropertyInfo refno = new PropertyInfo();
+        refno.setName("RefNo");
+        refno.setValue("");
+        requestEnterPayment.addProperty(refno);
+
+        PropertyInfo authcode = new PropertyInfo();
+        authcode.setName("AuthCode");
+        authcode.setValue("");
+        requestEnterPayment.addProperty(authcode);
+
+        PropertyInfo invoice = new PropertyInfo();
+        invoice.setName("Invoice");
+        invoice.setValue("");
+        requestEnterPayment.addProperty(invoice);
+
+
+        PropertyInfo acqrefdata = new PropertyInfo();
+        acqrefdata.setName("AcqRefData");
+        acqrefdata.setValue("");
+        requestEnterPayment.addProperty(acqrefdata);
+
+        PropertyInfo cardholdername = new PropertyInfo();
+        cardholdername.setName("CardHolderName");
+        cardholdername.setValue("");
+        requestEnterPayment.addProperty(cardholdername);
+
+        PropertyInfo cctoken = new PropertyInfo();
+        cctoken.setName("CCToken");
+        cctoken.setValue("");
+        requestEnterPayment.addProperty(cctoken);
+
+        SoapSerializationEnvelope envelopePayment = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        MarshalFloat mf = new MarshalFloat();
+        mf.register(envelopePayment);
+
+        envelopePayment.dotNet = true;
+        envelopePayment.setOutputSoapObject(requestEnterPayment);
+
+        SoapPrimitive responsePayment = null;
+        HttpTransportSE HttpTransport = new HttpTransportSE("http://app.akadasoftware.com/MobileAppWebService/Android.asmx");
+        try {
+            HttpTransport.call(SOAP_ACTION, envelopePayment);
+
+            responsePayment = (SoapPrimitive) envelopePayment.getResponse();
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return responsePayment;
+    }
+
+
+    public Boolean EnterPaymentFromSoap(SoapPrimitive soap) {
+
+        Boolean success = Boolean.parseBoolean(soap.toString());
+
+        return success;
+    }
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -226,5 +480,4 @@ public class EnterPaymentFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-
 }

@@ -254,6 +254,16 @@ public class Login extends ActionBarActivity {
                         piSchID.setValue(user.SchID);
                         requestSchool.addProperty(piSchID);
 
+                        PropertyInfo UserID = new PropertyInfo();
+                        UserID.setName("UserID");
+                        UserID.setValue(user.UserID);
+                        requestSchool.addProperty(UserID);
+
+                        PropertyInfo UserGUID = new PropertyInfo();
+                        UserGUID.setName("UserGUID");
+                        UserGUID.setValue(user.UserGUID);
+                        requestSchool.addProperty(UserGUID);
+
                         SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
                                 SoapEnvelope.VER11);
                         envelopeSchool.dotNet = true;
@@ -271,6 +281,8 @@ public class Login extends ActionBarActivity {
                                 .getProperty(56).toString());
                         school.ST2Rate = Float.parseFloat(responseSchool
                                 .getProperty(59).toString());
+                        school.LogoName = responseSchool.getProperty(116)
+                                .toString();
 
                         _appPrefs.saveSessionID(school.SessionID);
                         _appPrefs.saveCCProcessor(school.CCProcessor);

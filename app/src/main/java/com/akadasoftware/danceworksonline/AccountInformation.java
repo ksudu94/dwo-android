@@ -49,7 +49,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     private AppPreferences _appPrefs;
 
     /*Uses the saved position from the onAccountSelected method in Home.java to fill an empty
-     account with the matching position in the accountlist array.
+     account with the matching position in the account list array.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
