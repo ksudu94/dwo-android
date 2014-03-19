@@ -150,12 +150,12 @@ public class AccountTransactionsFragment extends ListFragment {
 
                 // We need to insert the PullToRefreshLayout into the Fragment's ViewGroup
                 .insertLayoutInto(viewGroup)
+
                         // We need to mark the ListView and it's Empty View as pull-able
                         // This is because they are not direct children of the ViewGroup
-
                 .theseChildrenArePullable(getListView(), getListView().getEmptyView())
-                        // Set the OnRefreshListener
 
+                        // Set the OnRefreshListener
                 .options(Options.create().refreshOnUp(true).build())
 
 
@@ -163,7 +163,7 @@ public class AccountTransactionsFragment extends ListFragment {
                     @Override
                     public void onRefreshStarted(View view) {
                         Toast toast = Toast.makeText(activity, "Refreshing :)"
-                                , Toast.LENGTH_LONG);
+                                , Toast.LENGTH_SHORT);
                         toast.show();
                         getAccountTransactions trans = new getAccountTransactions();
                         trans.execute();
@@ -175,7 +175,7 @@ public class AccountTransactionsFragment extends ListFragment {
 
                         // Finally commit the setup to our PullToRefreshLayout
                 .setup(mPullToRefreshLayout);
-        //mPullToRefreshLayout.
+
     }
 
 

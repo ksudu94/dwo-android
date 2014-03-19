@@ -6,6 +6,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -32,9 +33,22 @@ public class EditAmountDialog extends DialogFragment implements TextView.OnEdito
         View view = inflater.inflate(R.layout.editamountdialog, container);
         tvAmount = (TextView) view.findViewById(R.id.tvAmount);
         etAmount = (EditText) view.findViewById(R.id.etAmount);
+
+        /**
+         * Automatically displays the keyboard when the dialog pops up
+         */
+        etAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                }
+            }
+        });
+
         String input = getArguments().getString("Input");
         etAmount.setText(input);
-        getDialog().setTitle("Enter Charge Amount");
+        getDialog().setTitle("Enter Amount");
         etAmount.setOnEditorActionListener(this);
         return view;
     }

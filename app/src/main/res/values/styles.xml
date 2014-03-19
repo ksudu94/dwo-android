@@ -18,7 +18,6 @@
 
     <style name="Widget.Custom.PtrHeader" parent="android:Widget">
 
-
         <!-- This is commented out as you should not set this unless you know what you're doing -->
         <!--<item name="ptrHeaderHeight"></item>-->
 
@@ -29,7 +28,7 @@
 
         <item name="ptrPullText">Keep going...</item>
         <item name="ptrRefreshingText">Refreshing :)</item>
-        <item name="ptrReleaseText">Let go if you want me to refresh!</item>
+        <item name="ptrReleaseText">Release to refresh!</item>
     </style>
 
     <style name="TextAppearance.Custom.PtrHeader.Title" parent="android:TextAppearance.Large.Inverse">

@@ -245,15 +245,18 @@ public class EnterPaymentFragment extends Fragment {
                 switch (position) {
                     case 1:
                         etReference.setText("Cash");
+                        Kind = "$";
                         break;
                     case 2:
                         etReference.setText("Chk");
+                        Kind = "C";
                         break;
                     case 3:
                         etReference.setText("Credit Card");
                         break;
                     case 4:
                         etReference.setText("Other");
+                        Kind = "O";
                         break;
                     default:
                         etReference.getText().clear();
@@ -319,7 +322,6 @@ public class EnterPaymentFragment extends Fragment {
             SessionID = _appPrefs.getSessionID();
             Amount = Float.valueOf(tvChangeAmount.getText().toString());
             POSTrans = false;
-            Kind = "C";
             ChkNo = etReference.getText().toString();
 
             enterPayment = EnterPayment(UserID, UserGUID, SchID, AcctID, PDate, PDesc, ChkNo, Amount, Kind, CCard, CCDate, CCAuth,
