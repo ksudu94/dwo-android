@@ -65,10 +65,12 @@ public class AccountTransactionsFragment extends ListFragment {
      */
     private AccountTransactionAdapter transAdapter;
 
-    //Interface used to communicate between two fragments. The method OnTrasnactionSelected is
-    //defined in the AccountInformation page and the two items are found in the list item click
-    // by getting the position of the Transaction array because it corresponds to the position
-    // in the list.
+    /**
+     * Interface used to communicate between two fragments. The method OnTrasnactionSelected is
+     * defined in the AccountInformation page and the two items are found in the list item click
+     * by getting the position of the Transaction array because it corresponds to the position
+     * in the list.
+     */
     public interface OnTransactionSelected {
         // TODO: Update argument type and name
         public void OnTransactionSelected(float amount, int TID, String description);
@@ -130,10 +132,11 @@ public class AccountTransactionsFragment extends ListFragment {
         return view;
     }
 
-    /*Using ActionBar-PullToRefresh with a ListFragment is slightly different, as ListFragment
-    provides the whole content view itself. This means that we need to insert ourselves into the
-    view hierachy. That is why the code for it is put in the onViewCreated instead of
-    onCreateView
+    /**
+     * Using ActionBar-PullToRefresh with a ListFragment is slightly different, as ListFragment
+     * provides the whole content view itself. This means that we need to insert ourselves into the
+     * view hierachy. That is why the code for it is put in the onViewCreated instead of
+     * onCreateView
      */
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -147,24 +150,32 @@ public class AccountTransactionsFragment extends ListFragment {
 
                 // We need to insert the PullToRefreshLayout into the Fragment's ViewGroup
                 .insertLayoutInto(viewGroup)
-                        // We need to mark the ListView and it's Empty View as pullable
-                        // This is because they are not dirent children of the ViewGroup
+                        // We need to mark the ListView and it's Empty View as pull-able
+                        // This is because they are not direct children of the ViewGroup
 
                 .theseChildrenArePullable(getListView(), getListView().getEmptyView())
                         // Set the OnRefreshListener
 
                 .options(Options.create().refreshOnUp(true).build())
 
+
                 .listener(new OnRefreshListener() {
                     @Override
                     public void onRefreshStarted(View view) {
+                        Toast toast = Toast.makeText(activity, "Refreshing :)"
+                                , Toast.LENGTH_LONG);
+                        toast.show();
                         getAccountTransactions trans = new getAccountTransactions();
                         trans.execute();
+                        mPullToRefreshLayout.setRefreshComplete();
+
                     }
 
                 })
+
                         // Finally commit the setup to our PullToRefreshLayout
                 .setup(mPullToRefreshLayout);
+        //mPullToRefreshLayout.
     }
 
 

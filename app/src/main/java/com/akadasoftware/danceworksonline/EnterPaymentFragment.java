@@ -8,6 +8,8 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -219,6 +221,50 @@ public class EnterPaymentFragment extends Fragment {
             }
         });
 
+        /**
+         * Creating a list of resources to populate the spinner with. Because the list is pre-determined
+         * I created a resource of string array and put them in there and created a simple array
+         * adapter to populate the list with.
+         */
+        ArrayAdapter<CharSequence> paymentType = ArrayAdapter.createFromResource(activity,
+                R.array.payment_types, android.R.layout.simple_spinner_item);
+
+        // Specify the layout to use when the list of choices appears
+        paymentType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        // Apply the adapter to the spinner
+        typeSpinner.setAdapter(paymentType);
+
+
+        typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+                int position = typeSpinner.getSelectedItemPosition();
+
+                switch (position) {
+                    case 1:
+                        etReference.setText("Cash");
+                        break;
+                    case 2:
+                        etReference.setText("Chk");
+                        break;
+                    case 3:
+                        etReference.setText("Credit Card");
+                        break;
+                    case 4:
+                        etReference.setText("Other");
+                        break;
+                    default:
+                        etReference.getText().clear();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
         // Returning the populated layout for this fragment
         return rootView;
     }
@@ -274,6 +320,7 @@ public class EnterPaymentFragment extends Fragment {
             Amount = Float.valueOf(tvChangeAmount.getText().toString());
             POSTrans = false;
             Kind = "C";
+            ChkNo = etReference.getText().toString();
 
             enterPayment = EnterPayment(UserID, UserGUID, SchID, AcctID, PDate, PDesc, ChkNo, Amount, Kind, CCard, CCDate, CCAuth,
                     CCRecNo, POSTrans, TransPostHistID, SessionID, ConsentID, PaymentID, ProcessData, RefNo,
@@ -341,7 +388,7 @@ public class EnterPaymentFragment extends Fragment {
 
         PropertyInfo chkno = new PropertyInfo();
         chkno.setName("ChkNo");
-        chkno.setValue("");
+        chkno.setValue(ChkNo);
         requestEnterPayment.addProperty(chkno);
 
 
