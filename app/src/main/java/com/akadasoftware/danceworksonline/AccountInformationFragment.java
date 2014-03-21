@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,11 +50,12 @@ public class AccountInformationFragment extends Fragment {
     Account account;
     Activity activity;
     ArrayList<Account> accounts;
-    String status, expdate, cctype, SOAP_ACTION, METHOD_NAME;
+    String status, expdate, cctype, ccnum, SOAP_ACTION, METHOD_NAME;
     int acctid;
 
-    Button btnEdit, btnSave, btnSaveCard, btnEditCreditCard;
+    Button btnEdit, btnSave, btnCancel, btnSaveCard, btnEditCreditCard, btnCancelSaveCreditCard;
     EditText etFirst, etLast, etAddress, etCity, etState, etZip, etPhone, etEmail, etCC, etcard;
+    TextView tvcc;
     ViewSwitcher accountSwitcher;
     Spinner AccountStatusSpinner;
 
@@ -132,7 +132,7 @@ public class AccountInformationFragment extends Fragment {
                 cctype = "";
                 break;
         }
-        String ccnum = "";
+        ccnum = "";
         if (account.CCTrail.equals(""))
             ccnum = " ";
         else {
@@ -159,6 +159,8 @@ public class AccountInformationFragment extends Fragment {
         etEmail = (EditText) rootView.findViewById(R.id.etEmail);
         btnEdit = (Button) rootView.findViewById(R.id.btnEdit);
         btnSave = (Button) rootView.findViewById(R.id.btnSave);
+        btnCancel = (Button) rootView.findViewById(R.id.btnCancel);
+        btnCancelSaveCreditCard = (Button) rootView.findViewById(R.id.btnCancelSaveCreditCard);
         btnEditCreditCard = (Button) rootView.findViewById(R.id.btnEditCreditCard);
         accountSwitcher = (ViewSwitcher) rootView.findViewById(R.id.accountSwitcher);
 
@@ -182,7 +184,7 @@ public class AccountInformationFragment extends Fragment {
         if (cctype.length() > 0)
             type.setText(cctype + ": ");
 
-        TextView tvcc = (TextView) rootView.findViewById(R.id.tvccfield);
+        tvcc = (TextView) rootView.findViewById(R.id.tvccfield);
         etcard = (EditText) rootView.findViewById(R.id.etcard);
         btnSaveCard = (Button) rootView.findViewById(R.id.btnSaveCard);
 
@@ -191,22 +193,64 @@ public class AccountInformationFragment extends Fragment {
         etcard.setVisibility(View.VISIBLE);
         btnSaveCard.setVisibility(View.VISIBLE);
         btnEditCreditCard.setVisibility(View.VISIBLE);
+        btnCancelSaveCreditCard.setVisibility(View.VISIBLE);
+
+
+        //No credit card saved on file
         if (account.CCConsentID == 0) {
             tvcc.setVisibility(View.GONE);
             btnEditCreditCard.setVisibility(View.GONE);
-            btnSaveCard.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
 
-                }
-            });
 
         } else {
             etcard.setVisibility(View.GONE);
             btnSaveCard.setVisibility(View.GONE);
+            btnCancelSaveCreditCard.setVisibility(View.GONE);
             tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " - Exp. " + expdate);
+
         }
 
+        btnEditCreditCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tvcc.setVisibility(View.GONE);
+                btnEditCreditCard.setVisibility(View.GONE);
+                etcard.setVisibility(View.VISIBLE);
+                btnSaveCard.setVisibility(View.VISIBLE);
+                btnCancelSaveCreditCard.setVisibility(View.VISIBLE);
+            }
+        });
+
+        /**
+         * Figure out how to save credit card to webservice later
+         */
+        btnSaveCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etcard.setVisibility(View.GONE);
+                btnSaveCard.setVisibility(View.GONE);
+                btnCancelSaveCreditCard.setVisibility(View.GONE);
+                tvcc.setVisibility(View.VISIBLE);
+                btnEditCreditCard.setVisibility(View.VISIBLE);
+                tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " - Exp. " + expdate);
+
+            }
+        });
+        /**
+         * Cancels edit of credit card informatoin. Takes you back to main paige.
+         */
+        btnCancelSaveCreditCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                etcard.setVisibility(View.GONE);
+                btnSaveCard.setVisibility(View.GONE);
+                btnCancelSaveCreditCard.setVisibility(View.GONE);
+                tvcc.setVisibility(View.VISIBLE);
+                btnEditCreditCard.setVisibility(View.VISIBLE);
+                tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " - Exp. " + expdate);
+
+            }
+        });
 
         btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -241,7 +285,9 @@ public class AccountInformationFragment extends Fragment {
                 }
             }
         });
-
+        /**
+         * Saves changes to account information. Returns you back to main page
+         */
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -249,6 +295,22 @@ public class AccountInformationFragment extends Fragment {
                     saveAccountChanges save = new saveAccountChanges();
                     save.execute();
                     accountSwitcher.showNext();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        /**
+         * Cancel changes to account information. Returns you back to main page
+         */
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    accountSwitcher.showNext();
+                    Toast toast = Toast.makeText(getActivity(), "Changes Canceled", Toast.LENGTH_LONG);
+                    toast.show();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -9,7 +9,11 @@
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     -->
     <item name="fragment_accountlist" type="layout">@layout/fragment_accountlist_list</item>
-    <item name="fragment_accounttransactions" type="layout">        @layout/fragment_accounttransactions_list</item>
-    <item name="fragment_accountstudentsfragment" type="layout">@layout/fragment_accountstudents_list</item>
-
+    <item name="fragment_accounttransactions" type="layout">
+        @layout/fragment_accounttransactions_list
+    </item>
+    <item name="fragment_accountstudentsfragment" type="layout">
+        @layout/fragment_accountstudents_list
+    </item>
+    <bool name="isTablet">false</bool>
 </resources>

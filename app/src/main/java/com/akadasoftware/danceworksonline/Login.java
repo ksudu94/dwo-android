@@ -233,7 +233,7 @@ public class Login extends ActionBarActivity {
                     }
                     ArrayList<User> userarray = new ArrayList<User>();
                     userarray.add(0, user);
-                    //If the user logged in before it will not hit this break point but instead
+                    // If the user logged in before it will not hit this break point but instead
                     // go to the splash page
                     if (user.SchID > 0) {
                         _appPrefs.saveSchID(user.SchID);
@@ -254,6 +254,16 @@ public class Login extends ActionBarActivity {
                         piSchID.setValue(user.SchID);
                         requestSchool.addProperty(piSchID);
 
+                        PropertyInfo UserID = new PropertyInfo();
+                        UserID.setName("UserID");
+                        UserID.setValue(user.UserID);
+                        requestSchool.addProperty(UserID);
+
+                        PropertyInfo UserGUID = new PropertyInfo();
+                        UserGUID.setName("UserGUID");
+                        UserGUID.setValue(user.UserGUID);
+                        requestSchool.addProperty(UserGUID);
+
                         SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
                                 SoapEnvelope.VER11);
                         envelopeSchool.dotNet = true;
@@ -271,15 +281,19 @@ public class Login extends ActionBarActivity {
                                 .getProperty(56).toString());
                         school.ST2Rate = Float.parseFloat(responseSchool
                                 .getProperty(59).toString());
+                        school.LogoName = responseSchool.getProperty(116)
+                                .toString();
 
                         _appPrefs.saveSessionID(school.SessionID);
                         _appPrefs.saveCCProcessor(school.CCProcessor);
                         _appPrefs.saveST1Rate(school.ST1Rate);
                         _appPrefs.saveST2Rate(school.ST2Rate);
+                        _appPrefs.saveLogoName(school.LogoName);
+
                     }
 
                 } catch (Exception exception) {
-
+                    exception.printStackTrace();
                 }
 
                 return user;

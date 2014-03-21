@@ -14,9 +14,23 @@ import android.view.MenuItem;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
 import java.text.NumberFormat;
+import java.util.Calendar;
 import java.util.Locale;
 
-public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener, AccountTransactionsFragment.OnTransactionSelected, AccountStudentsFragment.OnFragmentInteractionListener {
+/**
+ * This is the parent activity from which all fragments are linked and where all of the interfaces
+ * are linked. In the case of dates both the dialog and the fragment itself have things that need
+ * to be implemented.
+ */
+public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener,
+        AccountTransactionsFragment.OnTransactionSelected,
+        AccountStudentsFragment.OnFragmentInteractionListener,
+        EnterChargeFragment.onEditAmountDialog,
+        EnterChargeFragment.onEditDateDialog,
+        EnterPaymentFragment.onEditAmountDialog,
+        EnterPaymentFragment.onEditDateDialog,
+        EditDateDialog.EditDateDialogListener,
+        EditAmountDialog.EditAmountDialogListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -35,7 +49,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     private AppPreferences _appPrefs;
 
     /*Uses the saved position from the onAccountSelected method in Home.java to fill an empty
-     account with the matching position in the accountlist array.
+     account with the matching position in the account list array.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +103,8 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
             actionBar.addTab(
                     actionBar.newTab()
                             .setText(mSectionsPagerAdapter.getPageTitle(i))
-                            .setTabListener(this));
+                            .setTabListener(this)
+            );
         }
     }
 
@@ -99,7 +114,8 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.account_information, menu);
-        return true;
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -139,6 +155,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     public void onFragmentInteraction(String id) {
     }
 
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -176,6 +193,9 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                 case 4:
                     newFragment = EnterChargeFragment.newInstance(listPosition);
                     break;
+                case 5:
+                    newFragment = PullFragment.newInstance(listPosition);
+                    break;
                 default:
                     newFragment = AccountInformationFragment.newInstance(listPosition);
                     break;
@@ -187,7 +207,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         @Override
         public int getCount() {
             // Show x number of pages.
-            return 5;
+            return 6;
         }
 
         //Tab titles
@@ -205,6 +225,8 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                     return getString(R.string.title_account_payment).toUpperCase(l);
                 case 4:
                     return getString(R.string.title_account_charge).toUpperCase(l);
+                case 5:
+                    return "PullFragment".toUpperCase(l);
                 default:
                     return "";
             }
@@ -222,13 +244,96 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
         NumberFormat format = NumberFormat.getCurrencyInstance();
         EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
-        pf.etAmount.setText(String.valueOf(format.format(balance)));
+        pf.tvChangeAmount.setText(String.valueOf(format.format(balance)));
         _appPrefs.saveChgID(TID);
         pf.chgid = TID;
         pf.etDescription.setText("Payment - " + description);
 
+    }
+
+    /**
+     * Passes info from fragment to dialog so that you can pre-fill the dialog with the stored value
+     * for amount using the bundle
+     */
+
+
+    public void onEditAmountDialog(String input) {
+
+        FragmentManager fm = getSupportFragmentManager();
+        EditAmountDialog editAmountDialog = new EditAmountDialog();
+        Bundle args = new Bundle();
+        args.putString("Input", input);
+        editAmountDialog.setArguments(args);
+        //Just the name of the dialog. Has no effect on it.
+        editAmountDialog.show(fm, "");
+    }
+
+    /**
+     * The inputText is the value from the edit text from the dialog which we then use set tvChangeAmount
+     * and then run the async task.
+     */
+
+    @Override
+    public void onFinishEditAmountDialog(String inputText) {
+
+        int position = getActionBar().getSelectedTab().getPosition();
+
+        if (position == 3) {
+            EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
+            pf.tvChangeAmount.setText(inputText);
+        } else {
+            EnterChargeFragment cf = (EnterChargeFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 4);
+            cf.tvChangeAmount.setText(inputText);
+            cf.runChargeAmountAsync();
+        }
 
     }
 
+    /**
+     * The date is the value from the datePicker from the dialog which we then use set tvDate in the
+     * EnterCharge Fragment.
+     */
+
+
+    /**
+     * After we get the date from the datepicker dialog we use the interface to pass that value back
+     * to EnterCharge to set the date to be used for various other methods
+     */
+
+
+    @Override
+    public void onEditDateDialog(Calendar date) {
+
+        FragmentManager fm = getSupportFragmentManager();
+        EditDateDialog editDateDialog = new EditDateDialog();
+
+
+        getIntent().putExtra("Calendar", date);
+        /**
+         * Bundle args = new Bundle();
+         * int year = date.get(Calendar.YEAR);
+         * int month = date.get(Calendar.MONTH);
+         * int day = date.get(Calendar.DAY_OF_MONTH);
+         * args.putInt("Year", year);
+         * args.putInt("Month", month);
+         * args.putInt("Day", day);
+         * editDateDialog.setArguments(args);
+         */
+        editDateDialog.show(fm, "");
+    }
+
+    @Override
+    public void onFinishEditDateDialog(Calendar dateSelected) {
+        int position = getActionBar().getSelectedTab().getPosition();
+
+        if (position == 3) {
+            EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
+            pf.setDate(dateSelected);
+        } else {
+            EnterChargeFragment cf = (EnterChargeFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 4);
+            cf.setDate(dateSelected);
+        }
+
+    }
 
 }

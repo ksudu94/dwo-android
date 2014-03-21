@@ -206,13 +206,30 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/etcard" />
 
-                <Button
-                    android:id="@+id/btnSaveCard"
-                    android:layout_width="75dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="right"
-                    android:clickable="true"
-                    android:text="save" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/activity_vertical_padding"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/btnSaveCard"
+                        android:layout_width="80dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="right"
+                        android:clickable="true"
+                        android:text="Save" />
+
+                    <Button
+                        android:id="@+id/btnCancelSaveCreditCard"
+                        android:text="Cancel"
+                        android:layout_width="80dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="right"
+                        android:layout_marginTop="2dp"
+                        android:clickable="true" />
+
+                </LinearLayout>
             </LinearLayout>
 
 
@@ -223,158 +240,171 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <FrameLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="2dip"
-            android:orientation="vertical">
+            android:layout_height="fill_parent">
 
-            <Button
-                android:id="@+id/btnSave"
-                android:layout_width="75dip"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:text="Save" />
-
-            <TextView
-                android:id="@+id/tvFName"
+            <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:padding="5dip"
-                android:textStyle="bold"
-                android:text="First Name: " />
+                android:layout_gravity="center"
+                android:layout_marginTop="2dip"
+                android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/etFirst"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dip"
-                android:hint="First Name"
-                android:padding="5dip" />
+                <Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="80dip"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:text="Save" />
 
-            <TextView
-                android:id="@+id/tvLName"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dip"
-                android:textStyle="bold"
-                android:text="Last Name: " />
+                <Button
+                    android:id="@+id/btnCancel"
+                    android:layout_width="80dip"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:text="Cancel" />
 
-            <EditText
-                android:id="@+id/etLast"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dip"
-                android:hint="Last Name"
-                android:padding="5dip" />
+                <TextView
+                    android:id="@+id/tvFName"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dip"
+                    android:textStyle="bold"
+                    android:text="First Name: " />
 
-            <TextView
-                android:id="@+id/tvAddress"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dip"
-                android:textStyle="bold"
-                android:text="Address: " />
+                <EditText
+                    android:id="@+id/etFirst"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dip"
+                    android:hint="First Name"
+                    android:padding="5dip" />
 
-            <EditText
-                android:id="@+id/etAddress"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dip"
-                android:hint="Street Address"
-                android:padding="5dip" />
+                <TextView
+                    android:id="@+id/tvLName"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dip"
+                    android:textStyle="bold"
+                    android:text="Last Name: " />
 
-            <TextView
-                android:id="@+id/tvCity"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dip"
-                android:textStyle="bold"
-                android:text="City: " />
+                <EditText
+                    android:id="@+id/etLast"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dip"
+                    android:hint="Last Name"
+                    android:padding="5dip" />
 
-            <EditText
-                android:id="@+id/etCity"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dip"
-                android:hint="City"
-                android:padding="5dip" />
+                <TextView
+                    android:id="@+id/tvAddress"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dip"
+                    android:textStyle="bold"
+                    android:text="Address: " />
 
-            <TextView
-                android:id="@+id/tvState"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dip"
-                android:textStyle="bold"
-                android:text="State: " />
+                <EditText
+                    android:id="@+id/etAddress"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dip"
+                    android:hint="Street Address"
+                    android:padding="5dip" />
 
-            <EditText
-                android:id="@+id/etState"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dip"
-                android:hint="State"
-                android:padding="5dip" />
+                <TextView
+                    android:id="@+id/tvCity"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dip"
+                    android:textStyle="bold"
+                    android:text="City: " />
 
-            <TextView
-                android:id="@+id/tvZip"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dip"
-                android:textStyle="bold"
-                android:text="Zip Code: " />
+                <EditText
+                    android:id="@+id/etCity"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dip"
+                    android:hint="City"
+                    android:padding="5dip" />
 
-            <EditText
-                android:id="@+id/etZip"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dip"
-                android:hint="Zip Code"
-                android:padding="5dip" />
+                <TextView
+                    android:id="@+id/tvState"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dip"
+                    android:textStyle="bold"
+                    android:text="State: " />
 
-            <TextView
-                android:id="@+id/tvPhone"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dip"
-                android:textStyle="bold"
-                android:text="Phone:" />
+                <EditText
+                    android:id="@+id/etState"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dip"
+                    android:hint="State"
+                    android:padding="5dip" />
 
-            <EditText
-                android:id="@+id/etPhone"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dip"
-                android:hint="Phone Number"
-                android:padding="5dip" />
+                <TextView
+                    android:id="@+id/tvZip"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dip"
+                    android:textStyle="bold"
+                    android:text="Zip Code: " />
 
-            <TextView
-                android:id="@+id/tvEmail"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:padding="5dip"
-                android:textStyle="bold"
-                android:text="Email:" />
+                <EditText
+                    android:id="@+id/etZip"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dip"
+                    android:hint="Zip Code"
+                    android:padding="5dip" />
 
-            <EditText
-                android:id="@+id/etEmail"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="2dip"
-                android:hint="Email"
-                android:padding="5dip" />
+                <TextView
+                    android:id="@+id/tvPhone"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dip"
+                    android:textStyle="bold"
+                    android:text="Phone:" />
 
-            <Spinner
-                android:id="@+id/AccountStatusSpinner"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:animateLayoutChanges="true"
-                android:dropDownSelector="#000000"
-                android:spinnerMode="dropdown"
-                android:prompt="@string/status" />
+                <EditText
+                    android:id="@+id/etPhone"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dip"
+                    android:hint="Phone Number"
+                    android:padding="5dip" />
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tvEmail"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="5dip"
+                    android:textStyle="bold"
+                    android:text="Email:" />
+
+                <EditText
+                    android:id="@+id/etEmail"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dip"
+                    android:hint="Email"
+                    android:padding="5dip" />
+
+                <Spinner
+                    android:id="@+id/AccountStatusSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
+                    android:dropDownSelector="#000000"
+                    android:spinnerMode="dropdown"
+                    android:prompt="@string/status" />
+
+            </LinearLayout>
+        </FrameLayout>
     </ScrollView>
 </ViewSwitcher>

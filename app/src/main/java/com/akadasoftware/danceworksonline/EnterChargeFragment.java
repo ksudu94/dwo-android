@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -31,8 +30,11 @@ import org.ksoap2.transport.HttpTransportSE;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 /**
@@ -40,18 +42,17 @@ import java.util.ArrayList;
  * It gets the account from _appPrefs as a position in the accounts array list and from that
  * account uses fields like acctid, billingfreq, mtuition etc. It also uses the ChargeCode class
  * for other values. Those values are retrieved from the web method with the values userid,
- * userguid and schid which are all in _appPrefs. The end result is a spinner populated by the
+ * userguid and schid which are all in _appPrefs. It uses two interfaces to be able to run
+ * editAmount and editDate dialogs. The end result is a spinner populated by the
  * ChgDesc field and then values returned with DiscountedAmount and Total w/ tax textviews
  * only showing up if their values have changed.
  */
 
 
 public class EnterChargeFragment extends Fragment {
-    private static String ARG_SECTION_NUMBER = "section_number";
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 
-    String SOAP_ACTION, METHOD_NAME, userguid;
+
+    String SOAP_ACTION, METHOD_NAME, userguid, date;
     int schid, userid;
 
 
@@ -64,13 +65,18 @@ public class EnterChargeFragment extends Fragment {
     ChargeCodes chargeCode;
     float floatAmount, floatDiscAmount, floatSTax1, floatSTax2;
 
-    TextView tvDescription, tvAmount, tvDiscAmount, tvDiscAmountDisplayed, tvTotal, tvTotalDisplayed;
-    EditText etDescription, etAmount;
-    DatePicker datePicker;
+    TextView tvDate, tvDescription, tvAmount, tvChangeAmount, tvAmountHint, tvDiscAmount, tvDiscAmountDisplayed, tvTotal, tvTotalDisplayed;
+    EditText etDescription;
+
     Spinner chargecodespinner;
     Button btnCharge;
+    Calendar cal;
 
-    //Called to do initial creation of a fragment. This is called after onAttach(Activity) and
+    // Listeners for the interface used to handle the dialog pop-ups
+    private onEditAmountDialog mListener;
+    private onEditDateDialog dateListener;
+
+    // Called to do initial creation of a fragment. This is called after onAttach(Activity) and
     // before onCreateView(LayoutInflater, ViewGroup, Bundle).Note that this can be called while
     // the fragment's activity is still in the process of being created. As such, you can not rely
     // on things like the activity's content view hierarchy being initialized at this point.
@@ -89,12 +95,55 @@ public class EnterChargeFragment extends Fragment {
 
     }
 
-        @Override
-        public void onResume(){
-            super.onResume();
-            getChargeCodesAsync chargeCodes = new getChargeCodesAsync();
-            chargeCodes.execute();
+    @Override
+    public void onResume() {
+        super.onResume();
+        getChargeCodesAsync chargeCodes = new getChargeCodesAsync();
+        chargeCodes.execute();
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (onEditAmountDialog) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement onEditAmountDialog");
         }
+        try {
+            dateListener = (onEditDateDialog) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement onEditDateDialog");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+        dateListener = null;
+    }
+
+    /**
+     * Uses a interface so that it can communicate with the parent activity which is AccountInformation
+     * First it comes here and then goes to AccountInformation where it is then created with the
+     * onEditAmountDialog method.. That method goes to the EditAmountDialog class which takes the
+     * new Amount from the dialog and returns it to the onFinishEditAmountDialog method that from there
+     * runs the runChargeAmountAsync method because we could not access it otherwise from outside this
+     * class.
+     */
+    public interface onEditAmountDialog {
+        // TODO: Update argument type and name
+        public void onEditAmountDialog(String input);
+    }
+
+    public interface onEditDateDialog {
+        // TODO: Update argument type and name
+        public void onEditDateDialog(Calendar today);
+    }
+
 
     /**
      * Use this factory method to create a new instance of
@@ -112,9 +161,11 @@ public class EnterChargeFragment extends Fragment {
         // Required empty public constructor
     }
 
-    //This method is to handle if your activity is every paused by a semi-transparent activity starts
-    //ie opening an app drawer. Here you would handle such things as pausing a video or stopping
-    //an animation.
+    /**
+     * This method is to handle if your activity is every paused by a semi-transparent activity starts
+     * ie opening an app drawer. Here you would handle such things as pausing a video or stopping
+     * an animation.
+     */
     @Override
     public void onPause() {
         super.onPause();  // Always call the superclass method first
@@ -130,11 +181,13 @@ public class EnterChargeFragment extends Fragment {
 
         //use inflated view to find elements on page
         tvDescription = (TextView) rootView.findViewById(R.id.tvDescription);
+        tvDate = (TextView) rootView.findViewById(R.id.tvDate);
         tvAmount = (TextView) rootView.findViewById(R.id.tvAmount);
+        tvChangeAmount = (TextView) rootView.findViewById(R.id.tvChangeAmount);
+        tvAmountHint = (TextView) rootView.findViewById(R.id.tvAmountHint);
         etDescription = (EditText) rootView.findViewById(R.id.etDescription);
-        etAmount = (EditText) rootView.findViewById(R.id.etAmount);
         chargecodespinner = (Spinner) rootView.findViewById(R.id.chargecodespinner);
-        datePicker = (DatePicker) rootView.findViewById(R.id.datePicker);
+
         btnCharge = (Button) rootView.findViewById(R.id.btnCharge);
         tvDiscAmount = (TextView) rootView.findViewById(R.id.tvDiscAmount);
         tvDiscAmountDisplayed = (TextView) rootView.findViewById(R.id.tvDiscAmountDisplayed);
@@ -148,8 +201,8 @@ public class EnterChargeFragment extends Fragment {
         btnCharge.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (etAmount.getText().toString().trim().length() > 0) {
-                    Float floatAmount = Float.parseFloat(etAmount.getText().toString());
+                if (tvChangeAmount.getText().toString().trim().length() > 0) {
+                    Float floatAmount = Float.parseFloat(tvChangeAmount.getText().toString());
                     if (floatAmount == 0) {
                         Toast toast = Toast.makeText(getActivity(), "Cannot enter a charge with an amount of $0 ",
                                 Toast.LENGTH_LONG);
@@ -168,12 +221,49 @@ public class EnterChargeFragment extends Fragment {
                     toast.show();
                 }
 
-
             }
         });
 
+
+        /**
+         *  Use a listener to interact with interface on EditDateDialog and EditAmountDialogs. Sends
+         *  the value in to be pre set on the dialogs. For the amount dialog, changing to 0 amount
+         *  with the default charge type selected cause the app the crash.
+         */
+
+        tvChangeAmount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (chargecodespinner.getSelectedItemPosition() == 0) {
+                    Toast toast = Toast.makeText(getActivity(), "Please select a charge type. ",
+                            Toast.LENGTH_LONG);
+                    toast.show();
+                } else
+                    mListener.onEditAmountDialog(tvChangeAmount.getText().toString());
+            }
+        });
+
+
+        cal = Calendar.getInstance();
+        setDate(cal);
+        tvDate.setTextSize(25);
+        tvDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dateListener.onEditDateDialog(cal);
+            }
+        });
+
+
         // Inflate the layout for this fragment
         return rootView;
+    }
+
+    public void setDate(Calendar calinput) {
+        cal = calinput;
+        DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+        String today = dateFormat.format(cal.getTime());
+        tvDate.setText(today);
     }
 
 
@@ -202,12 +292,6 @@ public class EnterChargeFragment extends Fragment {
             return RetrieveChargeCodesFromSoap(codes);
 
         }
-
-        protected void onProgressUpdate(Integer... progress) {
-            dialog.incrementProgressBy(progress[0]);
-
-        }
-
 
         protected void onPostExecute(ArrayList<ChargeCodes> result) {
             dialog.dismiss();
@@ -319,9 +403,8 @@ public class EnterChargeFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 setSelectedCharge(chargecodespinner);
 
-                if (!etAmount.getText().toString().equals("0.00")) {
-                    getChargeAmountAsync ChargeAmount = new getChargeAmountAsync();
-                    ChargeAmount.execute();
+                if (!tvChangeAmount.getText().toString().equals("0.00")) {
+                    runChargeAmountAsync();
                 }
 
             }
@@ -333,6 +416,15 @@ public class EnterChargeFragment extends Fragment {
         });
     }
 
+    /**
+     * We need this method so that we can run it form onFinishEditAmoutnDialog which is in the parent
+     * activity.
+     */
+    public void runChargeAmountAsync() {
+        getChargeAmountAsync ChargeAmount = new getChargeAmountAsync();
+        ChargeAmount.execute();
+    }
+
     //Handles if the selected field for the spinner
     public void setSelectedCharge(Spinner spinnerChargeCode) {
 
@@ -341,15 +433,15 @@ public class EnterChargeFragment extends Fragment {
 
 
         if (chargeCode.ChgID == 0) {
-            etAmount.setText("0.00");
+            tvChangeAmount.setText("0.00");
             etDescription.setText("");
 
         } else if (chargeCode.Kind.equals("T") && Integer.parseInt(chargeCode.ChgNo) < 4) {
 
-            etAmount.setText(String.valueOf(account.MTuition));
+            tvChangeAmount.setText(String.valueOf(account.MTuition));
             etDescription.setText(chargeCode.ChgDesc);
         } else {
-            etAmount.setText(String.valueOf(chargeCode.Amount));
+            tvChangeAmount.setText(String.valueOf(chargeCode.Amount));
             etDescription.setText(chargeCode.ChgDesc);
         }
     }
@@ -358,13 +450,13 @@ public class EnterChargeFragment extends Fragment {
     public class getChargeAmountAsync extends
             AsyncTask<Data, Void, Float[]> {
 
-        ProgressDialog dialog;
-
         protected void onPreExecute() {
-          /*  dialog = new ProgressDialog(activity);
-            dialog.setProgress(ProgressDialog.STYLE_HORIZONTAL);
-            dialog.setMax(100);
-            dialog.show();*/
+            /**
+             * dialog = new ProgressDialog(activity);
+             * dialog.setProgress(ProgressDialog.STYLE_HORIZONTAL);
+             * dialog.setMax(100);
+             * dialog.show();
+             * */
         }
 
         @Override
@@ -373,22 +465,17 @@ public class EnterChargeFragment extends Fragment {
 
             float ST1Rate = _appPrefs.getST1Rate();
             float ST2Rate = _appPrefs.getST2Rate();
-            newCodes = getChargeAmount(userid, userguid, chargeCode.ChgID, account.AcctID, account.BillingFreq, Float.parseFloat(etAmount.getText().toString()), account.TuitionSel, account.AccountFeeAmount, ST1Rate, ST2Rate);
+            newCodes = getChargeAmount(userid, userguid, chargeCode.ChgID, account.AcctID, account.BillingFreq, Float.parseFloat(tvChangeAmount.getText().toString()), account.TuitionSel, account.AccountFeeAmount, ST1Rate, ST2Rate);
             return RetrieveChargeCodeFromSoap(newCodes);
 
 
         }
 
-        protected void onProgressUpdate(Integer... progress) {
-            // dialog.incrementProgressBy(progress[0]);
-
-        }
-
 
         protected void onPostExecute(Float[] result) {
-            //dialog.dismiss();
+
             NumberFormat format = NumberFormat.getCurrencyInstance();
-            floatAmount = Float.parseFloat(etAmount.getText().toString());
+            floatAmount = Float.parseFloat(tvChangeAmount.getText().toString());
             floatDiscAmount = result[0];
             floatSTax1 = result[1];
             floatSTax2 = result[2];
@@ -540,12 +627,6 @@ public class EnterChargeFragment extends Fragment {
                 DiscAmount = 0;
             } else
                 totalAmount = chargeCode.Amount;
-
-            int day = datePicker.getDayOfMonth();
-            int month = datePicker.getMonth() + 1;
-            int year = datePicker.getYear();
-
-            String date = String.valueOf(year) + "-" + String.valueOf(month) + "-" + String.valueOf(day);
 
 
             enterCharge = EnterCharge(userid, userguid, schid, account.AcctID, date, chargeCode.ChgDesc,

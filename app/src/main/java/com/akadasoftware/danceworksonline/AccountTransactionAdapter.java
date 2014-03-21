@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.akadasoftware.danceworksonline.classes.AccountTransactions;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
-import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.List;
 
@@ -51,8 +50,9 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
         TextView tvBalance;
     }
 
-    /*The holder is the container for each list item defined in the ViewHolder class. Below we
-      define them and find out what the equivalent is in our xml file
+    /**
+     * The holder is the container for each list item defined in the ViewHolder class. Below we
+     * define them and find out what the equivalent is in our xml file
     */
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.v("ConertView", String.valueOf(position));
@@ -92,7 +92,6 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
 
         AccountTransactions trans = transactions.get(position);
         NumberFormat format = NumberFormat.getCurrencyInstance();
-        DateFormat dateformat = DateFormat.getDateInstance();
 
         if (trans.Kind.equals("$")) {
             kind = "CASH";

@@ -30,4 +30,12 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_student">Student</string>
 
+    <string-array name="payment_types">
+        <item>Select Charge Type</item>
+        <item>Cash</item>
+        <item>Check</item>
+        <item>Credit Card</item>
+        <item>Other</item>
+    </string-array>
+
 </resources>

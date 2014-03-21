@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,9 +8,40 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.akadasoftware.danceworksonline.classes.Student$PlaceholderFragment">
 
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvFNameLName"
+            android:text="Name"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:layout_marginRight="25dp" />
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvStatus"
+            android:text="Status"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:layout_marginRight="25dp" />
+    </LinearLayout>
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="#33b5e6"
+        android:dividerHeight="2px" />
+
     <TextView
         android:text="@string/hello_world"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-</RelativeLayout>
+</FrameLayout>

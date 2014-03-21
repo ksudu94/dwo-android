@@ -4,6 +4,7 @@ import org.ksoap2.serialization.KvmSerializable;
 import org.ksoap2.serialization.PropertyInfo;
 
 import java.util.Hashtable;
+
 /**
  * Created by DJ on 12/28/13.
  */
@@ -26,7 +27,7 @@ public class School implements KvmSerializable {
             CostumeNote, RConfirmNote, ShipName, ShipAddr, ShipAddr2, ShipCity,
             ShipState, ShipZip, ShipPhone, CCProcessor, CCUserName, CCPassword,
             YearUpdate, Closeout, OLPWord, ReturnPolicy, DeclineMessage,
-            MCAPIString, MCListID, MercuryUsername, MercuryPassword;
+            MCAPIString, MCListID, MercuryUsername, MercuryPassword, LogoName;
 
     public float DiscAmount, DiscRound, LateChgAmt, ClassTuition, ST1Rate,
             ST2Rate, RegStu01, RegStu02, RegStu03, RegStu04, RegStu05,
@@ -73,7 +74,7 @@ public class School implements KvmSerializable {
                   boolean ccmastercard, boolean ccvisa, String declinemessage,
                   boolean mcactive, String mcapistring, String mclistid,
                   boolean useschoolemail, String mercuryusername,
-                  String mercurypassword, int mercuryavscheck, int mercurycvvcheck) {
+                  String mercurypassword, int mercuryavscheck, int mercurycvvcheck, String logoname) {
 
         SchID = schid;
         SStatus = sstatus;
@@ -191,8 +192,7 @@ public class School implements KvmSerializable {
         MercuryPassword = mercurypassword;
         MercuryAVSCheck = mercuryavscheck;
         MercuryCVVCheck = mercurycvvcheck;
-
-
+        LogoName = logoname;
 
 
     }
@@ -432,6 +432,8 @@ public class School implements KvmSerializable {
                 return MercuryAVSCheck;
             case 115:
                 return MercuryCVVCheck;
+            case 116:
+                return LogoName;
         }
 
         return null;
@@ -440,7 +442,7 @@ public class School implements KvmSerializable {
     @Override
     public int getPropertyCount() {
         // TODO Auto-generated method stub
-        return 116;
+        return 117;
     }
 
     @Override
@@ -910,6 +912,10 @@ public class School implements KvmSerializable {
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "MercuryCVVCheck";
                 break;
+            case 116:
+                info.type = PropertyInfo.STRING_CLASS;
+                info.name = "LogoName";
+                break;
             default:
                 break;
         }
@@ -1016,7 +1022,7 @@ public class School implements KvmSerializable {
                 DefaultAreaCode = value.toString();
                 break;
             case 32:
-                PhoneMask =  value.toString();
+                PhoneMask = value.toString();
                 break;
             case 33:
                 DiscType = Boolean.parseBoolean(value.toString());
@@ -1267,6 +1273,12 @@ public class School implements KvmSerializable {
             case 115:
                 MercuryCVVCheck = Integer.parseInt(value.toString());
                 break;
+            case 116:
+                if (value.equals("anyType{}")) {
+                    LogoName = "";
+                } else {
+                    LogoName = value.toString();
+                }
             default:
                 break;
         }

@@ -24,6 +24,11 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.Options;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
@@ -46,7 +51,7 @@ public class AccountTransactionsFragment extends ListFragment {
     Activity activity;
     ArrayList<Account> arrayAccounts;
 
-
+    private PullToRefreshLayout mPullToRefreshLayout;
     private OnTransactionSelected mListener;
 
     /**
@@ -60,10 +65,12 @@ public class AccountTransactionsFragment extends ListFragment {
      */
     private AccountTransactionAdapter transAdapter;
 
-    //Interace used to communicate between two fragments. The method OnTrasnactionSelected is
-    //defined in the AccountInformatoin page and the two items are found in the list item click
-    // by getting the position of the Transaction array because it corresponds to the position
-    // in the list.
+    /**
+     * Interface used to communicate between two fragments. The method OnTrasnactionSelected is
+     * defined in the AccountInformation page and the two items are found in the list item click
+     * by getting the position of the Transaction array because it corresponds to the position
+     * in the list.
+     */
     public interface OnTransactionSelected {
         // TODO: Update argument type and name
         public void OnTransactionSelected(float amount, int TID, String description);
@@ -115,6 +122,7 @@ public class AccountTransactionsFragment extends ListFragment {
         mListener = null;
     }
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -123,6 +131,53 @@ public class AccountTransactionsFragment extends ListFragment {
         View view = inflater.inflate(R.layout.fragment_accounttransactions_list, container, false);
         return view;
     }
+
+    /**
+     * Using ActionBar-PullToRefresh with a ListFragment is slightly different, as ListFragment
+     * provides the whole content view itself. This means that we need to insert ourselves into the
+     * view hierachy. That is why the code for it is put in the onViewCreated instead of
+     * onCreateView
+     */
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        ViewGroup viewGroup = (ViewGroup) view;
+
+        mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+
+        ActionBarPullToRefresh.from(activity)
+
+                // We need to insert the PullToRefreshLayout into the Fragment's ViewGroup
+                .insertLayoutInto(viewGroup)
+
+                        // We need to mark the ListView and it's Empty View as pull-able
+                        // This is because they are not direct children of the ViewGroup
+                .theseChildrenArePullable(getListView(), getListView().getEmptyView())
+
+                        // Set the OnRefreshListener
+                .options(Options.create().refreshOnUp(true).build())
+
+
+                .listener(new OnRefreshListener() {
+                    @Override
+                    public void onRefreshStarted(View view) {
+                        Toast toast = Toast.makeText(activity, "Refreshing :)"
+                                , Toast.LENGTH_SHORT);
+                        toast.show();
+                        getAccountTransactions trans = new getAccountTransactions();
+                        trans.execute();
+                        mPullToRefreshLayout.setRefreshComplete();
+
+                    }
+
+                })
+
+                        // Finally commit the setup to our PullToRefreshLayout
+                .setup(mPullToRefreshLayout);
+
+    }
+
 
     @Override
     public void onDestroyView() {
