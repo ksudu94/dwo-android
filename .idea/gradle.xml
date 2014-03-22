@@ -7,8 +7,8 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="modules">
           <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="C:\Users\Kyle\.AndroidStudioPreview\dwo-android" />
+            <option value="C:\Users\Kyle\.AndroidStudioPreview\dwo-android\app" />
           </set>
         </option>
       </GradleProjectSettings>

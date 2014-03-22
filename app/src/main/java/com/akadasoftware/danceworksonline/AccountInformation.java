@@ -24,7 +24,7 @@ import java.util.Locale;
  */
 public class AccountInformation extends ActionBarActivity implements ActionBar.TabListener,
         AccountTransactionsFragment.OnTransactionSelected,
-        AccountStudentsFragment.OnFragmentInteractionListener,
+        AccountStudentsFragment.OnStudentFragmentInteractionListener,
         EnterChargeFragment.onEditAmountDialog,
         EnterChargeFragment.onEditDateDialog,
         EnterPaymentFragment.onEditAmountDialog,
@@ -152,7 +152,8 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     }
 
     @Override
-    public void onFragmentInteraction(String id) {
+    public void onStudentFragmentInteraction(String id) {
+
     }
 
 
@@ -193,9 +194,6 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
                 case 4:
                     newFragment = EnterChargeFragment.newInstance(listPosition);
                     break;
-                case 5:
-                    newFragment = PullFragment.newInstance(listPosition);
-                    break;
                 default:
                     newFragment = AccountInformationFragment.newInstance(listPosition);
                     break;
@@ -207,7 +205,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         @Override
         public int getCount() {
             // Show x number of pages.
-            return 6;
+            return 5;
         }
 
         //Tab titles
@@ -335,5 +333,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         }
 
     }
+
+
 
 }

@@ -129,7 +129,7 @@ public class Home extends ActionBarActivity
                 break;
             case 2:
                 mTitle = getString(R.string.title_students);
-                break;
+
             case 3:
                 mTitle = getString(R.string.title_classes);
                 break;
@@ -153,6 +153,8 @@ public class Home extends ActionBarActivity
         _appPrefs = new AppPreferences(getApplicationContext());
 
         _appPrefs.saveAccountListPosition(id);
+
+
 
         Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.AccountInformation");
         startActivity(openMainPage);
