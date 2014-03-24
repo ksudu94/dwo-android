@@ -23,6 +23,8 @@
     <string name="title_activity_account_information">Account Information</string>
     <string name="title_account_info">Information</string>
     <string name="title_account_students">Students</string>
+    <string name="empty_student_list">No students registered to this account.</string>
+    <string name="empty_transaction_list">No transactions present on this account.</string>
     <string name="title_account_transactions">Transactions</string>
     <string name="title_account_payment">Payment</string>
     <string name="title_account_charge">Charge</string>
@@ -34,8 +36,23 @@
         <item>Select Charge Type</item>
         <item>Cash</item>
         <item>Check</item>
-        <item>Credit Card</item>
+        <item>Add New Credit Card</item>
         <item>Other</item>
+    </string-array>
+
+    <string-array name="months">
+        <item>01</item>
+        <item>02</item>
+        <item>03</item>
+        <item>04</item>
+        <item>05</item>
+        <item>06</item>
+        <item>07</item>
+        <item>08</item>
+        <item>09</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
     </string-array>
 
 </resources>

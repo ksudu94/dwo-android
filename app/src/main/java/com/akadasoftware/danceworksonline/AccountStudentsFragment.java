@@ -1,16 +1,15 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
-import android.support.v4.app.ListFragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
-import android.widget.TextView;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
@@ -86,8 +85,6 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
         account = arrayAccounts.get(position);
 
 
-
-
     }
 
     @Override
@@ -96,6 +93,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
         super.onCreateView(inflater, container,
                 savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_accountstudents_list, container, false);
+
         return view;
     }
 
@@ -130,19 +128,6 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
     }
 
 
-    /**
-     * The default content for this Fragment has a TextView that is shown when
-     * the list is empty. If you would like to change the text, call this method
-     * to supply the text it should use.
-     */
-    public void setEmptyText(CharSequence emptyText) {
-        View emptyView = mListView.getEmptyView();
-
-        if (emptyText instanceof TextView) {
-            ((TextView) emptyView).setText(emptyText);
-        }
-    }
-
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
@@ -168,6 +153,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
             StudentsArray = students;
             stuAdapter = new AccountStudentsAdapter(activity,
                     R.layout.item_accountstudents, StudentsArray);
+
             setListAdapter(stuAdapter);
             stuAdapter.setNotifyOnChange(true);
 

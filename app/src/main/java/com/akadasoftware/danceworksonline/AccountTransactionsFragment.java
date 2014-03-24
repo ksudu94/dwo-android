@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.Account;
@@ -206,6 +207,21 @@ public class AccountTransactionsFragment extends ListFragment {
             }
         }
 
+    }
+
+    /**
+     * The default content for this Fragment has a TextView that is shown when
+     * the list is empty. If you would like to change the text, call this method
+     * to supply the text it should use.
+     */
+    public void setEmptyText(CharSequence emptyText) {
+        ListView listView = (ListView) activity.findViewById(R.id.list);
+        //listView.setEmptyView( activity.findViewById( R.id.empty_list_item ) );
+        View emptyView = listView.getEmptyView();
+
+        if (emptyText instanceof TextView) {
+            ((TextView) emptyView).setText(emptyText);
+        }
     }
 
     class Data {

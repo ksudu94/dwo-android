@@ -1,6 +1,7 @@
 package com.akadasoftware.danceworksonline;
 
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -29,8 +30,10 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         EnterChargeFragment.onEditDateDialog,
         EnterPaymentFragment.onEditAmountDialog,
         EnterPaymentFragment.onEditDateDialog,
+        EnterPaymentFragment.onEditCreditCardDialog,
         EditDateDialog.EditDateDialogListener,
-        EditAmountDialog.EditAmountDialogListener {
+        EditAmountDialog.EditAmountDialogListener,
+        EditCreditCardDialog.EditCreditCardDialogListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -157,6 +160,17 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     }
 
 
+    @Override
+    public void onDialogPositiveClick(String CCNo, String CVV) {
+
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+
+    }
+
+
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -248,6 +262,18 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         pf.etDescription.setText("Payment - " + description);
 
     }
+
+    public void onEditCreditCardDialog(int ConsentID) {
+
+        FragmentManager fm = getSupportFragmentManager();
+        EditCreditCardDialog editCCDialog = new EditCreditCardDialog();
+        Bundle args = new Bundle();
+        args.putInt("ConsentID", ConsentID);
+        editCCDialog.setArguments(args);
+        //Just the name of the dialog. Has no effect on it.
+        editCCDialog.show(fm, "");
+    }
+
 
     /**
      * Passes info from fragment to dialog so that you can pre-fill the dialog with the stored value

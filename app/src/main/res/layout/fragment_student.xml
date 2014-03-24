@@ -33,14 +33,15 @@
     </LinearLayout>
 
     <ListView
-        android:id="@android:id/list"
+        android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:divider="#33b5e6"
         android:dividerHeight="2px" />
 
     <TextView
-        android:text="@string/hello_world"
+        android:id="@+id/empty_list_item"
+        android:text="@string/empty_student_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

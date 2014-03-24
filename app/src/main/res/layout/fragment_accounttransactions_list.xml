@@ -56,10 +56,11 @@
 
         <TextView
             android:id="@android:id/empty"
+            android:text="@string/empty_transaction_list"
+            android:textSize="30dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center" />
-
     </LinearLayout>
 
 </uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout>
