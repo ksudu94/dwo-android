@@ -31,7 +31,7 @@ public class AppPreferences {
     private SharedPreferences.Editor prefsEditor;
     Gson gson = new Gson();
     String jsonAccounts;
-    String jsonUser;
+    String jsonUser, jsonSchool;
 
 
     public AppPreferences(Context context) {
@@ -158,6 +158,27 @@ public class AppPreferences {
 
     public void saveLogoName(String LogoName) {
         prefsEditor.putString(putLogoName, LogoName);
+        prefsEditor.commit();
+    }
+
+    public School getSchool() {
+        School school = new School();
+        jsonSchool = sharedPrefs.getString("School", "None found");
+        if (jsonSchool != "None found") {
+            JsonParser parser = new JsonParser();
+            JsonArray array = parser.parse(jsonSchool).getAsJsonArray();
+            school = gson.fromJson(array.get(0), School.class);
+        }
+
+        return school;
+
+    }
+
+    public void saveSchool(ArrayList<School> schoolArray) {
+        Gson gson = new Gson();
+        jsonSchool = gson.toJson(schoolArray);
+
+        prefsEditor.putString("School", jsonSchool);
         prefsEditor.commit();
     }
 

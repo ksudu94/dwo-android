@@ -56,7 +56,7 @@
                 android:id="@+id/etReference"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:imeOptions="actionDone"
+                android:imeOptions="actionNext"
                 android:singleLine="true"
                 android:hint="Reference" />
 
@@ -71,7 +71,8 @@
                 android:id="@+id/etDescription"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:hint="Description of Payment" />
+                android:hint="Description of Payment"
+                android:imeOptions="actionDone" />
 
             <TextView
                 android:id="@+id/tvAmount"
@@ -103,13 +104,6 @@
                     android:paddingRight="5px"
                     android:text="Tap the amount to edit" />
             </LinearLayout>
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="User Different Card"
-                android:id="@+id/btnUseDifferentCard" />
-
 
             <Button
                 android:layout_width="wrap_content"

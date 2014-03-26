@@ -49,9 +49,9 @@ public class EnterPaymentFragment extends Fragment {
 
     String SOAP_ACTION, METHOD_NAME, UserGUID, PDate, PDesc, ChkNo, Kind, CCard, CCDate, CCAuth,
             PaymentID, ProcessData, RefNo, AuthCode, Invoice, AcqRefData, CardHolderName, CCToken,
-            ccuser, ccpass, CardNumber, strUserName, FName, LName, Address, City, State, Zip;
+            ccuser, ccpass, CardNumber, strUserName, CVV, FName, LName, Address, City, State, Zip;
 
-    int SchID, UserID, chgid, AcctID, CCRecNo, TransPostHistID, SessionID, ConsentID, CCMerch, CVV;
+    int SchID, UserID, chgid, AcctID, CCRecNo, TransPostHistID, SessionID, ConsentID, CCMerch;
 
     Boolean POSTrans;
 
@@ -59,7 +59,7 @@ public class EnterPaymentFragment extends Fragment {
     private AppPreferences _appPrefs;
     Account account;
     User user;
-    School school;
+
     Activity activity;
     ArrayList<Account> arrayAccounts;
     ArrayList<AccountTransactions> TransactionArray;
@@ -67,7 +67,7 @@ public class EnterPaymentFragment extends Fragment {
 
     TextView tvDate, tvTitle, tvType, tvReference, tvDescription, tvAmount, tvChangeAmount;
     EditText etReference, etDescription;
-    Button btnUseDifferentCard, btnPayment;
+    Button btnPayment;
     Spinner typeSpinner;
     Calendar cal;
 
@@ -97,7 +97,7 @@ public class EnterPaymentFragment extends Fragment {
 
     public interface onEditCreditCardDialog {
         // TODO: Update argument type and name
-        public void onEditCreditCardDialog(int consentID);
+        public void onEditCreditCardDialog();
     }
 
     public static EnterPaymentFragment newInstance(int position, String description, Float amount) {
@@ -185,7 +185,6 @@ public class EnterPaymentFragment extends Fragment {
         etReference = (EditText) rootView.findViewById(R.id.etReference);
         etDescription = (EditText) rootView.findViewById(R.id.etDescription);
         typeSpinner = (Spinner) rootView.findViewById(R.id.typeSpinner);
-        btnUseDifferentCard = (Button) rootView.findViewById(R.id.btnUseDifferentCard);
         btnPayment = (Button) rootView.findViewById(R.id.btnPayment);
 
 
@@ -244,8 +243,24 @@ public class EnterPaymentFragment extends Fragment {
          * I created a resource of string array and put them in there and created a simple array
          * adapter to populate the list with.
          */
-        ArrayAdapter<CharSequence> paymentType = ArrayAdapter.createFromResource(activity,
-                R.array.payment_types, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> paymentType = null;
+        if (_appPrefs.getCCProcessor().equals("PPAY")) {
+            if (account.CCConsentID > 0) {
+                //If they have credit card processing and a credit card on file
+                paymentType = ArrayAdapter.createFromResource(activity,
+                        R.array.payment_types3, android.R.layout.simple_spinner_item);
+            } else {
+                //If they have credit card processing but no card on file
+                paymentType = ArrayAdapter.createFromResource(activity,
+                        R.array.payment_types2, android.R.layout.simple_spinner_item);
+            }
+
+        } else {
+            //If credit card processing is not enabled
+            paymentType = ArrayAdapter.createFromResource(activity,
+                    R.array.payment_types1, android.R.layout.simple_spinner_item);
+
+        }
 
         // Specify the layout to use when the list of choices appears
         paymentType.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -258,8 +273,12 @@ public class EnterPaymentFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
+                CardNumber = "";
+                CCDate = "";
+                CCard = "";
+                CVV = "";
+                ConsentID = 0;
                 int position = typeSpinner.getSelectedItemPosition();
-
                 switch (position) {
                     case 1:
                         etReference.setText("Cash");
@@ -272,38 +291,43 @@ public class EnterPaymentFragment extends Fragment {
                         Kind = "C";
                         break;
                     case 3:
-                        ccListener.onEditCreditCardDialog(account.CCConsentID);
-                        switch (CardNumber.charAt(0)) {
-                            case 3:
+                        etReference.setText("Other");
+                        ChkNo = "Other";
+                        Kind = "O";
+                        break;
+                    case 4:
+                        ccListener.onEditCreditCardDialog();
+                        break;
+                    case 5:
+                        switch (account.CCType) {
+                            case 1:
                                 etReference.setText("AmEx");
                                 ChkNo = "AmEx";
                                 Kind = "A";
                                 break;
-                            case 4:
+                            case 2:
                                 etReference.setText("Discover");
                                 ChkNo = "Discover";
                                 Kind = "D";
                                 break;
-                            case 5:
+                            case 3:
                                 etReference.setText("MC");
                                 ChkNo = "MC";
                                 Kind = "M";
                                 break;
-                            case 6:
+                            case 4:
                                 etReference.setText("Visa");
                                 ChkNo = "Visa";
                                 Kind = "V";
                                 break;
                         }
-
-                        break;
-                    case 4:
-                        etReference.setText("Other");
-                        ChkNo = "Other";
-                        Kind = "O";
+                        CCard = account.CCTrail.substring(account.CCTrail.length() - 4);
+                        CCDate = String.valueOf(account.CCDate);
+                        ConsentID = account.CCConsentID;
                         break;
                     default:
                         etReference.getText().clear();
+
                 }
             }
 
@@ -321,6 +345,7 @@ public class EnterPaymentFragment extends Fragment {
         DateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
         String today = dateFormat.format(cal.getTime());
         tvDate.setText(today);
+        PDate = today;
     }
 
     @Override
@@ -360,78 +385,33 @@ public class EnterPaymentFragment extends Fragment {
         static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
     }
 
-    public class getSchoolAsync extends AsyncTask<Data, Void, School> {
-        public School doInBackground(Data... data) {
-
-            METHOD_NAME = "getSchool";
-            SOAP_ACTION = "getSchool";
-            School school = new School();
-            SoapObject requestSchool = new SoapObject(Data.NAMESPACE,
-                    METHOD_NAME);
-
-            PropertyInfo piSchID = new PropertyInfo();
-            piSchID.setName("SchID");
-            piSchID.setValue(user.SchID);
-            requestSchool.addProperty(piSchID);
-
-            PropertyInfo UserID = new PropertyInfo();
-            UserID.setName("UserID");
-            UserID.setValue(user.UserID);
-            requestSchool.addProperty(UserID);
-
-            PropertyInfo UserGUID = new PropertyInfo();
-            UserGUID.setName("UserGUID");
-            UserGUID.setValue(user.UserGUID);
-            requestSchool.addProperty(UserGUID);
-
-            SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
-                    SoapEnvelope.VER11);
-            envelopeSchool.dotNet = true;
-            envelopeSchool.setOutputSoapObject(requestSchool);
-            try {
-                HttpTransportSE HttpTransport = new HttpTransportSE("http://app.akadasoftware.com/MobileAppWebService/Android.asmx");
-
-                HttpTransport.call(SOAP_ACTION, envelopeSchool);
-                SoapObject responseSchool = (SoapObject) envelopeSchool
-                        .getResponse();
-                for (int i = 0; i < responseSchool.getPropertyCount(); i++) {
-                    school.setProperty(i, responseSchool.getProperty(i).toString());
-                }
-                schoolArray.add(0, school);
-
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-
-            return school;
-
-        }
-    }
-
 
     public class enterPaymentAsync extends AsyncTask<Data, Void, String> {
 
         public String doInBackground(Data... data) {
             SoapPrimitive enterPayment = null;
 
-            UserID = _appPrefs.getUserID();
-            UserGUID = _appPrefs.getUserGUID();
+            School school = _appPrefs.getSchool();
             user = _appPrefs.getUser();
+            UserID = user.UserID;
+            UserGUID = user.UserGUID;
+            strUserName = user.UserName;
             SchID = account.SchID;
             AcctID = account.AcctID;
-            SessionID = _appPrefs.getSessionID();
+            PDesc = etDescription.getText().toString();
+
             Amount = Float.valueOf(tvChangeAmount.getText().toString());
-            strUserName = user.UserName;
-            ccuser = school.CCUserName;
-            ccpass = school.CCPassword;
-            CCMerch = school.CCMerchantNo;
             FName = account.FName;
             LName = account.LName;
             Address = account.Address;
             City = account.City;
             State = account.State;
             Zip = account.ZipCode;
-
+            POSTrans = false;
+            SessionID = school.SessionID;
+            ccuser = school.CCUserName;
+            ccpass = school.CCPassword;
+            CCMerch = school.CCMerchantNo;
 
             enterPayment = EnterPayment(UserID, UserGUID, SchID, AcctID, PDate, PDesc, ChkNo, Amount, Kind, CCard, CCDate, CCAuth,
                     CCRecNo, POSTrans, TransPostHistID, SessionID, ConsentID, PaymentID, ProcessData, RefNo,
@@ -445,6 +425,16 @@ public class EnterPaymentFragment extends Fragment {
             if (result.equalsIgnoreCase("sucess")) {
                 Toast toast = Toast.makeText(getActivity(), "Payment Successfully entered", Toast.LENGTH_LONG);
                 toast.show();
+                CardNumber = "";
+                CCDate = "";
+                CCard = "";
+                CVV = "";
+                ConsentID = 0;
+                etReference.getText().clear();
+                etDescription.getText().clear();
+                tvChangeAmount.setText("0.00");
+                typeSpinner.setSelection(0);
+
             } else {
                 Toast toast = Toast.makeText(getActivity(), result, Toast.LENGTH_LONG);
                 toast.show();
@@ -465,7 +455,7 @@ public class EnterPaymentFragment extends Fragment {
                                       int TransPostHistID, int SessionID, int ConsentID, String PaymentID,
                                       String ProcessData, String RefNo, String AuthCode, String Invoice,
                                       String AcqRefData, String CardHolderName, String CCToken, String ccuser,
-                                      String ccpass, String CardNumber, String strUserName, int CCMerch, int CVV,
+                                      String ccpass, String CardNumber, String strUserName, int CCMerch, String CVV,
                                       String FName, String LName, String Address, String City, String State, String Zip) {
         SOAP_ACTION = "enterPayment";
         METHOD_NAME = "enterPayment";
@@ -495,12 +485,12 @@ public class EnterPaymentFragment extends Fragment {
 
         PropertyInfo pdate = new PropertyInfo();
         pdate.setName("PDate");
-        pdate.setValue("");
+        pdate.setValue(PDate);
         requestEnterPayment.addProperty(pdate);
 
         PropertyInfo pdesc = new PropertyInfo();
         pdesc.setName("PDesc");
-        pdesc.setValue("");
+        pdesc.setValue(PDesc);
         requestEnterPayment.addProperty(pdesc);
 
         PropertyInfo chkno = new PropertyInfo();
@@ -522,12 +512,12 @@ public class EnterPaymentFragment extends Fragment {
 
         PropertyInfo ccard = new PropertyInfo();
         ccard.setName("CCard");
-        ccard.setValue("");
+        ccard.setValue(CCard);
         requestEnterPayment.addProperty(ccard);
 
         PropertyInfo ccdate = new PropertyInfo();
         ccdate.setName("CCDate");
-        ccdate.setValue("");
+        ccdate.setValue(CCDate);
         requestEnterPayment.addProperty(ccdate);
 
         PropertyInfo ccauth = new PropertyInfo();
@@ -558,7 +548,7 @@ public class EnterPaymentFragment extends Fragment {
 
         PropertyInfo consentid = new PropertyInfo();
         consentid.setName("ConsentID");
-        consentid.setValue(0);
+        consentid.setValue(ConsentID);
         requestEnterPayment.addProperty(consentid);
 
         PropertyInfo paymentid = new PropertyInfo();
@@ -602,6 +592,68 @@ public class EnterPaymentFragment extends Fragment {
         cctoken.setName("CCToken");
         cctoken.setValue("");
         requestEnterPayment.addProperty(cctoken);
+
+        PropertyInfo Ccuser = new PropertyInfo();
+        Ccuser.setName("ccuser");
+        Ccuser.setValue(ccuser);
+        requestEnterPayment.addProperty(Ccuser);
+
+        PropertyInfo Ccpass = new PropertyInfo();
+        Ccpass.setName("ccpass");
+        Ccpass.setValue(ccpass);
+        requestEnterPayment.addProperty(Ccpass);
+
+        PropertyInfo cardnumber = new PropertyInfo();
+        cardnumber.setName("CardNumber");
+        cardnumber.setValue(CardNumber);
+        requestEnterPayment.addProperty(cardnumber);
+
+
+        PropertyInfo strusername = new PropertyInfo();
+        strusername.setName("strUserName");
+        strusername.setValue(strUserName);
+        requestEnterPayment.addProperty(strusername);
+
+        PropertyInfo ccmerch = new PropertyInfo();
+        ccmerch.setName("CCMerch");
+        ccmerch.setValue(CCMerch);
+        requestEnterPayment.addProperty(ccmerch);
+
+        PropertyInfo cvv = new PropertyInfo();
+        cvv.setName("CVV");
+        cvv.setValue(CVV);
+        requestEnterPayment.addProperty(cvv);
+
+        PropertyInfo fname = new PropertyInfo();
+        fname.setName("FName");
+        fname.setValue(FName);
+        requestEnterPayment.addProperty(fname);
+
+
+        PropertyInfo lname = new PropertyInfo();
+        lname.setName("LName");
+        lname.setValue(LName);
+        requestEnterPayment.addProperty(lname);
+
+        PropertyInfo address = new PropertyInfo();
+        address.setName("Address");
+        address.setValue(Address);
+        requestEnterPayment.addProperty(address);
+
+        PropertyInfo city = new PropertyInfo();
+        city.setName("City");
+        city.setValue(City);
+        requestEnterPayment.addProperty(city);
+
+        PropertyInfo state = new PropertyInfo();
+        state.setName("State");
+        state.setValue(State);
+        requestEnterPayment.addProperty(state);
+
+        PropertyInfo zip = new PropertyInfo();
+        zip.setName("Zip");
+        zip.setValue("");
+        requestEnterPayment.addProperty(zip);
 
         SoapSerializationEnvelope envelopePayment = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);

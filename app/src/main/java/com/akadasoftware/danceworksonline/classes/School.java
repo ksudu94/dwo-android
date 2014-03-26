@@ -207,9 +207,9 @@ public class School implements KvmSerializable {
             case 2:
                 return SRegNo;
             case 3:
-                return SName;
-            case 4:
                 return SessionID;
+            case 4:
+                return SName;
             case 5:
                 return SAddress;
             case 6:
@@ -461,12 +461,13 @@ public class School implements KvmSerializable {
                 info.name = "SRegNo";
                 break;
             case 3:
-                info.type = PropertyInfo.STRING_CLASS;
-                info.name = "SName";
-                break;
-            case 4:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "SessionID";
+
+                break;
+            case 4:
+                info.type = PropertyInfo.STRING_CLASS;
+                info.name = "SName";
                 break;
             case 5:
                 info.type = PropertyInfo.STRING_CLASS;
@@ -935,10 +936,10 @@ public class School implements KvmSerializable {
                 SRegNo = value.toString();
                 break;
             case 3:
-                SName = value.toString();
+                SessionID = Integer.parseInt(value.toString());
                 break;
             case 4:
-                SessionID = Integer.parseInt(value.toString());
+                SName = value.toString();
                 break;
             case 5:
                 SAddress = value.toString();

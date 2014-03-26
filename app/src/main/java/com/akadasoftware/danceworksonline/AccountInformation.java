@@ -1,7 +1,6 @@
 package com.akadasoftware.danceworksonline;
 
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -11,6 +10,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
@@ -160,17 +160,6 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     }
 
 
-    @Override
-    public void onDialogPositiveClick(String CCNo, String CVV) {
-
-    }
-
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
-
-    }
-
-
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
@@ -263,17 +252,60 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
     }
 
-    public void onEditCreditCardDialog(int ConsentID) {
+    public void onEditCreditCardDialog() {
 
         FragmentManager fm = getSupportFragmentManager();
         EditCreditCardDialog editCCDialog = new EditCreditCardDialog();
-        Bundle args = new Bundle();
-        args.putInt("ConsentID", ConsentID);
-        editCCDialog.setArguments(args);
         //Just the name of the dialog. Has no effect on it.
         editCCDialog.show(fm, "");
     }
 
+
+    @Override
+    public void onDialogPositiveClick(String CCNo, String CVV, String Date) {
+        EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
+        pf.CardNumber = CCNo;
+        pf.CVV = CVV;
+        pf.CCDate = Date;
+        pf.CCard = CCNo.substring(CCNo.length() - 4);
+        switch (pf.CardNumber.charAt(0)) {
+            case '3':
+                pf.etReference.setText("AmEx");
+                pf.ChkNo = "AmEx";
+                pf.Kind = "A";
+                break;
+            case '4':
+                pf.etReference.setText("Discover");
+                pf.ChkNo = "Discover";
+                pf.Kind = "D";
+                break;
+            case '5':
+                pf.etReference.setText("MC");
+                pf.ChkNo = "MC";
+                pf.Kind = "M";
+                break;
+            case '6':
+                pf.etReference.setText("Visa");
+                pf.ChkNo = "Visa";
+                pf.Kind = "V";
+                break;
+            default:
+                Toast toast = Toast.makeText(this, "Invalid Credit Card, please try again.", Toast.LENGTH_LONG);
+                toast.show();
+                break;
+        }
+
+
+    }
+
+    @Override
+    public void onDialogNegativeClick() {
+        Toast toast = Toast.makeText(this, "No information saved", Toast.LENGTH_LONG);
+        toast.show();
+        /**
+         * Do nothing and none of the information is saved.
+         */
+    }
 
     /**
      * Passes info from fragment to dialog so that you can pre-fill the dialog with the stored value
@@ -353,13 +385,13 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
         if (position == 3) {
             EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
             pf.setDate(dateSelected);
+
         } else {
             EnterChargeFragment cf = (EnterChargeFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 4);
             cf.setDate(dateSelected);
         }
 
     }
-
 
 
 }

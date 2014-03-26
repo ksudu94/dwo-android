@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,8 +22,9 @@ import java.util.Calendar;
 public class EditCreditCardDialog extends DialogFragment {
 
     EditText etCCNo, etCVV;
-    String CCNo, CVV, Date;
+    String CCNo, Date, CVV;
     Spinner spinnerMonth, spinnerYear;
+    Activity activity;
 
     ArrayList<String> years = new ArrayList<String>();
     String[] months;
@@ -31,9 +33,9 @@ public class EditCreditCardDialog extends DialogFragment {
     }
 
     public interface EditCreditCardDialogListener {
-        public void onDialogPositiveClick(String CCNo, String CVV);
+        public void onDialogPositiveClick(String CCNo, String CVV, String Date);
 
-        public void onDialogNegativeClick(DialogFragment dialog);
+        public void onDialogNegativeClick();
     }
 
     EditCreditCardDialogListener ccListener;
@@ -69,6 +71,7 @@ public class EditCreditCardDialog extends DialogFragment {
         etCVV = (EditText) view.findViewById(R.id.etCVV);
         spinnerMonth = (Spinner) view.findViewById(R.id.spinnerMonth);
         spinnerYear = (Spinner) view.findViewById(R.id.spinnerYear);
+        activity = getActivity();
 
         ArrayAdapter<CharSequence> monthAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.months, android.R.layout.simple_spinner_item);
@@ -95,7 +98,38 @@ public class EditCreditCardDialog extends DialogFragment {
                 .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        ccListener.onDialogPositiveClick(CCNo, CVV);
+                        CCNo = etCCNo.getText().toString();
+                        CVV = etCVV.getText().toString();
+                        Date = spinnerMonth.getSelectedItem().toString() + spinnerYear.getSelectedItem().toString().substring(2);
+
+                        //No blank fields
+                        if (CCNo.trim().length() == 0) {
+                            Toast toast = Toast.makeText(activity, "No Credit Card entered", Toast.LENGTH_LONG);
+                            toast.show();
+
+                        } else {
+                            //Amex, needs to be length 15
+                            if (CCNo.charAt(0) == '3') {
+                                if (CCNo.length() != 15) {
+                                    Toast toast = Toast.makeText(activity, "Invalid Credit Card #", Toast.LENGTH_LONG);
+                                    toast.show();
+                                } else if (CVV.length() != 3 || CVV.length() != 0) {
+                                    Toast toast = Toast.makeText(activity, "Invalid CVV #", Toast.LENGTH_LONG);
+                                    toast.show();
+                                }
+                                //All other card lengths are 16
+                            } else {
+                                if (CCNo.length() != 16) {
+                                    Toast toast = Toast.makeText(activity, "Invalid Credit Card #", Toast.LENGTH_LONG);
+                                    toast.show();
+                                } else if (CVV.length() != 4 || CVV.length() != 0) {
+                                    Toast toast = Toast.makeText(activity, "Invalid CVV #", Toast.LENGTH_LONG);
+                                    toast.show();
+                                }
+                            }
+                            ccListener.onDialogPositiveClick(CCNo, CVV, Date);
+
+                        }
                     }
                 })
                 .setNegativeButton("Use Card on File", new DialogInterface.OnClickListener() {

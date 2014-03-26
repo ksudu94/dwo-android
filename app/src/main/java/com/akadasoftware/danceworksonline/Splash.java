@@ -240,18 +240,14 @@ public class Splash extends ActionBarActivity {
                     SoapObject responseSchool = (SoapObject) envelopeSchool
                             .getResponse();
 
-                    school.SessionID = Integer.parseInt(responseSchool
-                            .getProperty(3).toString());
-                    school.CCProcessor = responseSchool.getProperty(88)
-                            .toString();
-                    school.ST1Rate = Float.parseFloat(responseSchool
-                            .getProperty(56).toString());
-                    school.ST2Rate = Float.parseFloat(responseSchool
-                            .getProperty(59).toString());
-                    school.LogoName = responseSchool.getProperty(116)
-                            .toString();
 
+                    for (int i = 0; i < responseSchool.getPropertyCount(); i++) {
+                        school.setProperty(i, responseSchool.getProperty(i).toString());
+                    }
 
+                    ArrayList<School> schoolArrayList = new ArrayList<School>();
+                    schoolArrayList.add(0, school);
+                    _appPrefs.saveSchool(schoolArrayList);
                     _appPrefs.saveSessionID(school.SessionID);
                     _appPrefs.saveCCProcessor(school.CCProcessor);
                     _appPrefs.saveST1Rate(school.ST1Rate);
