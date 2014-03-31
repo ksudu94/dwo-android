@@ -63,6 +63,14 @@
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/chkSaveCreditCard"
+            android:checked="false"
+            android:text="Save Credit Card"
+            android:textSize="12sp" />
+
     </LinearLayout>
 
 

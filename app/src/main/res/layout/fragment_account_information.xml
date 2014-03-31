@@ -433,6 +433,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="2dip"
+                    android:imeOptions="actionNext"
                     android:hint="First Name"
                     android:padding="5dip" />
 
@@ -449,6 +450,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="2dip"
+                    android:imeOptions="actionNext"
                     android:hint="Last Name"
                     android:padding="5dip" />
 
@@ -458,14 +460,16 @@
                     android:layout_height="wrap_content"
                     android:padding="5dip"
                     android:textStyle="bold"
-                    android:text="Phone:" />
+                    android:text="Credit Card:" />
 
                 <EditText
                     android:id="@+id/etNewCC"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
+                    android:imeOptions="actionNext"
+                    android:inputType="numberDecimal"
                     android:layout_margin="2dip"
-                    android:hint="Phone Number"
+                    android:hint="Credit Card Number"
                     android:padding="5dip" />
 
                 <TextView
@@ -474,14 +478,16 @@
                     android:layout_height="wrap_content"
                     android:padding="5dip"
                     android:textStyle="bold"
-                    android:text="Email:" />
+                    android:text="Exp Date:" />
 
                 <EditText
                     android:id="@+id/etNewCCExp"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="2dip"
-                    android:hint="Email"
+                    android:imeOptions="actionNext"
+                    android:inputType="numberDecimal"
+                    android:hint="Expiration Date"
                     android:padding="5dip" />
 
                 <TextView
@@ -498,6 +504,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="2dip"
                     android:hint="Street Address"
+                    android:imeOptions="actionNext"
                     android:padding="5dip" />
 
                 <TextView
@@ -513,6 +520,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="2dip"
+                    android:imeOptions="actionNext"
                     android:hint="City"
                     android:padding="5dip" />
 
@@ -529,6 +537,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="2dip"
+                    android:imeOptions="actionNext"
                     android:hint="State"
                     android:padding="5dip" />
 

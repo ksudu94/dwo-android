@@ -252,21 +252,25 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
     }
 
-    public void onEditCreditCardDialog() {
+    public void onEditCreditCardDialog(int accountPosition) {
 
         FragmentManager fm = getSupportFragmentManager();
         EditCreditCardDialog editCCDialog = new EditCreditCardDialog();
+        Bundle args = new Bundle();
+        args.putInt("AccountPosition", accountPosition);
+        editCCDialog.setArguments(args);
         //Just the name of the dialog. Has no effect on it.
         editCCDialog.show(fm, "");
     }
 
 
     @Override
-    public void onDialogPositiveClick(String CCNo, String CVV, String Date) {
+    public void onDialogPositiveClick(String CCNo, String CVV, String Date, Boolean saveCard) {
         EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
         pf.CardNumber = CCNo;
         pf.CVV = CVV;
-        pf.CCDate = Date;
+        pf.CCExpire = Date;
+        pf.saveNewCreditCard = saveCard;
         pf.CCard = CCNo.substring(CCNo.length() - 4);
         switch (pf.CardNumber.charAt(0)) {
             case '3':

@@ -17,7 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.Account;
-import com.akadasoftware.danceworksonline.classes.AccountTransactions;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.School;
 import com.akadasoftware.danceworksonline.classes.User;
@@ -49,21 +48,20 @@ public class EnterPaymentFragment extends Fragment {
 
     String SOAP_ACTION, METHOD_NAME, UserGUID, PDate, PDesc, ChkNo, Kind, CCard, CCDate, CCAuth,
             PaymentID, ProcessData, RefNo, AuthCode, Invoice, AcqRefData, CardHolderName, CCToken,
-            ccuser, ccpass, CardNumber, strUserName, CVV, FName, LName, Address, City, State, Zip;
+            ccuser, ccpass, CardNumber, strUserName, CVV, FName, LName, Address, City, State, Zip,
+            CCExpire;
 
-    int SchID, UserID, chgid, AcctID, CCRecNo, TransPostHistID, SessionID, ConsentID, CCMerch;
+    int SchID, UserID, chgid, AcctID, CCRecNo, TransPostHistID, SessionID, ConsentID, CCMerch, accountPosition;
 
-    Boolean POSTrans;
+    Boolean POSTrans, saveNewCreditCard;
 
-    Float Amount;
+    Float Amount, ccmax;
     private AppPreferences _appPrefs;
     Account account;
     User user;
-
     Activity activity;
     ArrayList<Account> arrayAccounts;
-    ArrayList<AccountTransactions> TransactionArray;
-    ArrayList<School> schoolArray = new ArrayList<School>();
+
 
     TextView tvDate, tvTitle, tvType, tvReference, tvDescription, tvAmount, tvChangeAmount;
     EditText etReference, etDescription;
@@ -97,7 +95,7 @@ public class EnterPaymentFragment extends Fragment {
 
     public interface onEditCreditCardDialog {
         // TODO: Update argument type and name
-        public void onEditCreditCardDialog();
+        public void onEditCreditCardDialog(int accountPosition);
     }
 
     public static EnterPaymentFragment newInstance(int position, String description, Float amount) {
@@ -129,10 +127,11 @@ public class EnterPaymentFragment extends Fragment {
         _appPrefs = new AppPreferences(activity);
 
         arrayAccounts = _appPrefs.getAccounts();
-        int position = getArguments().getInt("Position");
+        accountPosition = getArguments().getInt("Position");
 
-        account = arrayAccounts.get(position);
+        account = arrayAccounts.get(accountPosition);
 
+        saveNewCreditCard = false;
         if (account.CCTrail.equals(""))
             CardNumber = " ";
         else {
@@ -274,7 +273,7 @@ public class EnterPaymentFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
 
                 CardNumber = "";
-                CCDate = "";
+                CCExpire = "";
                 CCard = "";
                 CVV = "";
                 ConsentID = 0;
@@ -296,7 +295,7 @@ public class EnterPaymentFragment extends Fragment {
                         Kind = "O";
                         break;
                     case 4:
-                        ccListener.onEditCreditCardDialog();
+                        ccListener.onEditCreditCardDialog(accountPosition);
                         break;
                     case 5:
                         switch (account.CCType) {
@@ -322,7 +321,7 @@ public class EnterPaymentFragment extends Fragment {
                                 break;
                         }
                         CCard = account.CCTrail.substring(account.CCTrail.length() - 4);
-                        CCDate = String.valueOf(account.CCDate);
+                        CCExpire = String.valueOf(account.CCExpire);
                         ConsentID = account.CCConsentID;
                         break;
                     default:
@@ -386,9 +385,9 @@ public class EnterPaymentFragment extends Fragment {
     }
 
 
-    public class enterPaymentAsync extends AsyncTask<Data, Void, String> {
+    public class enterPaymentAsync extends AsyncTask<Data, Void, String[]> {
 
-        public String doInBackground(Data... data) {
+        public String[] doInBackground(Data... data) {
             SoapPrimitive enterPayment = null;
 
             School school = _appPrefs.getSchool();
@@ -412,6 +411,7 @@ public class EnterPaymentFragment extends Fragment {
             ccuser = school.CCUserName;
             ccpass = school.CCPassword;
             CCMerch = school.CCMerchantNo;
+            ccmax = school.CCMaxAmt;
 
             enterPayment = EnterPayment(UserID, UserGUID, SchID, AcctID, PDate, PDesc, ChkNo, Amount, Kind, CCard, CCDate, CCAuth,
                     CCRecNo, POSTrans, TransPostHistID, SessionID, ConsentID, PaymentID, ProcessData, RefNo,
@@ -420,25 +420,32 @@ public class EnterPaymentFragment extends Fragment {
             return EnterPaymentFromSoap(enterPayment);
         }
 
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(String result[]) {
 
-            if (result.equalsIgnoreCase("sucess")) {
-                Toast toast = Toast.makeText(getActivity(), "Payment Successfully entered", Toast.LENGTH_LONG);
-                toast.show();
-                CardNumber = "";
-                CCDate = "";
-                CCard = "";
-                CVV = "";
-                ConsentID = 0;
-                etReference.getText().clear();
-                etDescription.getText().clear();
-                tvChangeAmount.setText("0.00");
-                typeSpinner.setSelection(0);
+
+            if (result[0] == "Payment succesfully entered.") {
+
+                if (result[1] == "Card succesfully saved.") {
+
+                    CardNumber = "";
+                    CCExpire = "";
+                    CCard = "";
+                    CVV = "";
+                    ConsentID = 0;
+                    etReference.getText().clear();
+                    etDescription.getText().clear();
+                    tvChangeAmount.setText("0.00");
+                    typeSpinner.setSelection(0);
+                }
 
             } else {
-                Toast toast = Toast.makeText(getActivity(), result, Toast.LENGTH_LONG);
-                toast.show();
+
+                result[0] = "The payment was not entered.";
             }
+
+            Toast toast = Toast.makeText(getActivity(), result[0] + " " + result[1], Toast.LENGTH_LONG);
+            toast.show();
+
         }
     }
 
@@ -517,13 +524,19 @@ public class EnterPaymentFragment extends Fragment {
 
         PropertyInfo ccdate = new PropertyInfo();
         ccdate.setName("CCDate");
-        ccdate.setValue(CCDate);
+        ccdate.setValue(CCExpire);
         requestEnterPayment.addProperty(ccdate);
 
         PropertyInfo ccauth = new PropertyInfo();
         ccauth.setName("CCAuth");
         ccauth.setValue("");
         requestEnterPayment.addProperty(ccauth);
+
+        PropertyInfo ccmax = new PropertyInfo();
+        ccmax.setName("CCMaxAmount");
+        ccmax.setType(Float.class);
+        ccmax.setValue(5000.0);
+        requestEnterPayment.addProperty(ccmax);
 
         PropertyInfo ccrecno = new PropertyInfo();
         ccrecno.setName("CCRecNo");
@@ -655,6 +668,11 @@ public class EnterPaymentFragment extends Fragment {
         zip.setValue("");
         requestEnterPayment.addProperty(zip);
 
+        PropertyInfo saveCard = new PropertyInfo();
+        saveCard.setName("saveCard");
+        saveCard.setValue(saveNewCreditCard);
+        requestEnterPayment.addProperty(saveCard);
+
         SoapSerializationEnvelope envelopePayment = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
 
@@ -680,12 +698,15 @@ public class EnterPaymentFragment extends Fragment {
     }
 
 
-    public String EnterPaymentFromSoap(SoapPrimitive soap) {
+    public String[] EnterPaymentFromSoap(SoapPrimitive soap) {
 
-        String response = soap.toString();
+        String[] response = new String[2];
+        response[0] = soap.getAttribute(0).toString();
+        response[1] = soap.getAttribute(1).toString();
 
         return response;
     }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

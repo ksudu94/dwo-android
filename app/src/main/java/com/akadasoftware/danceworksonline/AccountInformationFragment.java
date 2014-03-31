@@ -18,8 +18,11 @@ import android.widget.ViewFlipper;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.School;
+import com.akadasoftware.danceworksonline.classes.User;
 
 import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.MarshalFloat;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapPrimitive;
@@ -35,8 +38,6 @@ import java.util.List;
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link AccountInformationFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
  * Use the {@link AccountInformationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
@@ -48,13 +49,16 @@ public class AccountInformationFragment extends Fragment {
 
     private AppPreferences _appPrefs;
     Account account;
+    School school;
+    User user;
     Activity activity;
     ArrayList<Account> accounts;
     String status, expdate, cctype, ccnum, SOAP_ACTION, METHOD_NAME;
     int acctid;
 
     Button btnEditAccount, btnSave, btnCancel, btnSaveCard, btnEditCreditCard, btnCancelSaveCreditCard, btnCancelNewCreditCard;
-    EditText etFirst, etLast, etAddress, etCity, etState, etZip, etPhone, etEmail, etCC, etcard;
+    EditText etFirst, etLast, etAddress, etCity, etState, etZip, etPhone, etEmail, etCC, etcard,
+            etFirstCC, etLastCC, etNewCC, etNewCCExp, etAddressCC, etCityCC, etStateCC, etZipCC;
     TextView tvcc;
     ViewFlipper accountSwitcher;
     Spinner AccountStatusSpinner;
@@ -148,7 +152,6 @@ public class AccountInformationFragment extends Fragment {
             expdate = test.substring(0, 2) + "/" + test.substring(2, test.length() - 1);
         }
 
-
         etFirst = (EditText) rootView.findViewById(R.id.etFirst);
         etLast = (EditText) rootView.findViewById(R.id.etLast);
         etAddress = (EditText) rootView.findViewById(R.id.etAddress);
@@ -157,7 +160,14 @@ public class AccountInformationFragment extends Fragment {
         etZip = (EditText) rootView.findViewById(R.id.etZip);
         etPhone = (EditText) rootView.findViewById(R.id.etPhone);
         etEmail = (EditText) rootView.findViewById(R.id.etEmail);
-
+        etFirstCC = (EditText) rootView.findViewById(R.id.etFirstCC);
+        etLastCC = (EditText) rootView.findViewById(R.id.etLastCC);
+        etNewCC = (EditText) rootView.findViewById(R.id.etNewCC);
+        etNewCCExp = (EditText) rootView.findViewById(R.id.etNewCCExp);
+        etAddressCC = (EditText) rootView.findViewById(R.id.etAddressCC);
+        etCityCC = (EditText) rootView.findViewById(R.id.etCityCC);
+        etStateCC = (EditText) rootView.findViewById(R.id.etStateCC);
+        etZipCC = (EditText) rootView.findViewById(R.id.etZipCC);
         btnEditAccount = (Button) rootView.findViewById(R.id.btnEditAccount);
         btnEditCreditCard = (Button) rootView.findViewById(R.id.btnEditCreditCard);
 
@@ -288,6 +298,14 @@ public class AccountInformationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 accountSwitcher.setDisplayedChild(2);
+                etFirstCC.setText(account.FName);
+                etLastCC.setText(account.LName);
+                etAddressCC.setText(account.CCAddress);
+                etCityCC.setText(account.CCCity);
+                etStateCC.setText(account.CCState);
+                etZipCC.setText(account.CCZip);
+
+
             }
         });
 
@@ -297,11 +315,39 @@ public class AccountInformationFragment extends Fragment {
         btnSaveCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                String creditCard = etNewCC.getText().toString();
+
+                //No blank fields
+                if (creditCard.trim().length() == 0) {
+                    Toast toast = Toast.makeText(activity, "No Credit Card entered", Toast.LENGTH_LONG);
+                    toast.show();
+
+                } else {
+                    //Amex, needs to be length 15
+                    if (creditCard.charAt(0) == '3') {
+                        if (creditCard.length() != 15) {
+                            Toast toast = Toast.makeText(activity, "Invalid Credit Card #", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                        //All other card lengths are 16
+                    } else {
+                        if (creditCard.length() != 16) {
+                            Toast toast = Toast.makeText(activity, "Invalid Credit Card #", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                    }
+                    saveCreditCardChanges changes = new saveCreditCardChanges();
+                    changes.execute();
+
+
+                }
+                /*
                 accountSwitcher.setDisplayedChild(0);
                 etcard.setVisibility(View.GONE);
                 tvcc.setVisibility(View.VISIBLE);
                 btnEditCreditCard.setVisibility(View.VISIBLE);
-                tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " - Exp. " + expdate);
+                tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " - Exp. " + expdate);*/
 
             }
         });
@@ -321,7 +367,6 @@ public class AccountInformationFragment extends Fragment {
 
             }
         });
-
 
 
         return rootView;
@@ -486,4 +531,167 @@ public class AccountInformationFragment extends Fragment {
         return response.toString();
 
     }
+
+    public class saveCreditCardChanges extends AsyncTask<Data, Void, SoapPrimitive> {
+
+
+        @Override
+        protected SoapPrimitive doInBackground(Data... data) {
+            publishProgress();
+            return saveCreditCard();
+        }
+
+
+        protected void onPostExecute(SoapPrimitive result) {
+
+            int response = Integer.valueOf(result.toString());
+            if (response > 0) {
+                account.CCConsentID = response;
+                Toast toast = Toast.makeText(getActivity(), "Save successful", Toast.LENGTH_LONG);
+                toast.show();
+                accountSwitcher.setDisplayedChild(0);
+            } else {
+
+                Toast toast = Toast.makeText(getActivity(), "Credit Card could not be saved.", Toast.LENGTH_LONG);
+                toast.show();
+            }
+
+            //getAccount getAccount = new getAccount();
+            //getAccount.execute();
+        }
+    }
+
+    public SoapPrimitive saveCreditCard() {
+        SOAP_ACTION = "saveCreditCard";
+        METHOD_NAME = "saveCreditCard";
+
+        SoapObject Request = new SoapObject(Data.NAMESPACE, METHOD_NAME);
+
+        school = _appPrefs.getSchool();
+        user = _appPrefs.getUser();
+
+        PropertyInfo userid = new PropertyInfo();
+        userid.setName("UserID");
+        userid.setValue(user.UserID);
+        Request.addProperty(userid);
+
+        PropertyInfo userguid = new PropertyInfo();
+        userguid.setName("UserGUID");
+        userguid.setValue(user.UserGUID);
+        Request.addProperty(userguid);
+
+        PropertyInfo acctid = new PropertyInfo();
+        acctid.setName("AcctID");
+        acctid.setValue(account.AcctID);
+        Request.addProperty(acctid);
+
+        PropertyInfo ccuser = new PropertyInfo();
+        ccuser.setName("ccuser");
+        ccuser.setValue(school.CCUserName);
+        Request.addProperty(ccuser);
+
+        PropertyInfo ccpass = new PropertyInfo();
+        ccpass.setName("ccpass");
+        ccpass.setValue(school.CCPassword);
+        Request.addProperty(ccpass);
+
+        PropertyInfo cardnumber = new PropertyInfo();
+        cardnumber.setName("CardNumber");
+        cardnumber.setValue(etNewCC.getText().toString().trim());
+        Request.addProperty(cardnumber);
+
+        PropertyInfo cardexpire = new PropertyInfo();
+        cardexpire.setName("CardExpire");
+        cardexpire.setValue(etNewCCExp.getText().toString().trim());
+        Request.addProperty(cardexpire);
+
+        PropertyInfo first = new PropertyInfo();
+        first.setName("FirstName");
+        first.setValue(etFirstCC.getText().toString().trim());
+        Request.addProperty(first);
+
+        PropertyInfo last = new PropertyInfo();
+        last.setName("LastName");
+        last.setValue(etLastCC.getText().toString().trim());
+        Request.addProperty(last);
+
+        String address;
+        if (etAddressCC.getText().toString().trim().equals(""))
+            address = account.Address;
+        else
+            address = etAddressCC.getText().toString().trim();
+        PropertyInfo Address = new PropertyInfo();
+        Address.setName("Address");
+        Address.setValue(address);
+        Request.addProperty(Address);
+
+        String city;
+        if (etCityCC.getText().toString().trim().equals(""))
+            city = account.City;
+        else
+            city = etCityCC.getText().toString().trim();
+        PropertyInfo City = new PropertyInfo();
+        City.setName("City");
+        City.setValue(city);
+        Request.addProperty(City);
+
+        String state;
+        if (etStateCC.getText().toString().trim().equals(""))
+            state = account.State;
+        else
+            state = etStateCC.getText().toString().trim();
+        PropertyInfo State = new PropertyInfo();
+        State.setName("State");
+        State.setValue(state);
+        Request.addProperty(State);
+
+        String zip;
+        if (etZipCC.getText().toString().trim().equals(""))
+            zip = account.ZipCode;
+        else
+            zip = etZipCC.getText().toString().trim();
+        PropertyInfo ZipCode = new PropertyInfo();
+        ZipCode.setName("ZipCode");
+        ZipCode.setValue(zip);
+        Request.addProperty(ZipCode);
+
+        PropertyInfo maxamount = new PropertyInfo();
+        maxamount.setName("MaxAmount");
+        maxamount.setType(Float.class);
+        maxamount.setValue(school.CCMaxAmt);
+        Request.addProperty(maxamount);
+
+        PropertyInfo merchantnumber = new PropertyInfo();
+        merchantnumber.setName("MerchantNumber");
+        merchantnumber.setValue(school.CCMerchantNo);
+        Request.addProperty(merchantnumber);
+
+        PropertyInfo username = new PropertyInfo();
+        username.setName("UserName");
+        username.setValue(user.UserName);
+        Request.addProperty(username);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        MarshalFloat mf = new MarshalFloat();
+        mf.register(envelope);
+
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(Request);
+
+        SoapPrimitive response = null;
+        HttpTransportSE HttpTransport = new HttpTransportSE(Data.URL);
+        try {
+            HttpTransport.call(SOAP_ACTION, envelope);
+
+            response = (SoapPrimitive) envelope.getResponse();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+        return response;
+    }
+
 }

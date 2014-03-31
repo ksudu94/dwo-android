@@ -9,9 +9,12 @@ import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.akadasoftware.danceworksonline.classes.Account;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,8 +26,11 @@ public class EditCreditCardDialog extends DialogFragment {
 
     EditText etCCNo, etCVV;
     String CCNo, Date, CVV;
+    Boolean saveCard;
     Spinner spinnerMonth, spinnerYear;
+    CheckBox chkSaveCreditCard;
     Activity activity;
+    Account account;
 
     ArrayList<String> years = new ArrayList<String>();
     String[] months;
@@ -33,7 +39,7 @@ public class EditCreditCardDialog extends DialogFragment {
     }
 
     public interface EditCreditCardDialogListener {
-        public void onDialogPositiveClick(String CCNo, String CVV, String Date);
+        public void onDialogPositiveClick(String CCNo, String CVV, String Date, Boolean saveCard);
 
         public void onDialogNegativeClick();
     }
@@ -71,7 +77,13 @@ public class EditCreditCardDialog extends DialogFragment {
         etCVV = (EditText) view.findViewById(R.id.etCVV);
         spinnerMonth = (Spinner) view.findViewById(R.id.spinnerMonth);
         spinnerYear = (Spinner) view.findViewById(R.id.spinnerYear);
+        chkSaveCreditCard = (CheckBox) view.findViewById(R.id.chkSaveCreditCard);
+        chkSaveCreditCard.setChecked(false);
         activity = getActivity();
+
+
+        saveCard = false;
+
 
         ArrayAdapter<CharSequence> monthAdapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.months, android.R.layout.simple_spinner_item);
@@ -127,8 +139,11 @@ public class EditCreditCardDialog extends DialogFragment {
                                     toast.show();
                                 }
                             }
-                            ccListener.onDialogPositiveClick(CCNo, CVV, Date);
 
+                            if (chkSaveCreditCard.isChecked()) {
+                                saveCard = true;
+                            }
+                            ccListener.onDialogPositiveClick(CCNo, CVV, Date, saveCard);
                         }
                     }
                 })
@@ -141,4 +156,5 @@ public class EditCreditCardDialog extends DialogFragment {
 
         return builder.create();
     }
+
 }
