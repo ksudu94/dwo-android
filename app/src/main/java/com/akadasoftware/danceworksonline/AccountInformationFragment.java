@@ -213,7 +213,7 @@ public class AccountInformationFragment extends Fragment {
         //No credit card saved on file
         if (account.CCConsentID == 0) {
             tvcc.setVisibility(View.GONE);
-            btnEditCreditCard.setVisibility(View.GONE);
+            btnEditCreditCard.setVisibility(View.VISIBLE);
 
 
         } else {
@@ -339,7 +339,6 @@ public class AccountInformationFragment extends Fragment {
                     }
                     saveCreditCardChanges changes = new saveCreditCardChanges();
                     changes.execute();
-
 
                 }
                 /*
@@ -556,8 +555,6 @@ public class AccountInformationFragment extends Fragment {
                 toast.show();
             }
 
-            //getAccount getAccount = new getAccount();
-            //getAccount.execute();
         }
     }
 

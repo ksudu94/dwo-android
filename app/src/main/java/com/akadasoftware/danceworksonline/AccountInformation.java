@@ -45,14 +45,16 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
      */
     AccountPagerAdapter mSectionsPagerAdapter;
 
+
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     ViewPager mViewPager;
     private AppPreferences _appPrefs;
 
-    /*Uses the saved position from the onAccountSelected method in Home.java to fill an empty
-     account with the matching position in the account list array.
+    /**
+     * Uses the saved position from the onAccountSelected method in Home.java to fill an empty
+     * account with the matching position in the account list array.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {

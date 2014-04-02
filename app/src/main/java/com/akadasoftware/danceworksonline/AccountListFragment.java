@@ -25,8 +25,6 @@ import java.util.ArrayList;
  * Large screen devices (such as tablets) are supported by replacing the ListView
  * with a GridView.
  * <p/>
- * Activities containing this fragment MUST implement the {@link Callbacks}
- * interface.
  */
 public class AccountListFragment extends ListFragment {
 
@@ -81,6 +79,16 @@ public class AccountListFragment extends ListFragment {
 
     }
 
+    /**
+     * Change the divider line color
+     *
+     * @Override public void onActivityCreated(Bundle savedInstanceState) {
+     * super.onActivityCreated(savedInstanceState);
+     * ColorDrawable light_blue = new ColorDrawable(this.getResources().getColor(R.color.light_blue));
+     * getListView().setDivider(light_blue);
+     * getListView().setDividerHeight(2);
+     * }
+     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

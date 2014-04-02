@@ -26,11 +26,12 @@ public class AppPreferences {
     public static final String putST1Rate = "ST1Rate";
     public static final String putST2Rate = "ST2Rate";
     public static final String putAccountListPosition = "AccountListPosition";
+    public static final String putStudentListPosition = "StudentListPosition";
     public static final String putLogoName = "LogoName";
     private SharedPreferences sharedPrefs;
     private SharedPreferences.Editor prefsEditor;
     Gson gson = new Gson();
-    String jsonAccounts;
+    String jsonAccounts, jsonStudents;
     String jsonUser, jsonSchool;
 
 
@@ -152,6 +153,15 @@ public class AppPreferences {
     }
 
 
+    public int getStudentListPosition() {
+        return sharedPrefs.getInt(putStudentListPosition, 0);
+    }
+
+    public void saveStudentListPosition(int position) {
+        prefsEditor.putInt(putStudentListPosition, position);
+        prefsEditor.commit();
+    }
+
     public String getLogoName() {
         return sharedPrefs.getString(putLogoName, "");
     }
@@ -221,6 +231,28 @@ public class AppPreferences {
         jsonAccounts = gson.toJson(accounts);
 
         prefsEditor.putString("Accounts", jsonAccounts);
+        prefsEditor.commit();
+    }
+
+    public ArrayList<Student> getStudent() {
+        ArrayList<Student> students = new ArrayList<Student>();
+        jsonStudents = sharedPrefs.getString("Students", "None found");
+        if (jsonStudents != "None found") {
+            JsonParser parser = new JsonParser();
+            JsonArray array = parser.parse(jsonStudents).getAsJsonArray();
+            for (int i = 0; i < array.size() - 1; i++) {
+                Student student = gson.fromJson(array.get(i), Student.class);
+                students.add(student);
+            }
+        }
+        return students;
+    }
+
+    public void saveStudents(ArrayList<Student> student) {
+        Gson gson = new Gson();
+        jsonStudents = gson.toJson(student);
+
+        prefsEditor.putString("Students", jsonStudents);
         prefsEditor.commit();
     }
 

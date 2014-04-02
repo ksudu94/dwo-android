@@ -13,10 +13,11 @@ import android.widget.Toast;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
 public class Home extends ActionBarActivity
-        implements NavigationDrawerFragment.NavigationDrawerCallbacks, AccountListFragment.OnAccountSelectedListener {
+        implements NavigationDrawerFragment.NavigationDrawerCallbacks,
+        AccountListFragment.OnAccountSelectedListener,
+        StudentsListFragment.OnStudentInteractionListener {
 
     /**
-     *
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
     private static SharedPreferences loginPreferences;
@@ -31,9 +32,9 @@ public class Home extends ActionBarActivity
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      * Called to do initial creation of a fragment. This is called after onAttach(Activity) and
-     before onCreateView(LayoutInflater, ViewGroup, Bundle).Note that this can be called while
-     the fragment's activity is still in the process of being created. As such, you can not rely
-     on things like the activity's content view hierarchy being initialized at this point.
+     * before onCreateView(LayoutInflater, ViewGroup, Bundle).Note that this can be called while
+     * the fragment's activity is still in the process of being created. As such, you can not rely
+     * on things like the activity's content view hierarchy being initialized at this point.
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,14 +147,14 @@ public class Home extends ActionBarActivity
     @Override
     public void OnAccountSelected(int id) {
 
-        /* Starting a new activity (AccountInformation) which is handled by intents in the manifest.
-        The position is saved to fill a matching account in the listarray.
+        /**
+         *  Starting a new activity (AccountInformation) which is handled by intents in the manifest.
+         *  The position is saved to fill a matching account in the listarray.
          */
 
         _appPrefs = new AppPreferences(getApplicationContext());
 
         _appPrefs.saveAccountListPosition(id);
-
 
 
         Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.AccountInformation");
@@ -162,6 +163,14 @@ public class Home extends ActionBarActivity
 
     }
 
+    @Override
+    public void onStudentInteraction(int position) {
+        _appPrefs = new AppPreferences(getApplicationContext());
+
+        _appPrefs.saveStudentListPosition(position);
+
+
+    }
 }
 
 

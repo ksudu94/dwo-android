@@ -15,5 +15,12 @@
     <item name="fragment_accountstudentsfragment" type="layout">
         @layout/fragment_accountstudents_grid
     </item>
+
     <bool name="isTablet">true</bool>
+
+    <item name="fragment_studentslistfragment" type="layout">
+        @layout/fragment_studentslistfragment_grid
+    </item>
+    <item name="fragment_studentslist" type="layout">@layout/fragment_studentslist_grid</item>
+
 </resources>

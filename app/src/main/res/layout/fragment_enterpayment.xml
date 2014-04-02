@@ -71,7 +71,7 @@
                 android:id="@+id/etDescription"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:hint="Description of Payment"
+                android:text="Payment"
                 android:imeOptions="actionDone" />
 
             <TextView
@@ -90,8 +90,7 @@
                     android:id="@+id/tvChangeAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="20dp"
-                    android:text="Hi"
+                    android:textSize="25dp"
                     android:textStyle="bold" />
 
 
@@ -108,7 +107,7 @@
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Enter Charge"
+                android:text="Enter Payment"
                 android:id="@+id/btnPayment" />
 
 

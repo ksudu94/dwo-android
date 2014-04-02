@@ -3,20 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.akadasoftware.danceworksonline.AccountListFragment">
+    tools:context="com.akadasoftware.danceworksonline.StudentsListFragmentFragment">
 
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="#33b5e6"
-        android:dividerHeight="2px" />
+        android:layout_height="match_parent" />
 
     <TextView
         android:id="@android:id/empty"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:background="@drawable/bg_color" />
+        android:gravity="center" />
 
 </FrameLayout>

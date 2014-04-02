@@ -203,6 +203,7 @@ public class AccountTransactionsFragment extends ListFragment {
                         Toast.LENGTH_LONG);
                 toast.show();
             } else {
+                _appPrefs.saveChgID(trans.TID);
                 mListener.OnTransactionSelected(trans.Balance, trans.TID, trans.TDesc);
             }
         }

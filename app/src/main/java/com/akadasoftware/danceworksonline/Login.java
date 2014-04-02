@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.School;
+import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.User;
 
 import org.ksoap2.SoapEnvelope;
@@ -240,8 +241,15 @@ public class Login extends ActionBarActivity {
                         _appPrefs.saveUserID(user.UserID);
                         _appPrefs.saveUserGUID(user.UserGUID);
                         _appPrefs.saveUser(userarray);
+
+                        /**
+                         * Blank out Accounts and Students lists
+                         */
                         ArrayList<Account> AccountsArray = new ArrayList<Account>();
                         _appPrefs.saveAccounts(AccountsArray);
+
+                        ArrayList<Student> StudentArray = new ArrayList<Student>();
+                        _appPrefs.saveStudents(StudentArray);
 
                         METHOD_NAME = "getSchool";
                         SOAP_ACTION = "getSchool";

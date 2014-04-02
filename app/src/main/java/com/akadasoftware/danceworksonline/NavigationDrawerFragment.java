@@ -124,7 +124,8 @@ public class NavigationDrawerFragment extends Fragment {
                         getString(R.string.title_accounts),
                         getString(R.string.title_students),
                         getString(R.string.title_classes),
-                }));
+                }
+        ));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
     }
@@ -225,6 +226,12 @@ public class NavigationDrawerFragment extends Fragment {
         switch (position) {
             case 0:
                 newFragment = new AccountListFragment();
+                transaction.replace(R.id.container, newFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+                break;
+            case 1:
+                newFragment = new StudentsListFragment();
                 transaction.replace(R.id.container, newFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();

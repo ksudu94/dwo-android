@@ -25,7 +25,6 @@ import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.MarshalFloat;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
@@ -163,7 +162,7 @@ public class EnterPaymentFragment extends Fragment {
 
     public void refreshEnterPayment() {
         chgid = 0;
-        etDescription.getText().clear();
+        etDescription.setText("Payment");
         tvChangeAmount.setText("0.00");
     }
 
@@ -388,7 +387,7 @@ public class EnterPaymentFragment extends Fragment {
     public class enterPaymentAsync extends AsyncTask<Data, Void, String[]> {
 
         public String[] doInBackground(Data... data) {
-            SoapPrimitive enterPayment = null;
+            SoapObject enterPayment = null;
 
             School school = _appPrefs.getSchool();
             user = _appPrefs.getUser();
@@ -400,48 +399,38 @@ public class EnterPaymentFragment extends Fragment {
             PDesc = etDescription.getText().toString();
 
             Amount = Float.valueOf(tvChangeAmount.getText().toString());
-            FName = account.FName;
-            LName = account.LName;
-            Address = account.Address;
-            City = account.City;
-            State = account.State;
-            Zip = account.ZipCode;
+            FName = account.CCFName;
+            LName = account.CCLName;
+            Address = account.CCAddress;
+            City = account.CCCity;
+            State = account.CCState;
+            Zip = account.CCZip;
             POSTrans = false;
             SessionID = school.SessionID;
             ccuser = school.CCUserName;
             ccpass = school.CCPassword;
             CCMerch = school.CCMerchantNo;
             ccmax = school.CCMaxAmt;
+            chgid = _appPrefs.getChgID();
 
             enterPayment = EnterPayment(UserID, UserGUID, SchID, AcctID, PDate, PDesc, ChkNo, Amount, Kind, CCard, CCDate, CCAuth,
                     CCRecNo, POSTrans, TransPostHistID, SessionID, ConsentID, PaymentID, ProcessData, RefNo,
                     AuthCode, Invoice, AcqRefData, CardHolderName, CCToken, ccuser, ccpass, CardNumber,
-                    strUserName, CCMerch, CVV, FName, LName, Address, City, State, Zip);
+                    strUserName, CCMerch, ccmax, CVV, FName, LName, Address, City, State, Zip, chgid);
             return EnterPaymentFromSoap(enterPayment);
         }
 
         protected void onPostExecute(String result[]) {
 
-
-            if (result[0] == "Payment succesfully entered.") {
-
-                if (result[1] == "Card succesfully saved.") {
-
-                    CardNumber = "";
-                    CCExpire = "";
-                    CCard = "";
-                    CVV = "";
-                    ConsentID = 0;
-                    etReference.getText().clear();
-                    etDescription.getText().clear();
-                    tvChangeAmount.setText("0.00");
-                    typeSpinner.setSelection(0);
-                }
-
-            } else {
-
-                result[0] = "The payment was not entered.";
-            }
+            CardNumber = "";
+            CCExpire = "";
+            CCard = "";
+            CVV = "";
+            ConsentID = 0;
+            etReference.getText().clear();
+            etDescription.getText().clear();
+            tvChangeAmount.setText("0.00");
+            typeSpinner.setSelection(0);
 
             Toast toast = Toast.makeText(getActivity(), result[0] + " " + result[1], Toast.LENGTH_LONG);
             toast.show();
@@ -456,14 +445,14 @@ public class EnterPaymentFragment extends Fragment {
      *
      * @return Returns a soap object which is basically a success or fail message.
      */
-    public SoapPrimitive EnterPayment(int UserID, String UserGUID, int SchID, int AcctID, String PDate,
-                                      String PDesc, String ChkNo, float Amount, String Kind, String CCard,
-                                      String CCDate, String CCAuth, int CCRecNo, Boolean POSTrans,
-                                      int TransPostHistID, int SessionID, int ConsentID, String PaymentID,
-                                      String ProcessData, String RefNo, String AuthCode, String Invoice,
-                                      String AcqRefData, String CardHolderName, String CCToken, String ccuser,
-                                      String ccpass, String CardNumber, String strUserName, int CCMerch, String CVV,
-                                      String FName, String LName, String Address, String City, String State, String Zip) {
+    public SoapObject EnterPayment(int UserID, String UserGUID, int SchID, int AcctID, String PDate,
+                                   String PDesc, String ChkNo, float Amount, String Kind, String CCard,
+                                   String CCDate, String CCAuth, int CCRecNo, Boolean POSTrans,
+                                   int TransPostHistID, int SessionID, int ConsentID, String PaymentID,
+                                   String ProcessData, String RefNo, String AuthCode, String Invoice,
+                                   String AcqRefData, String CardHolderName, String CCToken, String ccuser,
+                                   String ccpass, String CardNumber, String strUserName, int CCMerch, float CCMax, String CVV,
+                                   String FName, String LName, String Address, String City, String State, String Zip, int ChgID) {
         SOAP_ACTION = "enterPayment";
         METHOD_NAME = "enterPayment";
 
@@ -532,11 +521,6 @@ public class EnterPaymentFragment extends Fragment {
         ccauth.setValue("");
         requestEnterPayment.addProperty(ccauth);
 
-        PropertyInfo ccmax = new PropertyInfo();
-        ccmax.setName("CCMaxAmount");
-        ccmax.setType(Float.class);
-        ccmax.setValue(5000.0);
-        requestEnterPayment.addProperty(ccmax);
 
         PropertyInfo ccrecno = new PropertyInfo();
         ccrecno.setName("CCRecNo");
@@ -566,7 +550,7 @@ public class EnterPaymentFragment extends Fragment {
 
         PropertyInfo paymentid = new PropertyInfo();
         paymentid.setName("PaymentID");
-        paymentid.setValue(0);
+        paymentid.setValue("");
         requestEnterPayment.addProperty(paymentid);
 
 
@@ -632,6 +616,12 @@ public class EnterPaymentFragment extends Fragment {
         ccmerch.setValue(CCMerch);
         requestEnterPayment.addProperty(ccmerch);
 
+        PropertyInfo ccmax = new PropertyInfo();
+        ccmax.setName("CCMaxAmount");
+        ccmax.setType(Float.class);
+        ccmax.setValue(CCMax);
+        requestEnterPayment.addProperty(ccmax);
+
         PropertyInfo cvv = new PropertyInfo();
         cvv.setName("CVV");
         cvv.setValue(CVV);
@@ -665,13 +655,18 @@ public class EnterPaymentFragment extends Fragment {
 
         PropertyInfo zip = new PropertyInfo();
         zip.setName("Zip");
-        zip.setValue("");
+        zip.setValue(Zip);
         requestEnterPayment.addProperty(zip);
 
         PropertyInfo saveCard = new PropertyInfo();
         saveCard.setName("saveCard");
         saveCard.setValue(saveNewCreditCard);
         requestEnterPayment.addProperty(saveCard);
+
+        PropertyInfo chgid = new PropertyInfo();
+        chgid.setName("ChgID");
+        chgid.setValue(ChgID);
+        requestEnterPayment.addProperty(chgid);
 
         SoapSerializationEnvelope envelopePayment = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
@@ -682,12 +677,12 @@ public class EnterPaymentFragment extends Fragment {
         envelopePayment.dotNet = true;
         envelopePayment.setOutputSoapObject(requestEnterPayment);
 
-        SoapPrimitive responsePayment = null;
+        SoapObject responsePayment = null;
         HttpTransportSE HttpTransport = new HttpTransportSE("http://app.akadasoftware.com/MobileAppWebService/Android.asmx");
         try {
             HttpTransport.call(SOAP_ACTION, envelopePayment);
 
-            responsePayment = (SoapPrimitive) envelopePayment.getResponse();
+            responsePayment = (SoapObject) envelopePayment.getResponse();
 
 
         } catch (Exception e) {
@@ -698,11 +693,19 @@ public class EnterPaymentFragment extends Fragment {
     }
 
 
-    public String[] EnterPaymentFromSoap(SoapPrimitive soap) {
+    public String[] EnterPaymentFromSoap(SoapObject soap) {
+
 
         String[] response = new String[2];
-        response[0] = soap.getAttribute(0).toString();
-        response[1] = soap.getAttribute(1).toString();
+        if (soap.getProperty(0).toString() == "string : Result: Declined - FAILED ERROR CODE: 999 - Invalid Credit Card Number TR: 0") {
+            response[0] = "Payment not submitted.";
+        } else
+            response[0] = soap.getProperty(0).toString();
+
+        if (soap.getProperty(1).toString() == "anyType{}" || soap.getProperty(1).toString().isEmpty()) {
+            response[1] = "Card not saved.";
+        } else
+            response[1] = soap.getProperty(1).toString();
 
         return response;
     }
