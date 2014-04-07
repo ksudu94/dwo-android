@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.School;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.User;
@@ -34,7 +35,12 @@ public class Login extends ActionBarActivity {
 
     private static SharedPreferences loginPreferences;
     private static SharedPreferences.Editor loginEditor;
+    static String strQuery;
 
+    @Override
+    public boolean stopService(Intent name) {
+        return super.stopService(name);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -237,10 +243,22 @@ public class Login extends ActionBarActivity {
                     // If the user logged in before it will not hit this break point but instead
                     // go to the splash page
                     if (user.SchID > 0) {
+                        /**
+                         * Creates Query string that handles the sorting and selecting of accounts
+                         * when the accounts list is populated
+                         */
+                        Globals global = new Globals();
+                        strQuery = global.BuildQuery(user.AccountSelection, user.AccountSort);
+
                         _appPrefs.saveSchID(user.SchID);
                         _appPrefs.saveUserID(user.UserID);
                         _appPrefs.saveUserGUID(user.UserGUID);
+                        _appPrefs.saveAccountSortBy(user.AccountSort);
+                        _appPrefs.saveAccountSelectBy(user.AccountSelection);
                         _appPrefs.saveUser(userarray);
+                        _appPrefs.saveAccountQuery(strQuery);
+
+
 
                         /**
                          * Blank out Accounts and Students lists

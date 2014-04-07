@@ -28,6 +28,9 @@ public class AppPreferences {
     public static final String putAccountListPosition = "AccountListPosition";
     public static final String putStudentListPosition = "StudentListPosition";
     public static final String putLogoName = "LogoName";
+    public static final String putAccountQuery = "AccountQuery";
+    public static final String putAccountSortBy = "AccountSortBy";
+    public static final String putAccountSelectBy = "AccountSelectBy";
     private SharedPreferences sharedPrefs;
     private SharedPreferences.Editor prefsEditor;
     Gson gson = new Gson();
@@ -142,6 +145,36 @@ public class AppPreferences {
         prefsEditor.putFloat(putST2Rate, ST2Rate);
         prefsEditor.commit();
     }
+
+    public void saveAccountQuery(String Query) {
+        prefsEditor.putString(putAccountQuery, Query);
+        prefsEditor.commit();
+    }
+
+    public String getAccountQuery() {
+        return sharedPrefs.getString(putAccountQuery, "");
+    }
+
+
+    public int getAccountSortBy() {
+        return sharedPrefs.getInt(putAccountSortBy, 0);
+    }
+
+    public void saveAccountSortBy(int SortBy) {
+        prefsEditor.putInt(putAccountSortBy, SortBy);
+        prefsEditor.commit();
+    }
+
+
+    public int getAccountSelectBy() {
+        return sharedPrefs.getInt(putAccountSelectBy, 0);
+    }
+
+    public void saveAccountSelectBy(int SelectBy) {
+        prefsEditor.putInt(putAccountSelectBy, SelectBy);
+        prefsEditor.commit();
+    }
+
 
     public int getAccountListPosition() {
         return sharedPrefs.getInt(putAccountListPosition, 0);

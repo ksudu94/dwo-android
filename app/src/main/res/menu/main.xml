@@ -20,4 +20,11 @@
         android:title="@string/profile"
         android:orderInCategory="100"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/filter"
+        android:title="@string/filter"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
 </menu>

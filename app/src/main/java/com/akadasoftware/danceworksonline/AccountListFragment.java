@@ -32,6 +32,7 @@ public class AccountListFragment extends ListFragment {
     private AppPreferences _appPrefs;
     String METHOD_NAME = "";
     static String SOAP_ACTION = "getAccounts";
+    static String strQuery = "";
     static SoapSerializationEnvelope envelopeOutput;
     Activity activity;
     static User user;
@@ -51,7 +52,7 @@ public class AccountListFragment extends ListFragment {
     /**
      * Creates a new instance of the Accountlist fragment and sets the arguments of that fragment to
      * a list of accounts. Creating a new AccountListFragment runs the onCreate method which then
-     * checks wether the accountsarray is populated or not and takes the appropriate action. Bundle
+     * checks whether the accountsarray is populated or not and takes the appropriate action. Bundle
      * args is used to send in arguments to the onCreate method (we think).
      */
     public interface OnAccountSelectedListener {
@@ -66,6 +67,7 @@ public class AccountListFragment extends ListFragment {
         _appPrefs = new AppPreferences(getActivity());
         AccountsArray = _appPrefs.getAccounts();
         user = _appPrefs.getUser();
+        strQuery = _appPrefs.getAccountQuery();
 
         if (AccountsArray.size() > 0) {
             acctListAdpater = new AccountListAdapater(getActivity(),
@@ -106,18 +108,17 @@ public class AccountListFragment extends ListFragment {
         mListener = null;
     }
 
-    /*Called when one of the accounts is selected in the accountlist page calling onAccountSelected
-      takes us to the onAccountSelected method on the home page were it saves the account position
-      in the list and then starts our new activity which is opening the AccountInformationFragment
-      page.
+    /**
+     * Called when one of the accounts is selected in the accountlist page calling onAccountSelected
+     * takes us to the onAccountSelected method on the home page were it saves the account position
+     * in the list and then starts our new activity which is opening the AccountInformationFragment
+     * page.
      */
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Notify the parent activity of selected item
         mListener.OnAccountSelected(position);
-
-
     }
 
 
@@ -171,10 +172,11 @@ public class AccountListFragment extends ListFragment {
 
         SoapObject request = GetSoapObject(MethodName);
 
+
         PropertyInfo Order = new PropertyInfo();
         Order.setType("STRING_CLASS");
         Order.setName("Order");
-        Order.setValue(" AND Status=0 ORDER BY LName,FName,AcctID");
+        Order.setValue(strQuery);
         request.addProperty(Order);
 
         PropertyInfo SchID = new PropertyInfo();

@@ -8,6 +8,7 @@
     <string name="profile">Change user profile</string>
     <string name="login">Login</string>
     <string name="log_out">Log Out </string>
+    <string name="filter">Filter</string>
     <string name="cancel">Cancel</string>
     <string name="status">Status</string>
     <string name="charge">Select Charge Type</string>
@@ -70,6 +71,23 @@
         <item>10</item>
         <item>11</item>
         <item>12</item>
+    </string-array>
+
+    <string-array name="SortBy">
+        <item>Last Name</item>
+        <item>First Name</item>
+        <item>Account Number</item>
+        <item>Phone</item>
+        <item>Email</item>
+    </string-array>
+
+    <string-array name="SelectBy">
+        <item>Active</item>
+        <item>Inactive</item>
+        <item>Active and Inactive</item>
+        <item>Prospects</item>
+        <item>Deleted</item>
+        <item>All Accounts</item>
     </string-array>
 
 </resources>

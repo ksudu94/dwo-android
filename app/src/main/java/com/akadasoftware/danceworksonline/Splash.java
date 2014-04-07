@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.School;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.User;
@@ -34,6 +35,7 @@ public class Splash extends ActionBarActivity {
     private AppPreferences _appPrefs;
     User user = new User();
     String METHOD_NAME, SOAP_ACTION, UserGUID, newLogoName, LogoName, logoUrl;
+    static String strQuery;
 
     int UserID, SchID;
     Boolean isTablet;
@@ -205,10 +207,21 @@ public class Splash extends ActionBarActivity {
                 ArrayList<User> userarray = new ArrayList<User>();
                 userarray.add(0, user);
                 if (user.SchID > 0) {
+                    /**
+                     * Creates Query string that handles the sorting and selecting of accounts
+                     * when the accounts list is populated
+                     */
+                    Globals global = new Globals();
+                    strQuery = global.BuildQuery(user.AccountSelection, user.AccountSort);
+
                     _appPrefs.saveSchID(user.SchID);
                     _appPrefs.saveUserID(user.UserID);
                     _appPrefs.saveUserGUID(user.UserGUID);
+                    _appPrefs.saveAccountSortBy(user.AccountSort);
+                    _appPrefs.saveAccountSelectBy(user.AccountSelection);
                     _appPrefs.saveUser(userarray);
+                    _appPrefs.saveAccountQuery(strQuery);
+
                     /**
                      * Blank out Accounts and Students lists
                      */

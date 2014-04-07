@@ -3,6 +3,9 @@ package com.akadasoftware.danceworksonline;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -10,12 +13,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+
+import java.util.ArrayList;
 
 public class Home extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         AccountListFragment.OnAccountSelectedListener,
-        StudentsListFragment.OnStudentInteractionListener {
+        StudentsListFragment.OnStudentInteractionListener,
+        FilterDialog.FilterDialogListener {
 
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -28,6 +35,13 @@ public class Home extends ActionBarActivity
 
 
     private CharSequence mTitle;
+    private onFilterSelectedDialog fListener;
+
+    public interface onFilterSelectedDialog {
+        // TODO: Update argument type and name
+        public void onFilterSelectedDialog();
+    }
+
 
     /**
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
@@ -43,6 +57,8 @@ public class Home extends ActionBarActivity
 
         ActionBar bar = getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
+
+        _appPrefs = new AppPreferences(getApplicationContext());
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -90,6 +106,9 @@ public class Home extends ActionBarActivity
                 }
                 break;
             case R.id.profile:
+                return true;
+            case R.id.filter:
+                onFilterSelectedDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -152,7 +171,6 @@ public class Home extends ActionBarActivity
          *  The position is saved to fill a matching account in the listarray.
          */
 
-        _appPrefs = new AppPreferences(getApplicationContext());
 
         _appPrefs.saveAccountListPosition(id);
 
@@ -165,12 +183,45 @@ public class Home extends ActionBarActivity
 
     @Override
     public void onStudentInteraction(int position) {
-        _appPrefs = new AppPreferences(getApplicationContext());
+
 
         _appPrefs.saveStudentListPosition(position);
 
 
     }
+
+    public void onFilterSelectedDialog() {
+
+        FragmentManager fm = getSupportFragmentManager();
+        FilterDialog filterDialog = new FilterDialog();
+
+        filterDialog.show(fm, "");
+
+
+    }
+
+
+    @Override
+    public void onFilterDialogPositiveClick() {
+        /**
+         * Clears the saved Accounts List so that it refreshes it with the new select and sort values
+         */
+        ArrayList<Account> AccountsArray = new ArrayList<Account>();
+        _appPrefs.saveAccounts(AccountsArray);
+
+        Fragment newFragment;
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        newFragment = new AccountListFragment();
+        ft.replace(R.id.container, newFragment);
+        ft.addToBackStack(null);
+        ft.commit();
+    }
+
+    @Override
+    public void onFilterDialogNegativeClick() {
+
+    }
+
 }
 
 
