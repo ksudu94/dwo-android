@@ -219,7 +219,7 @@ public class AccountListFragment extends ListFragment {
 
             return response;
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return null;
     }

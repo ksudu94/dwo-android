@@ -11,10 +11,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Student;
 
 import java.util.ArrayList;
 
@@ -32,7 +34,7 @@ public class Home extends ActionBarActivity
     private NavigationDrawerFragment mNavigationDrawerFragment;
     private DrawerLayout mDrawerLayout;
     private AppPreferences _appPrefs;
-
+    private ListView mDrawerListView;
 
     private CharSequence mTitle;
     private onFilterSelectedDialog fListener;
@@ -68,6 +70,8 @@ public class Home extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+
+
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -87,7 +91,7 @@ public class Home extends ActionBarActivity
             case R.id.action_settings:
                 return true;
             case R.id.home:
-                //Overrides to function to open nav drawer instead of going to specificed home
+                //Overrides to function to open nav drawer instead of going to specified home
                 //page. Done by enabling bar.setDisplayHomeAsUpEnabled(true);
                 mNavigationDrawerFragment.openNavigationDrawer();
                 break;
@@ -108,7 +112,7 @@ public class Home extends ActionBarActivity
             case R.id.profile:
                 return true;
             case R.id.filter:
-                onFilterSelectedDialog();
+                onFilterSelectedDialog(mTitle.toString());
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -175,26 +179,31 @@ public class Home extends ActionBarActivity
         _appPrefs.saveAccountListPosition(id);
 
 
-        Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.AccountInformation");
-        startActivity(openMainPage);
+        Intent opentAccountPage = new Intent("com.akadasoftware.danceworksonline.AccountInformation");
+        startActivity(opentAccountPage);
 
 
     }
 
     @Override
-    public void onStudentInteraction(int position) {
+    public void onStudentSelected(int position) {
 
 
         _appPrefs.saveStudentListPosition(position);
 
+        Intent opentStudentPage = new Intent("com.akadasoftware.danceworksonline.StudentInformation");
+        startActivity(opentStudentPage);
+
 
     }
 
-    public void onFilterSelectedDialog() {
+    public void onFilterSelectedDialog(String mTitle) {
 
         FragmentManager fm = getSupportFragmentManager();
         FilterDialog filterDialog = new FilterDialog();
-
+        Bundle args = new Bundle();
+        args.putString("mTitle", mTitle);
+        filterDialog.setArguments(args);
         filterDialog.show(fm, "");
 
 
@@ -202,24 +211,35 @@ public class Home extends ActionBarActivity
 
 
     @Override
-    public void onFilterDialogPositiveClick() {
-        /**
-         * Clears the saved Accounts List so that it refreshes it with the new select and sort values
-         */
-        ArrayList<Account> AccountsArray = new ArrayList<Account>();
-        _appPrefs.saveAccounts(AccountsArray);
+    public void onFilterDialogPositiveClick(String mTitle) {
 
-        Fragment newFragment;
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        newFragment = new AccountListFragment();
-        ft.replace(R.id.container, newFragment);
-        ft.addToBackStack(null);
-        ft.commit();
-    }
+        if (mTitle.equals("Accounts") || mTitle.equals("Home")) {
+            /**
+             * Clears the saved Accounts List so that it refreshes it with the new select and sort values
+             */
+            ArrayList<Account> AccountsArray = new ArrayList<Account>();
+            _appPrefs.saveAccounts(AccountsArray);
 
-    @Override
-    public void onFilterDialogNegativeClick() {
+            Fragment newFragment;
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            newFragment = new AccountListFragment();
+            ft.replace(R.id.container, newFragment);
+            ft.addToBackStack(null);
+            ft.commit();
+        } else if (mTitle.equals("Students")) {
+            /**
+             * Clears the saved Accounts List so that it refreshes it with the new select and sort values
+             */
+            ArrayList<Student> StudentsArray = new ArrayList<Student>();
+            _appPrefs.saveStudents(StudentsArray);
 
+            Fragment newFragment;
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            newFragment = new StudentsListFragment();
+            ft.replace(R.id.container, newFragment);
+            ft.addToBackStack(null);
+            ft.commit();
+        }
     }
 
 }

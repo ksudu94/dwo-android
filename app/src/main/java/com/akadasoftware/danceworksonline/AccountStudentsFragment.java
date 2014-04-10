@@ -40,7 +40,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
     private AccountStudentsAdapter stuAdapter;
     static SoapSerializationEnvelope envelopeOutput;
     String METHOD_NAME = "";
-    static String SOAP_ACTION = "getStudentsByAccountID";
+    static String SOAP_ACTION = "getStudents";
     Activity activity;
     Account account;
 
@@ -161,7 +161,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
     }
 
     public ArrayList<Student> getStudents() {
-        String MethodName = "getStudentsByAccountID";
+        String MethodName = "getStudents";
         SoapObject response = InvokeMethod(Data.URL, MethodName);
         return RetrieveFromSoap(response);
 
@@ -170,6 +170,16 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
     public SoapObject InvokeMethod(String URL, String MethodName) {
 
         SoapObject request = GetSoapObject(MethodName);
+
+        PropertyInfo Where = new PropertyInfo();
+        Where.setName("Where");
+        Where.setValue(_appPrefs.getStudentQuery());
+        request.addProperty(Where);
+
+        PropertyInfo SchID = new PropertyInfo();
+        SchID.setName("SchID");
+        SchID.setValue(_appPrefs.getSchID());
+        request.addProperty(SchID);
 
         PropertyInfo AcctID = new PropertyInfo();
         AcctID.setName("AcctID");

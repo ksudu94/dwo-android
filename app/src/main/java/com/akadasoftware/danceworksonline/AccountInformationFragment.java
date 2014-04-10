@@ -18,6 +18,7 @@ import android.widget.ViewFlipper;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.School;
 import com.akadasoftware.danceworksonline.classes.User;
 
@@ -51,12 +52,13 @@ public class AccountInformationFragment extends Fragment {
     Account account;
     School school;
     User user;
+    Globals globals;
     Activity activity;
     ArrayList<Account> accounts;
     String status, expdate, cctype, ccnum, SOAP_ACTION, METHOD_NAME;
-    int acctid;
+    int acctid, position;
 
-    Button btnEditAccount, btnSave, btnCancel, btnSaveCard, btnEditCreditCard, btnCancelSaveCreditCard, btnCancelNewCreditCard;
+    Button btnEditAccount, btnSave, btnCancel, btnSaveCard, btnEditCreditCard, btnCancelSaveCreditCard, btnAddCreditCard;
     EditText etFirst, etLast, etAddress, etCity, etState, etZip, etPhone, etEmail, etCC, etcard,
             etFirstCC, etLastCC, etNewCC, etNewCCExp, etAddressCC, etCityCC, etStateCC, etZipCC;
     TextView tvcc;
@@ -80,10 +82,10 @@ public class AccountInformationFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         activity = getActivity();
-
+        globals = new Globals();
         _appPrefs = new AppPreferences(activity);
         accounts = _appPrefs.getAccounts();
-        int position = getArguments().getInt("Position");
+        position = getArguments().getInt("Position");
 
         account = accounts.get(position);
         acctid = account.AcctID;
@@ -170,6 +172,7 @@ public class AccountInformationFragment extends Fragment {
         etZipCC = (EditText) rootView.findViewById(R.id.etZipCC);
         btnEditAccount = (Button) rootView.findViewById(R.id.btnEditAccount);
         btnEditCreditCard = (Button) rootView.findViewById(R.id.btnEditCreditCard);
+        btnAddCreditCard = (Button) rootView.findViewById(R.id.btnAddCreditCard);
 
         btnSave = (Button) rootView.findViewById(R.id.btnSave);
         btnCancel = (Button) rootView.findViewById(R.id.btnCancel);
@@ -199,25 +202,23 @@ public class AccountInformationFragment extends Fragment {
             type.setText(cctype + ": ");
 
         tvcc = (TextView) rootView.findViewById(R.id.tvccfield);
-        etcard = (EditText) rootView.findViewById(R.id.etcard);
         btnSaveCard = (Button) rootView.findViewById(R.id.btnSaveCard);
 
 
         tvcc.setVisibility(View.VISIBLE);
-        etcard.setVisibility(View.VISIBLE);
         btnSaveCard.setVisibility(View.VISIBLE);
         btnEditCreditCard.setVisibility(View.VISIBLE);
+        btnAddCreditCard.setVisibility(View.VISIBLE);
         btnCancelSaveCreditCard.setVisibility(View.VISIBLE);
 
 
         //No credit card saved on file
         if (account.CCConsentID == 0) {
             tvcc.setVisibility(View.GONE);
-            btnEditCreditCard.setVisibility(View.VISIBLE);
+            btnEditCreditCard.setVisibility(View.GONE);
 
 
         } else {
-            etcard.setVisibility(View.GONE);
             tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " - Exp. " + expdate);
 
         }
@@ -309,6 +310,21 @@ public class AccountInformationFragment extends Fragment {
             }
         });
 
+        btnAddCreditCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                accountSwitcher.setDisplayedChild(2);
+                etFirstCC.setText(account.FName);
+                etLastCC.setText(account.LName);
+                etAddressCC.setText(account.CCAddress);
+                etCityCC.setText(account.CCCity);
+                etStateCC.setText(account.CCState);
+                etZipCC.setText(account.CCZip);
+
+
+            }
+        });
+
         /**
          * Figure out how to save credit card to webservice later
          */
@@ -359,9 +375,9 @@ public class AccountInformationFragment extends Fragment {
                 accountSwitcher.setDisplayedChild(0);
                 Toast toast = Toast.makeText(getActivity(), "Changes Canceled", Toast.LENGTH_LONG);
                 toast.show();
-                etcard.setVisibility(View.GONE);
                 tvcc.setVisibility(View.VISIBLE);
                 btnEditCreditCard.setVisibility(View.VISIBLE);
+                btnAddCreditCard.setVisibility(View.GONE);
                 tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " - Exp. " + expdate);
 
             }
@@ -400,7 +416,7 @@ public class AccountInformationFragment extends Fragment {
 
         protected void onPostExecute(String result) {
             dialog.dismiss();
-
+            globals.updateAccount(account, position, activity);
             Toast toast = Toast.makeText(getActivity(), result, Toast.LENGTH_LONG);
             toast.show();
             //getAccount getAccount = new getAccount();
@@ -546,6 +562,7 @@ public class AccountInformationFragment extends Fragment {
             int response = Integer.valueOf(result.toString());
             if (response > 0) {
                 account.CCConsentID = response;
+                globals.updateAccount(account, position, activity);
                 Toast toast = Toast.makeText(getActivity(), "Save successful", Toast.LENGTH_LONG);
                 toast.show();
                 accountSwitcher.setDisplayedChild(0);

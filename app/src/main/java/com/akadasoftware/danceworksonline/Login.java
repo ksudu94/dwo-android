@@ -248,16 +248,17 @@ public class Login extends ActionBarActivity {
                          * when the accounts list is populated
                          */
                         Globals global = new Globals();
-                        strQuery = global.BuildQuery(user.AccountSelection, user.AccountSort);
+                        strQuery = global.BuildQuery(user.AccountSelection, user.AccountSort, "Accounts");
 
                         _appPrefs.saveSchID(user.SchID);
                         _appPrefs.saveUserID(user.UserID);
                         _appPrefs.saveUserGUID(user.UserGUID);
                         _appPrefs.saveAccountSortBy(user.AccountSort);
                         _appPrefs.saveAccountSelectBy(user.AccountSelection);
+                        _appPrefs.saveStudentSortBy(user.StudentSort);
+                        _appPrefs.saveStudentSelectBy(user.StudentSelection);
                         _appPrefs.saveUser(userarray);
                         _appPrefs.saveAccountQuery(strQuery);
-
 
 
                         /**

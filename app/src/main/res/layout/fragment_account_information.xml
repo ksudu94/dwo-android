@@ -179,6 +179,14 @@
                         android:layout_gravity="right"
                         android:clickable="true"
                         android:text="Edit" />
+
+                    <Button
+                        android:id="@+id/btnAddCreditCard"
+                        android:layout_width="75dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="right"
+                        android:clickable="true"
+                        android:text="Add" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -202,11 +210,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/etcard" />
-
             </LinearLayout>
 
 
@@ -229,21 +232,6 @@
                 android:layout_marginTop="2dip"
                 android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/btnSave"
-                    android:layout_width="80dip"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:text="Save" />
-
-                <Button
-                    android:id="@+id/btnCancel"
-                    android:layout_width="80dip"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:text="Cancel" />
 
                 <TextView
                     android:id="@+id/tvFName"
@@ -382,6 +370,21 @@
                     android:spinnerMode="dropdown"
                     android:prompt="@string/status" />
 
+                <Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="80dip"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:text="Save" />
+
+                <Button
+                    android:id="@+id/btnCancel"
+                    android:layout_width="80dip"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:text="Cancel" />
             </LinearLayout>
         </FrameLayout>
     </ScrollView>
@@ -401,24 +404,6 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="2dip"
                 android:orientation="vertical">
-
-                <Button
-                    android:id="@+id/btnSaveCard"
-                    android:layout_width="80dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="right"
-                    android:clickable="true"
-                    android:text="Save" />
-
-                <Button
-                    android:id="@+id/btnCancelSaveCreditCard"
-                    android:text="Cancel"
-                    android:layout_width="80dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="right"
-                    android:layout_marginTop="2dp"
-                    android:clickable="true" />
-
 
                 <TextView
                     android:id="@+id/tvFNameCC"
@@ -557,6 +542,22 @@
                     android:hint="Zip Code"
                     android:padding="5dip" />
 
+                <Button
+                    android:id="@+id/btnSaveCard"
+                    android:layout_width="80dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="right"
+                    android:clickable="true"
+                    android:text="Save" />
+
+                <Button
+                    android:id="@+id/btnCancelSaveCreditCard"
+                    android:text="Cancel"
+                    android:layout_width="80dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="right"
+                    android:layout_marginTop="2dp"
+                    android:clickable="true" />
 
             </LinearLayout>
         </FrameLayout>

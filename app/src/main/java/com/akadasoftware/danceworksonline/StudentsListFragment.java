@@ -8,9 +8,11 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.User;
 
@@ -38,14 +40,37 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
     private AppPreferences _appPrefs;
     String METHOD_NAME = "";
     static String SOAP_ACTION = "getStudents";
+    static String strQuery = "";
     static SoapSerializationEnvelope envelopeOutput;
     Activity activity;
     static User user;
+    Globals globals;
 
 
     StudentListAdapter stuListAdapter;
 
     private OnStudentInteractionListener mListener;
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnStudentInteractionListener {
+        // TODO: Update argument type and name
+        public void onStudentSelected(int id);
+    }
+
 
     /**
      * The fragment's ListView/GridView.
@@ -68,10 +93,15 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        _appPrefs = new AppPreferences(getActivity());
-        studentsArray = _appPrefs.getStudent();
-        user = _appPrefs.getUser();
         activity = getActivity();
+        globals = new Globals();
+        _appPrefs = new AppPreferences(activity);
+        studentsArray = _appPrefs.getStudent();
+        strQuery = _appPrefs.getStudentQuery();
+        if (strQuery.length() == 0) {
+            strQuery = globals.BuildQuery(_appPrefs.getStudentSelectBy(), _appPrefs.getStudentSortBy(), "Students");
+        }
+        user = _appPrefs.getUser();
 
 
         if (studentsArray.size() > 0) {
@@ -114,15 +144,12 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
         mListener = null;
     }
 
-
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-
-            mListener.onStudentInteraction(position);
-
-        }
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        // Notify the parent activity of selected item
+        mListener.onStudentSelected(position);
     }
+
 
     /**
      * The default content for this Fragment has a TextView that is shown when
@@ -172,8 +199,18 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
         PropertyInfo Where = new PropertyInfo();
         Where.setType("STRING_CLASS");
         Where.setName("Where");
-        Where.setValue(" where schid=" + user.SchID);
+        Where.setValue(strQuery);
         request.addProperty(Where);
+
+        PropertyInfo SchID = new PropertyInfo();
+        SchID.setName("SchID");
+        SchID.setValue(user.SchID);
+        request.addProperty(SchID);
+
+        PropertyInfo AcctID = new PropertyInfo();
+        AcctID.setName("AcctID");
+        AcctID.setValue(0);
+        request.addProperty(AcctID);
 
         PropertyInfo UserID = new PropertyInfo();
         UserID.setName("UserID");
@@ -234,20 +271,5 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
         return Students;
     }
 
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnStudentInteractionListener {
-        // TODO: Update argument type and name
-        public void onStudentInteraction(int id);
-    }
 
 }

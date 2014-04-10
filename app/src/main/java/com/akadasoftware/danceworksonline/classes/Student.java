@@ -259,7 +259,7 @@ public class Student implements KvmSerializable {
             case 14:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "EMail";
-                if (info.equals("anyType{}")) {
+                if ("anyType{}".equals(info)) {
                     info.setValue(" ");
                 }
                 break;

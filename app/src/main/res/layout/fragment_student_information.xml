@@ -1,0 +1,320 @@
+<ViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/studentSwitcher"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/svStudentInformation">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="5dp"
+                android:paddingTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="20dp"
+                    android:text="Contact" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="right">
+
+                    <Button
+                        android:id="@+id/btnEditStudent"
+                        android:layout_width="75dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="right"
+                        android:clickable="true"
+                        android:text="Edit Student" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvName"
+                    android:layout_width="@dimen/information_label"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Name: " />
+
+                <TextView
+                    android:id="@+id/tvName1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvAddress"
+                    android:layout_width="@dimen/information_label"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Address: " />
+
+                <TextView
+                    android:id="@+id/tvAddress1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvContact"
+                    android:layout_width="@dimen/information_label"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Contact: " />
+
+                <TextView
+                    android:id="@+id/tvContact1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvStatus"
+                    android:layout_width="@dimen/information_label"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Status: " />
+
+                <TextView
+                    android:id="@+id/tvStatus1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvAccountName"
+                    android:layout_width="@dimen/information_label"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="Account name: " />
+
+                <TextView
+                    android:id="@+id/tvAccountName1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/svEditStudentInformation">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/tvEditFName"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Name: " />
+
+            <EditText
+                android:id="@+id/etFName"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip" />
+
+
+            <TextView
+                android:id="@+id/tvEditLName"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Name: " />
+
+            <EditText
+                android:id="@+id/etLName"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+                android:id="@+id/tvEditAddress"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Address: " />
+
+            <EditText
+                android:id="@+id/etAddress"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+                android:id="@+id/tvEditCity"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Address: " />
+
+            <EditText
+                android:id="@+id/etCity"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+                android:id="@+id/tvEditState"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Address: " />
+
+            <EditText
+                android:id="@+id/etState"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tvEditZip"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Address: " />
+
+            <EditText
+                android:id="@+id/etZip"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:inputType="numberDecimal"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tvEditContact"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Contact: " />
+
+            <EditText
+                android:id="@+id/etContact"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tvEditAccountName"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Account name: " />
+
+            <EditText
+                android:id="@+id/etAccountName"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tvEditStatus"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Status: " />
+
+            <Spinner
+                android:id="@+id/StudentStatusSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:animateLayoutChanges="true"
+                android:dropDownSelector="#000000"
+                android:spinnerMode="dropdown"
+                android:prompt="@string/status" />
+
+            <Button
+                android:id="@+id/btnSave"
+                android:layout_width="80dip"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:text="Save" />
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="80dip"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:text="Cancel" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</ViewFlipper>

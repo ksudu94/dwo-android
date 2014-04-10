@@ -23,16 +23,15 @@ public class FilterDialog extends DialogFragment {
     Spinner spinnerSort, spinnerSelect;
     AppPreferences _appPrefs;
     int sort, select;
-    String strQuery, Sort, Select;
+    String strQuery;
 
     public FilterDialog() {
     }
 
 
     public interface FilterDialogListener {
-        public void onFilterDialogPositiveClick();
+        public void onFilterDialogPositiveClick(String mTitle);
 
-        public void onFilterDialogNegativeClick();
     }
 
     FilterDialogListener Listener;
@@ -62,18 +61,36 @@ public class FilterDialog extends DialogFragment {
         spinnerSelect = (Spinner) view.findViewById(R.id.spinnerSelect);
         _appPrefs = new AppPreferences(getActivity());
 
+        final String mTitle = getArguments().getString("mTitle");
+        ArrayAdapter<CharSequence> sortAdapter = null;
+        ArrayAdapter<CharSequence> selectAdapter = null;
 
-        ArrayAdapter<CharSequence> sortAdapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.SortBy, android.R.layout.simple_spinner_item);
+        if (mTitle.equals("Accounts") || mTitle.equals("Home")) {
+            sortAdapter = ArrayAdapter.createFromResource(getActivity(),
+                    R.array.SortBy, android.R.layout.simple_spinner_item);
 
-        ArrayAdapter<CharSequence> selectAdapter = ArrayAdapter.createFromResource(getActivity(),
-                R.array.SelectBy, android.R.layout.simple_spinner_item);
+            selectAdapter = ArrayAdapter.createFromResource(getActivity(),
+                    R.array.SelectBy, android.R.layout.simple_spinner_item);
+
+            spinnerSelect.setSelection(_appPrefs.getAccountSelectBy());
+            spinnerSort.setSelection(_appPrefs.getAccountSortBy());
+        } else if (mTitle.equals("Students")) {
+            sortAdapter = ArrayAdapter.createFromResource(getActivity(),
+                    R.array.StudentSortBy, android.R.layout.simple_spinner_item);
+
+            selectAdapter = ArrayAdapter.createFromResource(getActivity(),
+                    R.array.StudentSelectBy, android.R.layout.simple_spinner_item);
+
+            spinnerSelect.setSelection(_appPrefs.getStudentSelectBy());
+            spinnerSort.setSelection(_appPrefs.getStudentSortBy());
+
+        } else if (mTitle.equals("Classes")) {
+
+        }
 
         spinnerSort.setAdapter(sortAdapter);
         spinnerSelect.setAdapter(selectAdapter);
 
-        spinnerSelect.setSelection(_appPrefs.getAccountSelectBy());
-        spinnerSort.setSelection(_appPrefs.getAccountSortBy());
         builder.setView(view)
                 // Title of dialog
                 .setTitle("Change Filter Settings")
@@ -87,12 +104,19 @@ public class FilterDialog extends DialogFragment {
                         select = spinnerSelect.getSelectedItemPosition();
 
                         Globals global = new Globals();
-                        strQuery = global.BuildQuery(select, sort);
+                        strQuery = global.BuildQuery(select, sort, mTitle);
 
-                        _appPrefs.saveAccountSortBy(sort);
-                        _appPrefs.saveAccountSelectBy(select);
-                        _appPrefs.saveAccountQuery(strQuery);
-                        Listener.onFilterDialogPositiveClick();
+                        if (mTitle.equals("Accounts") || mTitle.equals("Home")) {
+                            _appPrefs.saveAccountSortBy(sort);
+                            _appPrefs.saveAccountSelectBy(select);
+                            _appPrefs.saveAccountQuery(strQuery);
+                        } else if (mTitle.equals("Students")) {
+                            _appPrefs.saveStudentSortBy(sort);
+                            _appPrefs.saveStudentSelectBy(select);
+                            _appPrefs.saveStudentQuery(strQuery);
+                        }
+
+                        Listener.onFilterDialogPositiveClick(mTitle);
 
 
                     }

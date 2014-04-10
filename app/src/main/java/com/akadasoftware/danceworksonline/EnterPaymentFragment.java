@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.School;
 import com.akadasoftware.danceworksonline.classes.User;
 
@@ -35,12 +36,11 @@ import java.util.Calendar;
 
 
 /**
- * A simple {@link android.support.v4.app.Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link EnterPaymentFragment} interface
- * to handle interaction events.
- * Use the {@link EnterPaymentFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * Enterpayment Fragment
+ * Here the user can enter payment that will be saved to the web service. The user can use a saved
+ * credit card on file or enter a new credit card on file and have it be saved to their account. The
+ * switch case is where we handle the payment methods. Several different listeners are used to
+ * handle the different dialogs there are.. Calendar Dialog, Amount Dialog, and Credit Card Dialog.
  */
 public class EnterPaymentFragment extends Fragment {
 
@@ -435,6 +435,10 @@ public class EnterPaymentFragment extends Fragment {
             Toast toast = Toast.makeText(getActivity(), result[0] + " " + result[1], Toast.LENGTH_LONG);
             toast.show();
 
+            if (result[1].length() > 0) {
+                Globals gloabal = new Globals();
+                gloabal.updateAccount(account, accountPosition, activity);
+            }
         }
     }
 

@@ -31,6 +31,9 @@ public class AppPreferences {
     public static final String putAccountQuery = "AccountQuery";
     public static final String putAccountSortBy = "AccountSortBy";
     public static final String putAccountSelectBy = "AccountSelectBy";
+    public static final String putStudentsQuery = "StudentsQuery";
+    public static final String putStudentsSortBy = "StudentsSortBy";
+    public static final String putStudentsSelectBy = "StudentsSelectBy";
     private SharedPreferences sharedPrefs;
     private SharedPreferences.Editor prefsEditor;
     Gson gson = new Gson();
@@ -175,6 +178,34 @@ public class AppPreferences {
         prefsEditor.commit();
     }
 
+    public void saveStudentQuery(String Query) {
+        prefsEditor.putString(putStudentsQuery, Query);
+        prefsEditor.commit();
+    }
+
+    public String getStudentQuery() {
+        return sharedPrefs.getString(putStudentsQuery, "");
+    }
+
+
+    public int getStudentSortBy() {
+        return sharedPrefs.getInt(putStudentsSortBy, 0);
+    }
+
+    public void saveStudentSortBy(int SortBy) {
+        prefsEditor.putInt(putStudentsSortBy, SortBy);
+        prefsEditor.commit();
+    }
+
+
+    public int getStudentSelectBy() {
+        return sharedPrefs.getInt(putStudentsSelectBy, 0);
+    }
+
+    public void saveStudentSelectBy(int SelectBy) {
+        prefsEditor.putInt(putStudentsSelectBy, SelectBy);
+        prefsEditor.commit();
+    }
 
     public int getAccountListPosition() {
         return sharedPrefs.getInt(putAccountListPosition, 0);
@@ -251,7 +282,7 @@ public class AppPreferences {
         if (jsonAccounts != "None found") {
             JsonParser parser = new JsonParser();
             JsonArray array = parser.parse(jsonAccounts).getAsJsonArray();
-            for (int i = 0; i < array.size() - 1; i++) {
+            for (int i = 0; i < array.size(); i++) {
                 Account account = gson.fromJson(array.get(i), Account.class);
                 accounts.add(account);
             }
