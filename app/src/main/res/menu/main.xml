@@ -13,7 +13,7 @@
         android:id="@+id/log_out"
         android:title="@string/log_out"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/profile"
@@ -25,6 +25,6 @@
         android:id="@+id/filter"
         android:title="@string/filter"
         android:orderInCategory="100"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 
 </menu>

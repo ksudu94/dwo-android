@@ -19,7 +19,8 @@ import java.util.Locale;
  * Created by Kyle on 4/9/2014.
  */
 public class StudentInformation extends ActionBarActivity implements ActionBar.TabListener,
-        StudentClassFragment.OnStudentClassListener {
+        StudentClassFragment.OnStudentClassListener,
+        StudentWaitListFragment.OnWaitListListener {
 
     ViewPager mViewPager;
     private AppPreferences _appPrefs;
@@ -154,7 +155,7 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
                     newFragment = StudentClassFragment.newInstance(listPosition);
                     break;
                 case 2:
-                    newFragment = StudentClassFragment.newInstance(listPosition);
+                    newFragment = StudentWaitListFragment.newInstance(listPosition);
                     break;
                 default:
                     newFragment = StudentClassFragment.newInstance(listPosition);
@@ -193,5 +194,9 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
     public void onStudentClassInteraction(String id) {
     }
 
+    @Override
+    public void onWaitListInteraction(String id) {
+
+    }
 
 }

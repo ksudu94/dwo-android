@@ -45,7 +45,7 @@ public class Splash extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         _appPrefs = new AppPreferences(getApplicationContext());
         LogoName = _appPrefs.getLogoName();
-
+        _appPrefs.saveNavDrawerPosition(0);
         /**
          * Test if they have an api high enough to be able to set their own icon otherwise goes to
          * spalsh page with default

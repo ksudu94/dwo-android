@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -41,7 +42,7 @@ public class StudentInformationFragment extends Fragment {
 
     TextView tvName1, tvAddress1, tvContact1, tvStatus1, tvAccountName1;
 
-    EditText etFName, etLName, etAddress, etCity, etState, etZip, etContact, etStatus, etAccountName;
+    EditText etFName, etLName, etAddress, etCity, etState, etZip, etContact, etAccountName;
 
     Button btnEditStudent, btnSave, btnCancel;
 
@@ -61,6 +62,7 @@ public class StudentInformationFragment extends Fragment {
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         activity = getActivity();
         globals = new Globals();
         _appPrefs = new AppPreferences(activity);
@@ -177,6 +179,20 @@ public class StudentInformationFragment extends Fragment {
         return rootView;
 
     }
+
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                getFragmentManager().popBackStackImmediate();
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
 
     class Data {
 

@@ -10,38 +10,36 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.StudentClass;
+import com.akadasoftware.danceworksonline.classes.StuWaitList;
 
 import java.util.List;
 
 /**
- * Created by Kyle on 4/9/2014.
+ * Created by Kyle on 4/14/2014.
  */
-public class StudentClassAdapter extends ArrayAdapter<StudentClass> {
+public class StudentWaitListAdapter extends ArrayAdapter<StuWaitList> {
 
     private AppPreferences _appPrefs;
     Activity activity;
     int resource;
     //Context newContext;
-    List<StudentClass> classes;
+    List<StuWaitList> list;
 
-    public StudentClassAdapter(Context context, int resource, List<StudentClass> items) {
+    public StudentWaitListAdapter(Context context, int resource, List<StuWaitList> items) {
         super(context, resource, items);
-        //newContext = context;
         this.resource = resource;
-        classes = items;
-
+        this.list = items;
     }
 
     public class ViewHolder {
         TextView tvClassType;
         TextView tvClassLevel;
-        TextView tvDescription;
         TextView tvInstructor;
         TextView tvDay;
         TextView tvStart;
         TextView tvStop;
         TextView tvRoom;
+        TextView tvNotes;
     }
 
     /**
@@ -59,7 +57,7 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClass> {
             String inflater = Context.LAYOUT_INFLATER_SERVICE;
             LayoutInflater vi;
             vi = (LayoutInflater) getContext().getSystemService(inflater);
-            convertView = vi.inflate(R.layout.item_studentclass, null);
+            convertView = vi.inflate(R.layout.item_studentwaitlist, null);
 
             holder = new ViewHolder();
 
@@ -68,9 +66,6 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClass> {
 
             holder.tvClassLevel = (TextView) convertView
                     .findViewById(R.id.tvClassLevel);
-
-            holder.tvDescription = (TextView) convertView
-                    .findViewById(R.id.tvDescription);
 
             holder.tvInstructor = (TextView) convertView
                     .findViewById(R.id.tvInstructor);
@@ -87,6 +82,9 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClass> {
             holder.tvRoom = (TextView) convertView
                     .findViewById(R.id.tvRoom);
 
+            holder.tvNotes = (TextView) convertView
+                    .findViewById(R.id.tvNotes);
+
 
             convertView.setTag(holder);
 
@@ -94,56 +92,60 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClass> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        StudentClass stuClass = classes.get(position);
-        String Day = "";
-        holder.tvClassType.setText(stuClass.ClType);
+
+        StuWaitList waitList = list.get(position);
+
+
+        holder.tvClassType.setText(waitList.ClType);
         holder.tvClassType.setTag(position);
 
 
-        holder.tvClassLevel.setText(" - " + stuClass.ClLevel + " - ");
-        holder.tvDescription.setText(stuClass.ClDescription);
-        holder.tvInstructor.setText(stuClass.ClInstructor);
+        holder.tvClassLevel.setText(" - " + waitList.ClLevel + " - ");
 
-        if (stuClass.MultiDay) {
-            if (stuClass.Monday) {
+        holder.tvInstructor.setText(waitList.ClInstructor);
+
+        String Day = "";
+
+        if (waitList.MultiDay) {
+            if (waitList.Monday) {
                 Day = "Mon";
             }
-            if (stuClass.Tuesday) {
+            if (waitList.Tuesday) {
                 if (Day.isEmpty()) {
                     Day = "Tue";
                 } else {
                     Day = Day + "/Tue";
                 }
             }
-            if (stuClass.Wednesday) {
+            if (waitList.Wednesday) {
                 if (Day.isEmpty()) {
                     Day = "Wed";
                 } else {
                     Day = Day + "/Wed";
                 }
             }
-            if (stuClass.Thursday) {
+            if (waitList.Thursday) {
                 if (Day.isEmpty()) {
                     Day = "Thu";
                 } else {
                     Day = Day + "/Thu";
                 }
             }
-            if (stuClass.Friday) {
+            if (waitList.Friday) {
                 if (Day.isEmpty()) {
                     Day = "Fri";
                 } else {
                     Day = Day + "/Fri";
                 }
             }
-            if (stuClass.Saturday) {
+            if (waitList.Saturday) {
                 if (Day.isEmpty()) {
                     Day = "Sat";
                 } else {
                     Day = Day + "/Sat";
                 }
             }
-            if (stuClass.Sunday) {
+            if (waitList.Sunday) {
                 if (Day.isEmpty()) {
                     Day = "Sun";
                 } else {
@@ -151,14 +153,16 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClass> {
                 }
             }
         } else {
-            Day = stuClass.ClDay;
+            Day = waitList.ClDay;
         }
         holder.tvDay.setText(Day + " from ");
-        holder.tvStart.setText(stuClass.ClStart + " - ");
-        holder.tvStop.setText(stuClass.ClStop);
-        holder.tvRoom.setText(stuClass.ClRoom);
-
+        holder.tvStart.setText(waitList.ClStart + " - ");
+        holder.tvStop.setText(waitList.ClStop);
+        holder.tvRoom.setText(" - " + waitList.ClRoom);
+        holder.tvNotes.setText(waitList.Notes);
         return convertView;
 
     }
 }
+
+

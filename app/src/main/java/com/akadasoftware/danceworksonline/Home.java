@@ -20,6 +20,7 @@ import com.akadasoftware.danceworksonline.classes.Student;
 
 import java.util.ArrayList;
 
+
 public class Home extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         AccountListFragment.OnAccountSelectedListener,
@@ -59,6 +60,8 @@ public class Home extends ActionBarActivity
 
         ActionBar bar = getSupportActionBar();
         bar.setDisplayHomeAsUpEnabled(true);
+
+        onSupportNavigateUp();
 
         _appPrefs = new AppPreferences(getApplicationContext());
 
@@ -179,8 +182,8 @@ public class Home extends ActionBarActivity
         _appPrefs.saveAccountListPosition(id);
 
 
-        Intent opentAccountPage = new Intent("com.akadasoftware.danceworksonline.AccountInformation");
-        startActivity(opentAccountPage);
+        Intent openAccountPage = new Intent("com.akadasoftware.danceworksonline.AccountInformation");
+        startActivity(openAccountPage);
 
 
     }
@@ -191,8 +194,8 @@ public class Home extends ActionBarActivity
 
         _appPrefs.saveStudentListPosition(position);
 
-        Intent opentStudentPage = new Intent("com.akadasoftware.danceworksonline.StudentInformation");
-        startActivity(opentStudentPage);
+        Intent openStudentPage = new Intent("com.akadasoftware.danceworksonline.StudentInformation");
+        startActivity(openStudentPage);
 
 
     }

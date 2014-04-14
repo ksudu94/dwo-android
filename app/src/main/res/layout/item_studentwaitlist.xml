@@ -30,14 +30,16 @@
             android:paddingTop="5dp" />
 
         <TextView
-            android:id="@+id/tvDescription"
+            android:id="@+id/tvInstructor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
             android:focusableInTouchMode="false"
             android:paddingBottom="5dp"
-            android:paddingTop="5dp" />
+            android:paddingTop="5dp"
+            android:text="Taught By: " />
+
     </LinearLayout>
 
     <LinearLayout
@@ -75,6 +77,17 @@
             android:paddingTop="5dp" />
 
 
+        <TextView
+            android:id="@+id/tvRoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp" />
+
+
     </LinearLayout>
 
     <LinearLayout
@@ -82,18 +95,7 @@
         android:layout_height="fill_parent">
 
         <TextView
-            android:id="@+id/tvInstructor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:paddingBottom="5dp"
-            android:paddingTop="5dp"
-            android:text="Taught By: " />
-
-        <TextView
-            android:id="@+id/tvRoom"
+            android:id="@+id/tvNotes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="false"

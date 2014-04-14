@@ -28,6 +28,7 @@ public class AppPreferences {
     public static final String putAccountListPosition = "AccountListPosition";
     public static final String putStudentListPosition = "StudentListPosition";
     public static final String putLogoName = "LogoName";
+    public static final String putNavDrawerPosition = "NavDrawerPosition";
     public static final String putAccountQuery = "AccountQuery";
     public static final String putAccountSortBy = "AccountSortBy";
     public static final String putAccountSelectBy = "AccountSelectBy";
@@ -148,6 +149,16 @@ public class AppPreferences {
         prefsEditor.putFloat(putST2Rate, ST2Rate);
         prefsEditor.commit();
     }
+
+    public int getNavDrawerPosition() {
+        return sharedPrefs.getInt(putNavDrawerPosition, 0);
+    }
+
+    public void saveNavDrawerPosition(int NavDrawerPosition) {
+        prefsEditor.putInt(putNavDrawerPosition, NavDrawerPosition);
+        prefsEditor.commit();
+    }
+
 
     public void saveAccountQuery(String Query) {
         prefsEditor.putString(putAccountQuery, Query);

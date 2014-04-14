@@ -24,6 +24,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.akadasoftware.danceworksonline.classes.AppPreferences;
+
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
@@ -56,6 +58,7 @@ public class NavigationDrawerFragment extends Fragment {
     private ListView mDrawerListView;
     private View mFragmentContainerView;
     private ImageView logo;
+    private AppPreferences _appPrefs;
 
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
@@ -78,11 +81,12 @@ public class NavigationDrawerFragment extends Fragment {
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
         activity = getActivity();
+        _appPrefs = new AppPreferences(activity);
         if (savedInstanceState != null) {
             mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             mFromSavedInstanceState = true;
         } else
-            mCurrentSelectedPosition = 0;
+            mCurrentSelectedPosition = _appPrefs.getNavDrawerPosition();
 
         // Select either the default item (0) or the last selected item.
         selectItem(mCurrentSelectedPosition);
@@ -215,9 +219,9 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
 
-    /*
-    Based on the selection in the drawer, it will swap out the fragments in the container using
-    the int position and a switch case statement.
+    /**
+     * Based on the selection in the drawer, it will swap out the fragments in the container using
+     * the int position and a switch case statement.
      */
     private void selectItem(int position) {
         Fragment newFragment;
@@ -237,7 +241,14 @@ public class NavigationDrawerFragment extends Fragment {
                 transaction.commit();
                 break;
         }
+
+        /**
+         * Save the nav drawer position so that the app icon goes up to the student list instead of
+         * account list
+         */
+
         mCurrentSelectedPosition = position;
+        _appPrefs.saveNavDrawerPosition(position);
         if (mDrawerListView != null) {
             mDrawerListView.setItemChecked(position, true);
         }

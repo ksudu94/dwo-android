@@ -23,5 +23,6 @@
     </item>
     <item name="fragment_studentslist" type="layout">@layout/fragment_studentslist_grid</item>
     <item name="fragment_studentclass" type="layout">@layout/fragment_studentclass_grid</item>
+    <item name="fragment_studentwaitlist" type="layout">@layout/fragment_studentwaitlist_grid</item>
 
 </resources>

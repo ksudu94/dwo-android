@@ -120,6 +120,7 @@ public class Login extends ActionBarActivity {
             rootView = inflater.inflate(R.layout.fragment_login, container, false);
             activity = this.getActivity();
             _appPrefs = new AppPreferences(activity);
+            _appPrefs.saveNavDrawerPosition(0);
 
             btnLogin = (Button) rootView.findViewById(R.id.btnLogin);
             etEmail = (EditText) rootView.findViewById(R.id.etEmail);
