@@ -22,12 +22,12 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClass> {
     private AppPreferences _appPrefs;
     Activity activity;
     int resource;
-    Context newContext;
+    //Context newContext;
     List<StudentClass> classes;
 
     public StudentClassAdapter(Context context, int resource, List<StudentClass> items) {
-        super(context, resource);
-        newContext = context;
+        super(context, resource, items);
+        //newContext = context;
         this.resource = resource;
         classes = items;
 
@@ -49,7 +49,7 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClass> {
      * define them and find out what the equivalent is in our xml file
      */
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.v("ConertView", String.valueOf(position));
+        Log.v("ConvertView", String.valueOf(position));
         ViewHolder holder = null;
 
 
