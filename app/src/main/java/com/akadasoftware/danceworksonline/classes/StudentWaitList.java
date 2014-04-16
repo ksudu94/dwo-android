@@ -8,7 +8,7 @@ import java.util.Hashtable;
 /**
  * Created by Kyle on 4/14/2014.
  */
-public class StuWaitList implements KvmSerializable {
+public class StudentWaitList implements KvmSerializable {
 
     public int WaitID, ClID, ClCur, ClMax;
 
@@ -16,13 +16,13 @@ public class StuWaitList implements KvmSerializable {
 
     public Boolean MultiDay, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday;
 
-    public StuWaitList() {
+    public StudentWaitList() {
     }
 
-    public StuWaitList(int waitid, int clid, String cltype, String cllevel, String clroom,
-                       String clday, Boolean multiday, Boolean monday, Boolean tuesday, Boolean wednesday,
-                       Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday, String clstart,
-                       String clstop, String clinstructor, String waitdate, String notes, int clcur, int clmax) {
+    public StudentWaitList(int waitid, int clid, String cltype, String cllevel, String clroom,
+                           String clday, Boolean multiday, Boolean monday, Boolean tuesday, Boolean wednesday,
+                           Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday, String clstart,
+                           String clstop, String clinstructor, String waitdate, String notes, int clcur, int clmax) {
 
         waitid = WaitID;
         clid = ClID;

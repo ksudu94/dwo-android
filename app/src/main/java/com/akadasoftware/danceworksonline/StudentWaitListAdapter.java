@@ -10,25 +10,25 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.StuWaitList;
+import com.akadasoftware.danceworksonline.classes.StudentWaitList;
 
 import java.util.List;
 
 /**
  * Created by Kyle on 4/14/2014.
  */
-public class StudentWaitListAdapter extends ArrayAdapter<StuWaitList> {
+public class StudentWaitListAdapter extends ArrayAdapter<StudentWaitList> {
 
     private AppPreferences _appPrefs;
     Activity activity;
     int resource;
     //Context newContext;
-    List<StuWaitList> list;
+    List<StudentWaitList> list;
 
-    public StudentWaitListAdapter(Context context, int resource, List<StuWaitList> items) {
+    public StudentWaitListAdapter(Context context, int resource, List<StudentWaitList> items) {
         super(context, resource, items);
         this.resource = resource;
-        this.list = items;
+        list = items;
     }
 
     public class ViewHolder {
@@ -93,7 +93,7 @@ public class StudentWaitListAdapter extends ArrayAdapter<StuWaitList> {
         }
 
 
-        StuWaitList waitList = list.get(position);
+        StudentWaitList waitList = list.get(position);
 
 
         holder.tvClassType.setText(waitList.ClType);

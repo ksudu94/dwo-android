@@ -1,5 +1,6 @@
 package com.akadasoftware.danceworksonline;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,29 +21,12 @@ import java.util.Locale;
  */
 public class StudentInformation extends ActionBarActivity implements ActionBar.TabListener,
         StudentClassFragment.OnStudentClassListener,
-        StudentWaitListFragment.OnWaitListListener {
+        StudentWaitListFragment.OnWaitListListener,
+        StudentAttendanceFragment.OnAttendanceInteractionListener {
 
     ViewPager mViewPager;
     private AppPreferences _appPrefs;
     StudentPagerAdapter mSectionsPagerAdapter;
-
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
-        // When the given tab is selected, switch to the corresponding page in
-        // the ViewPager.
-        int position = tab.getPosition();
-        mViewPager.setCurrentItem(position, true);
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
-
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
-
-    }
 
 
     /**
@@ -66,7 +50,7 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
 
         // Set up the ViewPager with the sections adapter. setOFfScreenPageLimit handles the number
         // of tabs that are preloaded
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = (ViewPager) findViewById(R.id.studentPager);
         //How many adjacent pages it loads
         mViewPager.setOffscreenPageLimit(1);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -106,6 +90,23 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
         }
     }
 
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+        // When the given tab is selected, switch to the corresponding page in
+        // the ViewPager.
+        int position = tab.getPosition();
+        mViewPager.setCurrentItem(position, true);
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -157,8 +158,11 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
                 case 2:
                     newFragment = StudentWaitListFragment.newInstance(listPosition);
                     break;
+                case 3:
+                    newFragment = StudentAttendanceFragment.newInstance(listPosition);
+                    break;
                 default:
-                    newFragment = StudentClassFragment.newInstance(listPosition);
+                    newFragment = StudentInformationFragment.newInstance(listPosition);
                     break;
             }
 
@@ -196,6 +200,11 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
 
     @Override
     public void onWaitListInteraction(String id) {
+
+    }
+
+    @Override
+    public void onAttendanceInteraction(Uri uri) {
 
     }
 

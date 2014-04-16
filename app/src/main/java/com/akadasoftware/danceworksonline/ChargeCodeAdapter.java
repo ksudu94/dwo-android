@@ -44,6 +44,11 @@ public class ChargeCodeAdapter extends ArrayAdapter<ChargeCodes> {
         TextView tvChargeCode;
     }
 
+
+    /**
+     * Run when the spinner is open to show the items.
+     */
+
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         Log.v("ConvertView", String.valueOf(position));
@@ -72,7 +77,10 @@ public class ChargeCodeAdapter extends ArrayAdapter<ChargeCodes> {
         return convertView;
     }
 
-
+    /**
+     * This is run to create the initial value shown when the spinner is created. Not all spinner
+     * items will be created.
+     */
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.v("ConvertView", String.valueOf(position));
         ViewHolder holder = null;

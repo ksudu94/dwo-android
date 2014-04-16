@@ -371,12 +371,12 @@ public class EnterChargeFragment extends Fragment {
         defaultCC.ChgID = 0;
         defaultCC.Amount = 0;
         codes.add(0, defaultCC);
-        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
 
             SoapObject accountchargecodes = (SoapObject) soap.getProperty(i);
 
             ChargeCodes chargeCode = new ChargeCodes();
-            for (int j = 0; j < accountchargecodes.getPropertyCount() - 1; j++) {
+            for (int j = 0; j < accountchargecodes.getPropertyCount(); j++) {
                 chargeCode.setProperty(j, accountchargecodes.getProperty(j)
                         .toString());
                 if (accountchargecodes.getProperty(j).equals("anyType{}")) {
