@@ -31,15 +31,14 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
     Activity activity;
     int resource;
     private int selectedPos;
-    String response, kind, type;
-    Context context;
-    List<AccountTransactions> transactions;
+    String strResponse, strKind, strType;
+    List<AccountTransactions> transactionsList;
 
 
     public AccountTransactionAdapter(Context context, int resource, List<AccountTransactions> items) {
         super(context, resource, items);
         this.resource = resource;
-        transactions = items;
+        transactionsList = items;
     }
 
     public class ViewHolder {
@@ -53,7 +52,7 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
     /**
      * The holder is the container for each list item defined in the ViewHolder class. Below we
      * define them and find out what the equivalent is in our xml file
-    */
+     */
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.v("ConertView", String.valueOf(position));
         ViewHolder holder = null;
@@ -90,71 +89,71 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
             holder = (ViewHolder) convertView.getTag();
         }
 
-        AccountTransactions trans = transactions.get(position);
+        AccountTransactions oAccountTransactions = transactionsList.get(position);
         NumberFormat format = NumberFormat.getCurrencyInstance();
 
-        if (trans.Kind.equals("$")) {
-            kind = "CASH";
+        if (oAccountTransactions.Kind.equals("$")) {
+            strKind = "CASH";
 
-        } else if (trans.Kind.equals("C")) {
-            kind = "CHECK";
+        } else if (oAccountTransactions.Kind.equals("C")) {
+            strKind = "CHECK";
 
-        } else if (trans.Kind.equals("V")) {
-            kind = "VISA";
+        } else if (oAccountTransactions.Kind.equals("V")) {
+            strKind = "VISA";
 
-        } else if (trans.Kind.equals("M")) {
-            kind = "M/C";
+        } else if (oAccountTransactions.Kind.equals("M")) {
+            strKind = "M/C";
 
-        } else if (trans.Kind.equals("D")) {
-            kind = "DISC";
+        } else if (oAccountTransactions.Kind.equals("D")) {
+            strKind = "DISC";
 
-        } else if (trans.Kind.equals("A")) {
-            kind = "AMEX";
+        } else if (oAccountTransactions.Kind.equals("A")) {
+            strKind = "AMEX";
 
-        } else if (trans.Kind.equals("O")) {
-            kind = "OTHER";
+        } else if (oAccountTransactions.Kind.equals("O")) {
+            strKind = "OTHER";
 
         } else {
-            kind = "Refund";
+            strKind = "Refund";
 
         }
 
-        if (trans.Type.equals("C")) {
-            type = "Charge";
+        if (oAccountTransactions.Type.equals("C")) {
+            strType = "Charge";
 
-        } else if (trans.Type.equals("P")) {
-            type = "Payment";
+        } else if (oAccountTransactions.Type.equals("P")) {
+            strType = "Payment";
 
-        } else if (trans.Type.equals("R")) {
-            type = "Refund";
+        } else if (oAccountTransactions.Type.equals("R")) {
+            strType = "Refund";
 
-        } else if (trans.Type.equals("M")) {
-            type = "Credit";
+        } else if (oAccountTransactions.Type.equals("M")) {
+            strType = "Credit";
 
         } else {
-            type = "I have no freaking clue";
+            strType = "I have no freaking clue";
 
         }
 
         //String date with time portion chopped off
-        String date = trans.TDate.substring(0, 10);
+        String strDate = oAccountTransactions.TDate.substring(0, 10);
         //Switching order around so that mm/dd/yyyy
-        String testdate = date.substring(5, date.length()) + "/" + date.substring(0, 4);
-        String finaldate = testdate.replace("-", "/");
+        String strTestDate = strDate.substring(5, strDate.length()) + "/" + strDate.substring(0, 4);
+        String strFinalDate = strTestDate.replace("-", "/");
 
-        holder.tvDate.setText(finaldate + " ");
+        holder.tvDate.setText(strFinalDate + " ");
         holder.tvDate.setTag(position);
         holder.tvDate.setWidth(175);
 
-        if (trans.Type.contains("P") || trans.Type.contains("R"))
-            holder.tvType.setText(type + "\n" + kind);
+        if (oAccountTransactions.Type.contains("P") || oAccountTransactions.Type.contains("R"))
+            holder.tvType.setText(strType + "\n" + strKind);
         else
-            holder.tvType.setText(type + " ");
+            holder.tvType.setText(strType + " ");
         holder.tvType.setWidth(175);
 
-        holder.tvDescription.setText(trans.TDesc + " ");
+        holder.tvDescription.setText(oAccountTransactions.TDesc + " ");
         holder.tvDescription.setWidth(175);
-        holder.tvAmount.setText(" " + String.valueOf(format.format(trans.Amount)));
+        holder.tvAmount.setText(" " + String.valueOf(format.format(oAccountTransactions.Amount)));
         holder.tvAmount.setWidth(160);
 
 

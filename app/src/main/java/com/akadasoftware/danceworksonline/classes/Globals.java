@@ -2,6 +2,8 @@ package com.akadasoftware.danceworksonline.classes;
 
 import android.app.Activity;
 
+import org.ksoap2.serialization.SoapObject;
+
 import java.util.ArrayList;
 
 /**
@@ -115,5 +117,11 @@ public class Globals {
         _appPrefs.saveAccounts(AccountsArray);
 
     }
+
+    public static SoapObject GetSoapObject(String NAMESPACE, String MethodName) {
+        return new SoapObject(NAMESPACE, MethodName);
+    }
+
+
 
 }

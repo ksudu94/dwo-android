@@ -52,23 +52,23 @@ import java.util.Calendar;
 public class EnterChargeFragment extends Fragment {
 
 
-    String SOAP_ACTION, METHOD_NAME, userguid, date;
-    int schid, userid;
+    String SOAP_ACTION, METHOD_NAME, userGUID, strDate;
+    int schID, userID;
 
 
     private AppPreferences _appPrefs;
-    Account account;
+    Account oAccount;
     Activity activity;
     ArrayList<Account> arrayAccounts;
     ArrayList<ChargeCodes> arrayChargeCodes = new ArrayList<ChargeCodes>();
     ChargeCodeAdapter adapterChargeCodes;
-    ChargeCodes chargeCode;
+    ChargeCodes oChargeCodes;
     float floatAmount, floatDiscAmount, floatSTax1, floatSTax2;
 
     TextView tvDate, tvDescription, tvAmount, tvChangeAmount, tvAmountHint, tvDiscAmount, tvDiscAmountDisplayed, tvTotal, tvTotalDisplayed;
     EditText etDescription;
 
-    Spinner chargecodespinner;
+    Spinner ChargeCodeSpinner;
     Button btnCharge;
     Calendar cal;
 
@@ -91,7 +91,7 @@ public class EnterChargeFragment extends Fragment {
 
         int position = getArguments().getInt("Position");
 
-        account = arrayAccounts.get(position);
+        oAccount = arrayAccounts.get(position);
 
     }
 
@@ -186,7 +186,7 @@ public class EnterChargeFragment extends Fragment {
         tvChangeAmount = (TextView) rootView.findViewById(R.id.tvChangeAmount);
         tvAmountHint = (TextView) rootView.findViewById(R.id.tvAmountHint);
         etDescription = (EditText) rootView.findViewById(R.id.etDescription);
-        chargecodespinner = (Spinner) rootView.findViewById(R.id.chargecodespinner);
+        ChargeCodeSpinner = (Spinner) rootView.findViewById(R.id.chargecodespinner);
 
         btnCharge = (Button) rootView.findViewById(R.id.btnCharge);
         tvDiscAmount = (TextView) rootView.findViewById(R.id.tvDiscAmount);
@@ -234,7 +234,7 @@ public class EnterChargeFragment extends Fragment {
         tvChangeAmount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (chargecodespinner.getSelectedItemPosition() == 0) {
+                if (ChargeCodeSpinner.getSelectedItemPosition() == 0) {
                     Toast toast = Toast.makeText(getActivity(), "Please select a charge type. ",
                             Toast.LENGTH_LONG);
                     toast.show();
@@ -307,24 +307,24 @@ public class EnterChargeFragment extends Fragment {
 
         SoapObject Request = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
-        schid = _appPrefs.getSchID();
-        userid = _appPrefs.getUserID();
-        userguid = _appPrefs.getUserGUID();
+        schID = _appPrefs.getSchID();
+        userID = _appPrefs.getUserID();
+        userGUID = _appPrefs.getUserGUID();
 
-        PropertyInfo Where = new PropertyInfo();
-        Where.setName("Where");
-        Where.setValue(" where schid =" + schid);
-        Request.addProperty(Where);
+        PropertyInfo piWhere = new PropertyInfo();
+        piWhere.setName("Where");
+        piWhere.setValue(" where schid =" + schID);
+        Request.addProperty(piWhere);
 
-        PropertyInfo UserID = new PropertyInfo();
-        UserID.setName("UserID");
-        UserID.setValue(userid);
-        Request.addProperty(UserID);
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(userID);
+        Request.addProperty(piUserID);
 
-        PropertyInfo UserGUID = new PropertyInfo();
-        UserGUID.setName("UserGUID");
-        UserGUID.setValue(userguid);
-        Request.addProperty(UserGUID);
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(userGUID);
+        Request.addProperty(piUserGUID);
 
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
@@ -333,12 +333,12 @@ public class EnterChargeFragment extends Fragment {
         envelope.dotNet = true;
         envelope.setOutputSoapObject(Request);
 
-        SoapObject response = null;
+        SoapObject responseChargeCodes = null;
         HttpTransportSE HttpTransport = new HttpTransportSE(Data.URL);
         try {
             HttpTransport.call(SOAP_ACTION, envelope);
 
-            response = (SoapObject) envelope.getResponse();
+            responseChargeCodes = (SoapObject) envelope.getResponse();
 
 
         } catch (IOException e) {
@@ -357,7 +357,7 @@ public class EnterChargeFragment extends Fragment {
                     Toast.LENGTH_LONG);
             toast.show();
         }
-        return response;
+        return responseChargeCodes;
 
     }
 
@@ -396,12 +396,12 @@ public class EnterChargeFragment extends Fragment {
         adapterChargeCodes = new ChargeCodeAdapter(activity,
                 R.layout.fragment_entercharge, codes);
 
-        chargecodespinner.setAdapter(adapterChargeCodes);
+        ChargeCodeSpinner.setAdapter(adapterChargeCodes);
 
-        chargecodespinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        ChargeCodeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                setSelectedCharge(chargecodespinner);
+                setSelectedCharge(ChargeCodeSpinner);
 
                 if (!tvChangeAmount.getText().toString().equals("0.00")) {
                     runChargeAmountAsync();
@@ -429,20 +429,20 @@ public class EnterChargeFragment extends Fragment {
     public void setSelectedCharge(Spinner spinnerChargeCode) {
 
         int selected = spinnerChargeCode.getSelectedItemPosition();
-        chargeCode = (ChargeCodes) spinnerChargeCode.getItemAtPosition(selected);
+        oChargeCodes = (ChargeCodes) spinnerChargeCode.getItemAtPosition(selected);
 
 
-        if (chargeCode.ChgID == 0) {
+        if (oChargeCodes.ChgID == 0) {
             tvChangeAmount.setText("0.00");
             etDescription.setText("");
 
-        } else if (chargeCode.Kind.equals("T") && Integer.parseInt(chargeCode.ChgNo) < 4) {
+        } else if (oChargeCodes.Kind.equals("T") && Integer.parseInt(oChargeCodes.ChgNo) < 4) {
 
-            tvChangeAmount.setText(String.valueOf(account.MTuition));
-            etDescription.setText(chargeCode.ChgDesc);
+            tvChangeAmount.setText(String.valueOf(oAccount.MTuition));
+            etDescription.setText(oChargeCodes.ChgDesc);
         } else {
-            tvChangeAmount.setText(String.valueOf(chargeCode.Amount));
-            etDescription.setText(chargeCode.ChgDesc);
+            tvChangeAmount.setText(String.valueOf(oChargeCodes.Amount));
+            etDescription.setText(oChargeCodes.ChgDesc);
         }
     }
 
@@ -465,7 +465,8 @@ public class EnterChargeFragment extends Fragment {
 
             float ST1Rate = _appPrefs.getST1Rate();
             float ST2Rate = _appPrefs.getST2Rate();
-            newCodes = getChargeAmount(userid, userguid, chargeCode.ChgID, account.AcctID, account.BillingFreq, Float.parseFloat(tvChangeAmount.getText().toString()), account.TuitionSel, account.AccountFeeAmount, ST1Rate, ST2Rate);
+            newCodes = getChargeAmount(userID, userGUID, oChargeCodes.ChgID, oAccount.AcctID, oAccount.BillingFreq, Float.parseFloat(tvChangeAmount.getText().toString()),
+                    oAccount.TuitionSel, oAccount.AccountFeeAmount, ST1Rate, ST2Rate);
             return RetrieveChargeCodeFromSoap(newCodes);
 
 
@@ -497,68 +498,69 @@ public class EnterChargeFragment extends Fragment {
         }
     }
 
-    public SoapObject getChargeAmount(int UserID, String UserGUID, int ChgID, int AcctID, int BillingFreq, float Amount, int TuitionSel, float AccountFeeAmount, float ST1Rate, float ST2Rate) {
+    public SoapObject getChargeAmount(int UserID, String UserGUID, int ChgID, int AcctID, int BillingFreq,
+                                      float Amount, int TuitionSel, float AccountFeeAmount, float ST1Rate, float ST2Rate) {
 
         SOAP_ACTION = "getChargeAmount";
         METHOD_NAME = "getChargeAmount";
 
         SoapObject RequestCodes = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
-        PropertyInfo userID = new PropertyInfo();
-        userID.setName("UserID");
-        userID.setValue(UserID);
-        RequestCodes.addProperty(userID);
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(UserID);
+        RequestCodes.addProperty(piUserID);
 
-        PropertyInfo userGUID = new PropertyInfo();
-        userGUID.setName("UserGUID");
-        userGUID.setValue(UserGUID);
-        RequestCodes.addProperty(userGUID);
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(UserGUID);
+        RequestCodes.addProperty(piUserGUID);
 
-        PropertyInfo chgID = new PropertyInfo();
-        chgID.setName("ChgID");
-        chgID.setValue(ChgID);
-        RequestCodes.addProperty(chgID);
-
-
-        PropertyInfo acctid = new PropertyInfo();
-        acctid.setName("AcctID");
-        acctid.setValue(AcctID);
-        RequestCodes.addProperty(acctid);
-
-        PropertyInfo billingfreq = new PropertyInfo();
-        billingfreq.setName("BillingFreq");
-        billingfreq.setValue(BillingFreq);
-        RequestCodes.addProperty(billingfreq);
-
-        PropertyInfo amount = new PropertyInfo();
-        amount.setName("Amount");
-        amount.setType(Float.class);
-        amount.setValue(Amount);
-        RequestCodes.addProperty(amount);
-
-        PropertyInfo tuitionsel = new PropertyInfo();
-        tuitionsel.setName("TuitionSel");
-        tuitionsel.setValue(TuitionSel);
-        RequestCodes.addProperty(tuitionsel);
+        PropertyInfo piChgID = new PropertyInfo();
+        piChgID.setName("ChgID");
+        piChgID.setValue(ChgID);
+        RequestCodes.addProperty(piChgID);
 
 
-        PropertyInfo accountfeeamount = new PropertyInfo();
-        accountfeeamount.setName("AccountFeeAmount");
-        accountfeeamount.setType(Float.class);
-        accountfeeamount.setValue(AccountFeeAmount);
-        RequestCodes.addProperty(accountfeeamount);
+        PropertyInfo piAcctid = new PropertyInfo();
+        piAcctid.setName("AcctID");
+        piAcctid.setValue(AcctID);
+        RequestCodes.addProperty(piAcctid);
 
-        PropertyInfo st1rate = new PropertyInfo();
-        st1rate.setName("ST1Rate");
-        st1rate.setType(Float.class);
-        st1rate.setValue(ST1Rate);
-        RequestCodes.addProperty(st1rate);
+        PropertyInfo piBillingFreq = new PropertyInfo();
+        piBillingFreq.setName("BillingFreq");
+        piBillingFreq.setValue(BillingFreq);
+        RequestCodes.addProperty(piBillingFreq);
 
-        PropertyInfo st2rate = new PropertyInfo();
-        st2rate.setName("ST2Rate");
-        st2rate.setType(Float.class);
-        st2rate.setValue(ST2Rate);
-        RequestCodes.addProperty(st2rate);
+        PropertyInfo piAmount = new PropertyInfo();
+        piAmount.setName("Amount");
+        piAmount.setType(Float.class);
+        piAmount.setValue(Amount);
+        RequestCodes.addProperty(piAmount);
+
+        PropertyInfo piTuitionSEL = new PropertyInfo();
+        piTuitionSEL.setName("TuitionSel");
+        piTuitionSEL.setValue(TuitionSel);
+        RequestCodes.addProperty(piTuitionSEL);
+
+
+        PropertyInfo pitAccountFeeAmount = new PropertyInfo();
+        pitAccountFeeAmount.setName("AccountFeeAmount");
+        pitAccountFeeAmount.setType(Float.class);
+        pitAccountFeeAmount.setValue(AccountFeeAmount);
+        RequestCodes.addProperty(pitAccountFeeAmount);
+
+        PropertyInfo pitSt1Rate = new PropertyInfo();
+        pitSt1Rate.setName("ST1Rate");
+        pitSt1Rate.setType(Float.class);
+        pitSt1Rate.setValue(ST1Rate);
+        RequestCodes.addProperty(pitSt1Rate);
+
+        PropertyInfo piSt2Rate = new PropertyInfo();
+        piSt2Rate.setName("ST2Rate");
+        piSt2Rate.setType(Float.class);
+        piSt2Rate.setValue(ST2Rate);
+        RequestCodes.addProperty(piSt2Rate);
 
         SoapSerializationEnvelope envelopeCodes = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
@@ -621,17 +623,17 @@ public class EnterChargeFragment extends Fragment {
 
             if (tvDiscAmountDisplayed.isShown()) {
                 totalAmount = floatDiscAmount;
-                DiscAmount = chargeCode.Amount - floatDiscAmount;
+                DiscAmount = oChargeCodes.Amount - floatDiscAmount;
             } else if (tvTotalDisplayed.isShown()) {
                 totalAmount = floatDiscAmount + floatSTax1 + floatSTax2;
                 DiscAmount = 0;
             } else
-                totalAmount = chargeCode.Amount;
+                totalAmount = oChargeCodes.Amount;
 
 
-            enterCharge = EnterCharge(userid, userguid, schid, account.AcctID, date, chargeCode.ChgDesc,
-                    chargeCode.GLNo, floatDiscAmount, totalAmount, chargeCode.Kind, chargeCode.Tax,
-                    false, 0, chargeCode.PayOnline, 0, _appPrefs.getSessionID(), DiscAmount,
+            enterCharge = EnterCharge(userID, userGUID, schID, oAccount.AcctID, strDate, oChargeCodes.ChgDesc,
+                    oChargeCodes.GLNo, floatDiscAmount, totalAmount, oChargeCodes.Kind, oChargeCodes.Tax,
+                    false, 0, oChargeCodes.PayOnline, 0, _appPrefs.getSessionID(), DiscAmount,
                     floatSTax1, floatSTax2, user.DisplayName);
             return EnterChargeFromSoap(enterCharge);
 
@@ -650,7 +652,7 @@ public class EnterChargeFragment extends Fragment {
             if (result) {
                 Toast toast = Toast.makeText(getActivity(), "Charge Successfully entered", Toast.LENGTH_LONG);
                 toast.show();
-                chargecodespinner.setSelection(0);
+                ChargeCodeSpinner.setSelection(0);
                 setTotalsDisplay(false, false);
             } else {
                 Toast toast = Toast.makeText(getActivity(), "Charge failed", Toast.LENGTH_LONG);
@@ -670,114 +672,114 @@ public class EnterChargeFragment extends Fragment {
 
         SoapObject requestEnterCharge = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
-        PropertyInfo userID = new PropertyInfo();
-        userID.setName("UserID");
-        userID.setValue(UserID);
-        requestEnterCharge.addProperty(userID);
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(UserID);
+        requestEnterCharge.addProperty(piUserID);
 
-        PropertyInfo userGUID = new PropertyInfo();
-        userGUID.setName("UserGUID");
-        userGUID.setValue(UserGUID);
-        requestEnterCharge.addProperty(userGUID);
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(UserGUID);
+        requestEnterCharge.addProperty(piUserGUID);
 
-        PropertyInfo schid = new PropertyInfo();
-        schid.setName("SchID");
-        schid.setValue(SchID);
-        requestEnterCharge.addProperty(schid);
-
-
-        PropertyInfo acctid = new PropertyInfo();
-        acctid.setName("AcctID");
-        acctid.setValue(AcctID);
-        requestEnterCharge.addProperty(acctid);
-
-        PropertyInfo chgdate = new PropertyInfo();
-        chgdate.setName("strChgDate");
-        chgdate.setValue(ChgDate);
-        requestEnterCharge.addProperty(chgdate);
-
-        PropertyInfo chgdesc = new PropertyInfo();
-        chgdesc.setName("ChgDesc");
-        chgdesc.setValue(ChgDesc);
-        requestEnterCharge.addProperty(chgdesc);
-
-        PropertyInfo glno = new PropertyInfo();
-        glno.setName("GLNo");
-        glno.setValue(GLNo);
-        requestEnterCharge.addProperty(glno);
+        PropertyInfo piSchID = new PropertyInfo();
+        piSchID.setName("SchID");
+        piSchID.setValue(SchID);
+        requestEnterCharge.addProperty(piSchID);
 
 
-        PropertyInfo amount = new PropertyInfo();
-        amount.setName("Amount");
-        amount.setType(Float.class);
-        amount.setValue(Amount);
-        requestEnterCharge.addProperty(amount);
+        PropertyInfo piAcctID = new PropertyInfo();
+        piAcctID.setName("AcctID");
+        piAcctID.setValue(AcctID);
+        requestEnterCharge.addProperty(piAcctID);
 
-        PropertyInfo totalamount = new PropertyInfo();
-        totalamount.setName("totalAmount");
-        totalamount.setType(Float.class);
-        totalamount.setValue(totalAmount);
-        requestEnterCharge.addProperty(totalamount);
+        PropertyInfo piChgDate = new PropertyInfo();
+        piChgDate.setName("strChgDate");
+        piChgDate.setValue(ChgDate);
+        requestEnterCharge.addProperty(piChgDate);
 
-        PropertyInfo kind = new PropertyInfo();
-        kind.setName("Kind");
-        kind.setValue(Kind);
-        requestEnterCharge.addProperty(kind);
+        PropertyInfo piChgDesc = new PropertyInfo();
+        piChgDesc.setName("ChgDesc");
+        piChgDesc.setValue(ChgDesc);
+        requestEnterCharge.addProperty(piChgDesc);
 
-        PropertyInfo stax = new PropertyInfo();
-        stax.setName("STax");
-        stax.setValue(STax);
-        requestEnterCharge.addProperty(stax);
-
-        PropertyInfo posttrans = new PropertyInfo();
-        posttrans.setName("POSTrans");
-        posttrans.setValue(POSTrans);
-        requestEnterCharge.addProperty(posttrans);
-
-        PropertyInfo posinv = new PropertyInfo();
-        posinv.setName("POSInv");
-        posinv.setValue(POSInv);
-        requestEnterCharge.addProperty(posinv);
-
-        PropertyInfo payonline = new PropertyInfo();
-        payonline.setName("PayOnline");
-        payonline.setValue(PayOnline);
-        requestEnterCharge.addProperty(payonline);
+        PropertyInfo piGLNo = new PropertyInfo();
+        piGLNo.setName("GLNo");
+        piGLNo.setValue(GLNo);
+        requestEnterCharge.addProperty(piGLNo);
 
 
-        PropertyInfo transposthistid = new PropertyInfo();
-        transposthistid.setName("TransPostHistID");
-        transposthistid.setValue(TransPostHistID);
-        requestEnterCharge.addProperty(transposthistid);
+        PropertyInfo piAmount = new PropertyInfo();
+        piAmount.setName("Amount");
+        piAmount.setType(Float.class);
+        piAmount.setValue(Amount);
+        requestEnterCharge.addProperty(piAmount);
 
-        PropertyInfo sessionid = new PropertyInfo();
-        sessionid.setName("SessionID");
-        sessionid.setValue(SessionID);
-        requestEnterCharge.addProperty(sessionid);
+        PropertyInfo piTotalAmount = new PropertyInfo();
+        piTotalAmount.setName("totalAmount");
+        piTotalAmount.setType(Float.class);
+        piTotalAmount.setValue(totalAmount);
+        requestEnterCharge.addProperty(piTotalAmount);
 
-        PropertyInfo discamt = new PropertyInfo();
-        discamt.setName("DiscAmt");
-        discamt.setType(Float.class);
-        discamt.setValue(DiscAmt);
-        requestEnterCharge.addProperty(discamt);
+        PropertyInfo piKind = new PropertyInfo();
+        piKind.setName("Kind");
+        piKind.setValue(Kind);
+        requestEnterCharge.addProperty(piKind);
 
-        PropertyInfo stax1 = new PropertyInfo();
-        stax1.setName("STax1");
-        stax1.setType(Float.class);
-        stax1.setValue(STax1);
-        requestEnterCharge.addProperty(stax1);
+        PropertyInfo piSTax = new PropertyInfo();
+        piSTax.setName("STax");
+        piSTax.setValue(STax);
+        requestEnterCharge.addProperty(piSTax);
+
+        PropertyInfo piPOSTrans = new PropertyInfo();
+        piPOSTrans.setName("POSTrans");
+        piPOSTrans.setValue(POSTrans);
+        requestEnterCharge.addProperty(piPOSTrans);
+
+        PropertyInfo piPOSInv = new PropertyInfo();
+        piPOSInv.setName("POSInv");
+        piPOSInv.setValue(POSInv);
+        requestEnterCharge.addProperty(piPOSInv);
+
+        PropertyInfo piPayOnline = new PropertyInfo();
+        piPayOnline.setName("PayOnline");
+        piPayOnline.setValue(PayOnline);
+        requestEnterCharge.addProperty(piPayOnline);
 
 
-        PropertyInfo stax2 = new PropertyInfo();
-        stax2.setName("STax2");
-        stax2.setType(Float.class);
-        stax2.setValue(STax2);
-        requestEnterCharge.addProperty(stax2);
+        PropertyInfo pitTransPostHistID = new PropertyInfo();
+        pitTransPostHistID.setName("TransPostHistID");
+        pitTransPostHistID.setValue(TransPostHistID);
+        requestEnterCharge.addProperty(pitTransPostHistID);
 
-        PropertyInfo displayname = new PropertyInfo();
-        displayname.setName("DisplayName");
-        displayname.setValue(DisplayName);
-        requestEnterCharge.addProperty(displayname);
+        PropertyInfo piSessionID = new PropertyInfo();
+        piSessionID.setName("SessionID");
+        piSessionID.setValue(SessionID);
+        requestEnterCharge.addProperty(piSessionID);
+
+        PropertyInfo piDiscAmount = new PropertyInfo();
+        piDiscAmount.setName("DiscAmt");
+        piDiscAmount.setType(Float.class);
+        piDiscAmount.setValue(DiscAmt);
+        requestEnterCharge.addProperty(piDiscAmount);
+
+        PropertyInfo piStax1 = new PropertyInfo();
+        piStax1.setName("STax1");
+        piStax1.setType(Float.class);
+        piStax1.setValue(STax1);
+        requestEnterCharge.addProperty(piStax1);
+
+
+        PropertyInfo piSTax2 = new PropertyInfo();
+        piSTax2.setName("STax2");
+        piSTax2.setType(Float.class);
+        piSTax2.setValue(STax2);
+        requestEnterCharge.addProperty(piSTax2);
+
+        PropertyInfo piDisplayName = new PropertyInfo();
+        piDisplayName.setName("DisplayName");
+        piDisplayName.setValue(DisplayName);
+        requestEnterCharge.addProperty(piDisplayName);
 
 
         SoapSerializationEnvelope envelopeEnterCharge = new SoapSerializationEnvelope(

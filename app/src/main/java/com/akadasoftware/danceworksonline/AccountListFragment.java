@@ -29,13 +29,15 @@ import java.util.ArrayList;
 public class AccountListFragment extends ListFragment {
 
     ArrayList<Account> AccountsArray = new ArrayList<Account>();
+
     private AppPreferences _appPrefs;
     String METHOD_NAME = "";
     static String SOAP_ACTION = "getAccounts";
     static String strQuery = "";
     static SoapSerializationEnvelope envelopeOutput;
+
     Activity activity;
-    static User user;
+    static User oUser;
 
     /**
      * Listener to handle clicks on the list
@@ -66,7 +68,7 @@ public class AccountListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         _appPrefs = new AppPreferences(getActivity());
         AccountsArray = _appPrefs.getAccounts();
-        user = _appPrefs.getUser();
+        oUser = _appPrefs.getUser();
         strQuery = _appPrefs.getAccountQuery();
 
         if (AccountsArray.size() > 0) {
@@ -75,8 +77,8 @@ public class AccountListFragment extends ListFragment {
             setListAdapter(acctListAdpater);
             acctListAdpater.setNotifyOnChange(true);
         } else {
-            getAccountsList accountlist = new getAccountsList();
-            accountlist.execute();
+            getAccountsListAsync accountslist = new getAccountsListAsync();
+            accountslist.execute();
         }
 
     }
@@ -121,25 +123,13 @@ public class AccountListFragment extends ListFragment {
         mListener.OnAccountSelected(position);
     }
 
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-
     class Data {
 
         private static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
         private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
     }
 
-    private class getAccountsList extends
+    private class getAccountsListAsync extends
             AsyncTask<Data, Void, ArrayList<Account>> {
 
         @Override
@@ -164,41 +154,41 @@ public class AccountListFragment extends ListFragment {
     public static ArrayList<Account> getAccounts() {
         String MethodName = "getAccounts";
         SoapObject response = InvokeMethod(Data.URL, MethodName);
-        return RetrieveFromSoap(response);
+        return RetrieveAccountsFromSoap(response);
 
     }
 
     public static SoapObject InvokeMethod(String URL, String MethodName) {
 
-        SoapObject request = GetSoapObject(MethodName);
+        SoapObject requestAccounts = GetSoapObject(MethodName);
 
 
-        PropertyInfo Order = new PropertyInfo();
-        Order.setType("STRING_CLASS");
-        Order.setName("Order");
-        Order.setValue(strQuery);
-        request.addProperty(Order);
+        PropertyInfo piOrder = new PropertyInfo();
+        piOrder.setType("STRING_CLASS");
+        piOrder.setName("Order");
+        piOrder.setValue(strQuery);
+        requestAccounts.addProperty(piOrder);
 
-        PropertyInfo SchID = new PropertyInfo();
-        SchID.setName("SchID");
-        SchID.setValue(user.SchID);
-        request.addProperty(SchID);
+        PropertyInfo piSchID = new PropertyInfo();
+        piSchID.setName("SchID");
+        piSchID.setValue(oUser.SchID);
+        requestAccounts.addProperty(piSchID);
 
-        PropertyInfo UserID = new PropertyInfo();
-        UserID.setName("UserID");
-        UserID.setValue(user.UserID);
-        request.addProperty(UserID);
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        requestAccounts.addProperty(piUserID);
 
-        PropertyInfo UserGUID = new PropertyInfo();
-        UserGUID.setType("STRING_CLASS");
-        UserGUID.setName("UserGUID");
-        UserGUID.setValue(user.UserGUID);
-        request.addProperty(UserGUID);
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        requestAccounts.addProperty(piUserGUID);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
         envelope.dotNet = true;
-        envelope.setOutputSoapObject(request);
+        envelope.setOutputSoapObject(requestAccounts);
         return MakeCall(URL, envelope, Data.NAMESPACE, MethodName);
     }
 
@@ -215,16 +205,16 @@ public class AccountListFragment extends ListFragment {
                     new Account().getClass());
             HttpTransport.call(SOAP_ACTION, envelope);
             envelopeOutput = envelope;
-            SoapObject response = (SoapObject) envelope.getResponse();
+            SoapObject responseAccounts = (SoapObject) envelope.getResponse();
 
-            return response;
+            return responseAccounts;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static ArrayList<Account> RetrieveFromSoap(SoapObject soap) {
+    public static ArrayList<Account> RetrieveAccountsFromSoap(SoapObject soap) {
 
         ArrayList<Account> Accounts = new ArrayList<Account>();
         for (int i = 0; i < soap.getPropertyCount() - 1; i++) {

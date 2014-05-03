@@ -23,13 +23,13 @@ public class AccountListAdapater extends ArrayAdapter<Account> {
     Activity activity;
     int resource;
     private int selectedPos;
-    List<Account> accounts;
+    List<Account> Accounts;
 
     public AccountListAdapater(Context context, int resource,
                                List<Account> items) {
         super(context, resource, items);
         this.resource = resource;
-        accounts = items;
+        Accounts = items;
     }
 
     public void setSelectedPosition(int pos) {
@@ -52,7 +52,7 @@ public class AccountListAdapater extends ArrayAdapter<Account> {
     /**
      * The holder is the container for each list item defined in the ViewHolder class. Below we
      * define them and find out what the equivalent is in our xml file
-    */
+     */
     public View getView(int position, View convertView, ViewGroup parent) {
         Log.v("ConvertView", String.valueOf(position));
         ViewHolder holder = null;
@@ -78,9 +78,9 @@ public class AccountListAdapater extends ArrayAdapter<Account> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Account account = accounts.get(position);
+        Account oAccount = Accounts.get(position);
 
-        holder.tvAccountInformation.setText(account.LName + ", " + account.FName);
+        holder.tvAccountInformation.setText(oAccount.LName + ", " + oAccount.FName);
 
         holder.tvAccountInformation.setTextSize(20);
 

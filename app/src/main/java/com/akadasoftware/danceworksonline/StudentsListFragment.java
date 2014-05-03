@@ -25,13 +25,7 @@ import org.ksoap2.transport.HttpTransportSE;
 import java.util.ArrayList;
 
 /**
- * A fragment representing a list of Items.
- * <p/>
- * Large screen devices (such as tablets) are supported by replacing the ListView
- * with a GridView.
- * <p/>
- * Activities containing this fragment MUST implement the {@link Callbacks}
- * interface.
+ * Displays a list of activity students
  */
 public class StudentsListFragment extends ListFragment implements AbsListView.OnItemClickListener {
 
@@ -43,7 +37,7 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
     static String strQuery = "";
     static SoapSerializationEnvelope envelopeOutput;
     Activity activity;
-    static User user;
+    static User oUser;
     Globals globals;
 
 
@@ -101,7 +95,7 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
         if (strQuery.length() == 0) {
             strQuery = globals.BuildQuery(_appPrefs.getStudentSelectBy(), _appPrefs.getStudentSortBy(), "Students");
         }
-        user = _appPrefs.getUser();
+        oUser = _appPrefs.getUser();
 
 
         if (studentsArray.size() > 0) {
@@ -196,32 +190,32 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
 
         SoapObject request = GetSoapObject(MethodName);
 
-        PropertyInfo Where = new PropertyInfo();
-        Where.setType("STRING_CLASS");
-        Where.setName("Where");
-        Where.setValue(strQuery);
-        request.addProperty(Where);
+        PropertyInfo piWhere = new PropertyInfo();
+        piWhere.setType("STRING_CLASS");
+        piWhere.setName("Where");
+        piWhere.setValue(strQuery);
+        request.addProperty(piWhere);
 
-        PropertyInfo SchID = new PropertyInfo();
-        SchID.setName("SchID");
-        SchID.setValue(user.SchID);
-        request.addProperty(SchID);
+        PropertyInfo piSchID = new PropertyInfo();
+        piSchID.setName("SchID");
+        piSchID.setValue(oUser.SchID);
+        request.addProperty(piSchID);
 
-        PropertyInfo AcctID = new PropertyInfo();
-        AcctID.setName("AcctID");
-        AcctID.setValue(0);
-        request.addProperty(AcctID);
+        PropertyInfo piAcctID = new PropertyInfo();
+        piAcctID.setName("AcctID");
+        piAcctID.setValue(0);
+        request.addProperty(piAcctID);
 
-        PropertyInfo UserID = new PropertyInfo();
-        UserID.setName("UserID");
-        UserID.setValue(user.UserID);
-        request.addProperty(UserID);
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        request.addProperty(piUserID);
 
-        PropertyInfo UserGUID = new PropertyInfo();
-        UserGUID.setType("STRING_CLASS");
-        UserGUID.setName("UserGUID");
-        UserGUID.setValue(user.UserGUID);
-        request.addProperty(UserGUID);
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        request.addProperty(piUserGUID);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);

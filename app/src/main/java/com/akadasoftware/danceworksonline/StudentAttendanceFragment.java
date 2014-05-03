@@ -33,6 +33,7 @@ public class StudentAttendanceFragment extends ListFragment {
 
     Activity activity;
     private AppPreferences _appPrefs;
+    static SoapSerializationEnvelope envelopeOutput;
     String METHOD_NAME = "";
     String SOAP_ACTION = "";
     Student student;
@@ -41,11 +42,12 @@ public class StudentAttendanceFragment extends ListFragment {
     ArrayList<Session> sessionArrayList = new ArrayList<Session>();
     SessionAdapter sessionAdapter;
     ArrayList<StudentClass> classes = new ArrayList<StudentClass>();
+    private StudentClassAdapter classAdapter;
     ArrayList<Student> students = new ArrayList<Student>();
 
     private OnAttendanceInteractionListener mListener;
 
-    int position;
+    int position, SessionID;
 
     Spinner sessionSpinner;
 
@@ -82,6 +84,8 @@ public class StudentAttendanceFragment extends ListFragment {
         super.onResume();
         getSessionsAsync getSess = new getSessionsAsync();
         getSess.execute();
+
+
     }
 
     @Override
@@ -251,7 +255,110 @@ public class StudentAttendanceFragment extends ListFragment {
 
         int selected = sessionSpinner.getSelectedItemPosition();
         sessions = (Session) sessionSpinner.getItemAtPosition(selected);
+        SessionID = sessions.SessionID;
+
+
+        getStudentClassesAsync getStudentClasses = new getStudentClassesAsync();
+        getStudentClasses.execute();
     }
 
+
+    public class getStudentClassesAsync extends
+            AsyncTask<Data, Void, ArrayList<StudentClass>> {
+
+        @Override
+        protected ArrayList<StudentClass> doInBackground(Data... data) {
+
+            return getClasses();
+        }
+
+        protected void onPostExecute(ArrayList<StudentClass> result) {
+
+            classes = result;
+            classAdapter = new StudentClassAdapter(getActivity(),
+                    R.layout.item_studentclass, result);
+            setListAdapter(classAdapter);
+            classAdapter.setNotifyOnChange(true);
+
+        }
+    }
+
+    public ArrayList<StudentClass> getClasses() {
+        String MethodName = "getStuClasses";
+        SoapObject response = InvokeMethod(Data.URL, MethodName);
+        return RetrieveFromSoap(response);
+
+    }
+
+    public SoapObject InvokeMethod(String URL, String MethodName) {
+
+        SoapObject request = GetSoapObject(MethodName);
+
+        PropertyInfo piStuID = new PropertyInfo();
+        piStuID.setName("StuID");
+        piStuID.setValue(student.StuID);
+        request.addProperty(piStuID);
+
+        PropertyInfo piSessionID = new PropertyInfo();
+        piSessionID.setName("SessionID");
+        piSessionID.setValue(SessionID);
+        request.addProperty(piSessionID);
+
+        PropertyInfo piOLReg = new PropertyInfo();
+        piOLReg.setName("OLReg");
+        piOLReg.setValue(false);
+        request.addProperty(piOLReg);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(request);
+        return MakeCall(URL, envelope, Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject GetSoapObject(String MethodName) {
+        return new SoapObject(Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject MakeCall(String URL,
+                                      SoapSerializationEnvelope envelope, String NAMESPACE,
+                                      String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        try {
+            envelope.addMapping(Data.NAMESPACE, "StudentClass",
+                    new StudentClass().getClass());
+            HttpTransport.call("getStuClasses", envelope);
+            envelopeOutput = envelope;
+            SoapObject response = (SoapObject) envelope.getResponse();
+
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return null;
+    }
+
+    public static ArrayList<StudentClass> RetrieveFromSoap(SoapObject soap) {
+
+        ArrayList<StudentClass> stuClasses = new ArrayList<StudentClass>();
+        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
+
+            SoapObject classItem = (SoapObject) soap.getProperty(i);
+
+            StudentClass classes = new StudentClass();
+            for (int j = 0; j < classItem.getPropertyCount() - 1; j++) {
+                classes.setProperty(j, classItem.getProperty(j)
+                        .toString());
+                if (classItem.getProperty(j).equals("anyType{}")) {
+                    classItem.setProperty(j, "");
+                }
+
+            }
+            stuClasses.add(i, classes);
+        }
+
+        return stuClasses;
+    }
 
 }

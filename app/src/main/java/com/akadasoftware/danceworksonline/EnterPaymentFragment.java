@@ -45,19 +45,19 @@ import java.util.Calendar;
 public class EnterPaymentFragment extends Fragment {
 
 
-    String SOAP_ACTION, METHOD_NAME, UserGUID, PDate, PDesc, ChkNo, Kind, CCard, CCDate, CCAuth,
+    String SOAP_ACTION, METHOD_NAME, userGUID, PDate, PDesc, ChkNo, Kind, CCard, CCDate, CCAuth,
             PaymentID, ProcessData, RefNo, AuthCode, Invoice, AcqRefData, CardHolderName, CCToken,
             ccuser, ccpass, CardNumber, strUserName, CVV, FName, LName, Address, City, State, Zip,
             CCExpire;
 
-    int SchID, UserID, chgid, AcctID, CCRecNo, TransPostHistID, SessionID, ConsentID, CCMerch, accountPosition;
+    int schID, userID, chgid, acctID, ccRecNo, transPostHistID, sessionID, consentID, ccMerch, accountPosition;
 
     Boolean POSTrans, saveNewCreditCard;
 
-    Float Amount, ccmax;
+    Float floAmount, floCCMax;
     private AppPreferences _appPrefs;
-    Account account;
-    User user;
+    Account oAccount;
+    User oUser;
     Activity activity;
     ArrayList<Account> arrayAccounts;
 
@@ -128,14 +128,14 @@ public class EnterPaymentFragment extends Fragment {
         arrayAccounts = _appPrefs.getAccounts();
         accountPosition = getArguments().getInt("Position");
 
-        account = arrayAccounts.get(accountPosition);
+        oAccount = arrayAccounts.get(accountPosition);
 
         saveNewCreditCard = false;
-        if (account.CCTrail.equals(""))
+        if (oAccount.CCTrail.equals(""))
             CardNumber = " ";
         else {
             for (int j = 4; j > 0; j--) {
-                CardNumber += account.CCTrail.charAt(account.CCTrail.length() - j);
+                CardNumber += oAccount.CCTrail.charAt(oAccount.CCTrail.length() - j);
             }
         }
 
@@ -243,7 +243,7 @@ public class EnterPaymentFragment extends Fragment {
          */
         ArrayAdapter<CharSequence> paymentType = null;
         if (_appPrefs.getCCProcessor().equals("PPAY")) {
-            if (account.CCConsentID > 0) {
+            if (oAccount.CCConsentID > 0) {
                 //If they have credit card processing and a credit card on file
                 paymentType = ArrayAdapter.createFromResource(activity,
                         R.array.payment_types3, android.R.layout.simple_spinner_item);
@@ -275,7 +275,7 @@ public class EnterPaymentFragment extends Fragment {
                 CCExpire = "";
                 CCard = "";
                 CVV = "";
-                ConsentID = 0;
+                consentID = 0;
                 int position = typeSpinner.getSelectedItemPosition();
                 switch (position) {
                     case 1:
@@ -297,7 +297,7 @@ public class EnterPaymentFragment extends Fragment {
                         ccListener.onEditCreditCardDialog(accountPosition);
                         break;
                     case 5:
-                        switch (account.CCType) {
+                        switch (oAccount.CCType) {
                             case 1:
                                 etReference.setText("AmEx");
                                 ChkNo = "AmEx";
@@ -319,9 +319,9 @@ public class EnterPaymentFragment extends Fragment {
                                 Kind = "V";
                                 break;
                         }
-                        CCard = account.CCTrail.substring(account.CCTrail.length() - 4);
-                        CCExpire = String.valueOf(account.CCExpire);
-                        ConsentID = account.CCConsentID;
+                        CCard = oAccount.CCTrail.substring(oAccount.CCTrail.length() - 4);
+                        CCExpire = String.valueOf(oAccount.CCExpire);
+                        consentID = oAccount.CCConsentID;
                         break;
                     default:
                         etReference.getText().clear();
@@ -390,33 +390,33 @@ public class EnterPaymentFragment extends Fragment {
             SoapObject enterPayment = null;
 
             School school = _appPrefs.getSchool();
-            user = _appPrefs.getUser();
-            UserID = user.UserID;
-            UserGUID = user.UserGUID;
-            strUserName = user.UserName;
-            SchID = account.SchID;
-            AcctID = account.AcctID;
+            oUser = _appPrefs.getUser();
+            userID = oUser.UserID;
+            userGUID = oUser.UserGUID;
+            strUserName = oUser.UserName;
+            schID = oAccount.SchID;
+            acctID = oAccount.AcctID;
             PDesc = etDescription.getText().toString();
 
-            Amount = Float.valueOf(tvChangeAmount.getText().toString());
-            FName = account.CCFName;
-            LName = account.CCLName;
-            Address = account.CCAddress;
-            City = account.CCCity;
-            State = account.CCState;
-            Zip = account.CCZip;
+            floAmount = Float.valueOf(tvChangeAmount.getText().toString());
+            FName = oAccount.CCFName;
+            LName = oAccount.CCLName;
+            Address = oAccount.CCAddress;
+            City = oAccount.CCCity;
+            State = oAccount.CCState;
+            Zip = oAccount.CCZip;
             POSTrans = false;
-            SessionID = school.SessionID;
+            sessionID = school.SessionID;
             ccuser = school.CCUserName;
             ccpass = school.CCPassword;
-            CCMerch = school.CCMerchantNo;
-            ccmax = school.CCMaxAmt;
+            ccMerch = school.CCMerchantNo;
+            floCCMax = school.CCMaxAmt;
             chgid = _appPrefs.getChgID();
 
-            enterPayment = EnterPayment(UserID, UserGUID, SchID, AcctID, PDate, PDesc, ChkNo, Amount, Kind, CCard, CCDate, CCAuth,
-                    CCRecNo, POSTrans, TransPostHistID, SessionID, ConsentID, PaymentID, ProcessData, RefNo,
+            enterPayment = EnterPayment(userID, userGUID, schID, acctID, PDate, PDesc, ChkNo, floAmount, Kind, CCard, CCDate, CCAuth,
+                    ccRecNo, POSTrans, transPostHistID, sessionID, consentID, PaymentID, ProcessData, RefNo,
                     AuthCode, Invoice, AcqRefData, CardHolderName, CCToken, ccuser, ccpass, CardNumber,
-                    strUserName, CCMerch, ccmax, CVV, FName, LName, Address, City, State, Zip, chgid);
+                    strUserName, ccMerch, floCCMax, CVV, FName, LName, Address, City, State, Zip, chgid);
             return EnterPaymentFromSoap(enterPayment);
         }
 
@@ -426,7 +426,7 @@ public class EnterPaymentFragment extends Fragment {
             CCExpire = "";
             CCard = "";
             CVV = "";
-            ConsentID = 0;
+            consentID = 0;
             etReference.getText().clear();
             etDescription.getText().clear();
             tvChangeAmount.setText("0.00");
@@ -437,7 +437,7 @@ public class EnterPaymentFragment extends Fragment {
 
             if (result[1].length() > 0) {
                 Globals gloabal = new Globals();
-                gloabal.updateAccount(account, accountPosition, activity);
+                gloabal.updateAccount(oAccount, accountPosition, activity);
             }
         }
     }
@@ -462,215 +462,215 @@ public class EnterPaymentFragment extends Fragment {
 
         SoapObject requestEnterPayment = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
-        PropertyInfo userID = new PropertyInfo();
-        userID.setName("UserID");
-        userID.setValue(UserID);
-        requestEnterPayment.addProperty(userID);
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(UserID);
+        requestEnterPayment.addProperty(piUserID);
 
-        PropertyInfo userGUID = new PropertyInfo();
-        userGUID.setName("UserGUID");
-        userGUID.setValue(UserGUID);
-        requestEnterPayment.addProperty(userGUID);
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(UserGUID);
+        requestEnterPayment.addProperty(piUserGUID);
 
-        PropertyInfo schid = new PropertyInfo();
-        schid.setName("SchID");
-        schid.setValue(SchID);
-        requestEnterPayment.addProperty(schid);
-
-
-        PropertyInfo acctid = new PropertyInfo();
-        acctid.setName("AcctID");
-        acctid.setValue(AcctID);
-        requestEnterPayment.addProperty(acctid);
-
-        PropertyInfo pdate = new PropertyInfo();
-        pdate.setName("PDate");
-        pdate.setValue(PDate);
-        requestEnterPayment.addProperty(pdate);
-
-        PropertyInfo pdesc = new PropertyInfo();
-        pdesc.setName("PDesc");
-        pdesc.setValue(PDesc);
-        requestEnterPayment.addProperty(pdesc);
-
-        PropertyInfo chkno = new PropertyInfo();
-        chkno.setName("ChkNo");
-        chkno.setValue(ChkNo);
-        requestEnterPayment.addProperty(chkno);
+        PropertyInfo piSchID = new PropertyInfo();
+        piSchID.setName("SchID");
+        piSchID.setValue(SchID);
+        requestEnterPayment.addProperty(piSchID);
 
 
-        PropertyInfo amount = new PropertyInfo();
-        amount.setName("Amount");
-        amount.setType(Float.class);
-        amount.setValue(Amount);
-        requestEnterPayment.addProperty(amount);
+        PropertyInfo piAcctID = new PropertyInfo();
+        piAcctID.setName("AcctID");
+        piAcctID.setValue(AcctID);
+        requestEnterPayment.addProperty(piAcctID);
 
-        PropertyInfo kind = new PropertyInfo();
-        kind.setName("Kind");
-        kind.setValue(Kind);
-        requestEnterPayment.addProperty(kind);
+        PropertyInfo piPDate = new PropertyInfo();
+        piPDate.setName("PDate");
+        piPDate.setValue(PDate);
+        requestEnterPayment.addProperty(piPDate);
 
-        PropertyInfo ccard = new PropertyInfo();
-        ccard.setName("CCard");
-        ccard.setValue(CCard);
-        requestEnterPayment.addProperty(ccard);
+        PropertyInfo piPDesc = new PropertyInfo();
+        piPDesc.setName("PDesc");
+        piPDesc.setValue(PDesc);
+        requestEnterPayment.addProperty(piPDesc);
 
-        PropertyInfo ccdate = new PropertyInfo();
-        ccdate.setName("CCDate");
-        ccdate.setValue(CCExpire);
-        requestEnterPayment.addProperty(ccdate);
-
-        PropertyInfo ccauth = new PropertyInfo();
-        ccauth.setName("CCAuth");
-        ccauth.setValue("");
-        requestEnterPayment.addProperty(ccauth);
+        PropertyInfo piChkNo = new PropertyInfo();
+        piChkNo.setName("ChkNo");
+        piChkNo.setValue(ChkNo);
+        requestEnterPayment.addProperty(piChkNo);
 
 
-        PropertyInfo ccrecno = new PropertyInfo();
-        ccrecno.setName("CCRecNo");
-        ccrecno.setValue(0);
-        requestEnterPayment.addProperty(ccrecno);
+        PropertyInfo piAmount = new PropertyInfo();
+        piAmount.setName("Amount");
+        piAmount.setType(Float.class);
+        piAmount.setValue(Amount);
+        requestEnterPayment.addProperty(piAmount);
 
-        PropertyInfo postrans = new PropertyInfo();
-        postrans.setName("POSTrans");
-        postrans.setValue(POSTrans);
-        requestEnterPayment.addProperty(postrans);
+        PropertyInfo piKind = new PropertyInfo();
+        piKind.setName("Kind");
+        piKind.setValue(Kind);
+        requestEnterPayment.addProperty(piKind);
 
+        PropertyInfo piCCard = new PropertyInfo();
+        piCCard.setName("CCard");
+        piCCard.setValue(CCard);
+        requestEnterPayment.addProperty(piCCard);
 
-        PropertyInfo transposthistid = new PropertyInfo();
-        transposthistid.setName("TransPostHistID");
-        transposthistid.setValue(0);
-        requestEnterPayment.addProperty(transposthistid);
+        PropertyInfo piCCDate = new PropertyInfo();
+        piCCDate.setName("CCDate");
+        piCCDate.setValue(CCExpire);
+        requestEnterPayment.addProperty(piCCDate);
 
-        PropertyInfo sessionid = new PropertyInfo();
-        sessionid.setName("SessionID");
-        sessionid.setValue(SessionID);
-        requestEnterPayment.addProperty(sessionid);
-
-        PropertyInfo consentid = new PropertyInfo();
-        consentid.setName("ConsentID");
-        consentid.setValue(ConsentID);
-        requestEnterPayment.addProperty(consentid);
-
-        PropertyInfo paymentid = new PropertyInfo();
-        paymentid.setName("PaymentID");
-        paymentid.setValue("");
-        requestEnterPayment.addProperty(paymentid);
+        PropertyInfo piCCAuth = new PropertyInfo();
+        piCCAuth.setName("CCAuth");
+        piCCAuth.setValue("");
+        requestEnterPayment.addProperty(piCCAuth);
 
 
-        PropertyInfo processdata = new PropertyInfo();
-        processdata.setName("ProcessData");
-        processdata.setValue("");
-        requestEnterPayment.addProperty(processdata);
+        PropertyInfo piCCRecNo = new PropertyInfo();
+        piCCRecNo.setName("CCRecNo");
+        piCCRecNo.setValue(0);
+        requestEnterPayment.addProperty(piCCRecNo);
 
-        PropertyInfo refno = new PropertyInfo();
-        refno.setName("RefNo");
-        refno.setValue("");
-        requestEnterPayment.addProperty(refno);
-
-        PropertyInfo authcode = new PropertyInfo();
-        authcode.setName("AuthCode");
-        authcode.setValue("");
-        requestEnterPayment.addProperty(authcode);
-
-        PropertyInfo invoice = new PropertyInfo();
-        invoice.setName("Invoice");
-        invoice.setValue("");
-        requestEnterPayment.addProperty(invoice);
+        PropertyInfo piPOSTrans = new PropertyInfo();
+        piPOSTrans.setName("POSTrans");
+        piPOSTrans.setValue(POSTrans);
+        requestEnterPayment.addProperty(piPOSTrans);
 
 
-        PropertyInfo acqrefdata = new PropertyInfo();
-        acqrefdata.setName("AcqRefData");
-        acqrefdata.setValue("");
-        requestEnterPayment.addProperty(acqrefdata);
+        PropertyInfo piTransPostHistID = new PropertyInfo();
+        piTransPostHistID.setName("TransPostHistID");
+        piTransPostHistID.setValue(0);
+        requestEnterPayment.addProperty(piTransPostHistID);
 
-        PropertyInfo cardholdername = new PropertyInfo();
-        cardholdername.setName("CardHolderName");
-        cardholdername.setValue("");
-        requestEnterPayment.addProperty(cardholdername);
+        PropertyInfo piSessionID = new PropertyInfo();
+        piSessionID.setName("SessionID");
+        piSessionID.setValue(SessionID);
+        requestEnterPayment.addProperty(piSessionID);
 
-        PropertyInfo cctoken = new PropertyInfo();
-        cctoken.setName("CCToken");
-        cctoken.setValue("");
-        requestEnterPayment.addProperty(cctoken);
+        PropertyInfo piConsentID = new PropertyInfo();
+        piConsentID.setName("ConsentID");
+        piConsentID.setValue(ConsentID);
+        requestEnterPayment.addProperty(piConsentID);
 
-        PropertyInfo Ccuser = new PropertyInfo();
-        Ccuser.setName("ccuser");
-        Ccuser.setValue(ccuser);
-        requestEnterPayment.addProperty(Ccuser);
-
-        PropertyInfo Ccpass = new PropertyInfo();
-        Ccpass.setName("ccpass");
-        Ccpass.setValue(ccpass);
-        requestEnterPayment.addProperty(Ccpass);
-
-        PropertyInfo cardnumber = new PropertyInfo();
-        cardnumber.setName("CardNumber");
-        cardnumber.setValue(CardNumber);
-        requestEnterPayment.addProperty(cardnumber);
+        PropertyInfo piPaymentID = new PropertyInfo();
+        piPaymentID.setName("PaymentID");
+        piPaymentID.setValue("");
+        requestEnterPayment.addProperty(piPaymentID);
 
 
-        PropertyInfo strusername = new PropertyInfo();
-        strusername.setName("strUserName");
-        strusername.setValue(strUserName);
-        requestEnterPayment.addProperty(strusername);
+        PropertyInfo piProcessData = new PropertyInfo();
+        piProcessData.setName("ProcessData");
+        piProcessData.setValue("");
+        requestEnterPayment.addProperty(piProcessData);
 
-        PropertyInfo ccmerch = new PropertyInfo();
-        ccmerch.setName("CCMerch");
-        ccmerch.setValue(CCMerch);
-        requestEnterPayment.addProperty(ccmerch);
+        PropertyInfo piRefNo = new PropertyInfo();
+        piRefNo.setName("RefNo");
+        piRefNo.setValue("");
+        requestEnterPayment.addProperty(piRefNo);
 
-        PropertyInfo ccmax = new PropertyInfo();
-        ccmax.setName("CCMaxAmount");
-        ccmax.setType(Float.class);
-        ccmax.setValue(CCMax);
-        requestEnterPayment.addProperty(ccmax);
+        PropertyInfo piAuthCode = new PropertyInfo();
+        piAuthCode.setName("AuthCode");
+        piAuthCode.setValue("");
+        requestEnterPayment.addProperty(piAuthCode);
 
-        PropertyInfo cvv = new PropertyInfo();
-        cvv.setName("CVV");
-        cvv.setValue(CVV);
-        requestEnterPayment.addProperty(cvv);
-
-        PropertyInfo fname = new PropertyInfo();
-        fname.setName("FName");
-        fname.setValue(FName);
-        requestEnterPayment.addProperty(fname);
+        PropertyInfo piInvoice = new PropertyInfo();
+        piInvoice.setName("Invoice");
+        piInvoice.setValue("");
+        requestEnterPayment.addProperty(piInvoice);
 
 
-        PropertyInfo lname = new PropertyInfo();
-        lname.setName("LName");
-        lname.setValue(LName);
-        requestEnterPayment.addProperty(lname);
+        PropertyInfo piAcqRefData = new PropertyInfo();
+        piAcqRefData.setName("AcqRefData");
+        piAcqRefData.setValue("");
+        requestEnterPayment.addProperty(piAcqRefData);
 
-        PropertyInfo address = new PropertyInfo();
-        address.setName("Address");
-        address.setValue(Address);
-        requestEnterPayment.addProperty(address);
+        PropertyInfo piCardHolderName = new PropertyInfo();
+        piCardHolderName.setName("CardHolderName");
+        piCardHolderName.setValue("");
+        requestEnterPayment.addProperty(piCardHolderName);
 
-        PropertyInfo city = new PropertyInfo();
-        city.setName("City");
-        city.setValue(City);
-        requestEnterPayment.addProperty(city);
+        PropertyInfo piCCToken = new PropertyInfo();
+        piCCToken.setName("CCToken");
+        piCCToken.setValue("");
+        requestEnterPayment.addProperty(piCCToken);
 
-        PropertyInfo state = new PropertyInfo();
-        state.setName("State");
-        state.setValue(State);
-        requestEnterPayment.addProperty(state);
+        PropertyInfo piCCUser = new PropertyInfo();
+        piCCUser.setName("ccuser");
+        piCCUser.setValue(ccuser);
+        requestEnterPayment.addProperty(piCCUser);
 
-        PropertyInfo zip = new PropertyInfo();
-        zip.setName("Zip");
-        zip.setValue(Zip);
-        requestEnterPayment.addProperty(zip);
+        PropertyInfo piCCPass = new PropertyInfo();
+        piCCPass.setName("ccpass");
+        piCCPass.setValue(ccpass);
+        requestEnterPayment.addProperty(piCCPass);
 
-        PropertyInfo saveCard = new PropertyInfo();
-        saveCard.setName("saveCard");
-        saveCard.setValue(saveNewCreditCard);
-        requestEnterPayment.addProperty(saveCard);
+        PropertyInfo piCardNumber = new PropertyInfo();
+        piCardNumber.setName("CardNumber");
+        piCardNumber.setValue(CardNumber);
+        requestEnterPayment.addProperty(piCardNumber);
 
-        PropertyInfo chgid = new PropertyInfo();
-        chgid.setName("ChgID");
-        chgid.setValue(ChgID);
-        requestEnterPayment.addProperty(chgid);
+
+        PropertyInfo piStrUserName = new PropertyInfo();
+        piStrUserName.setName("strUserName");
+        piStrUserName.setValue(strUserName);
+        requestEnterPayment.addProperty(piStrUserName);
+
+        PropertyInfo piCCMerch = new PropertyInfo();
+        piCCMerch.setName("CCMerch");
+        piCCMerch.setValue(CCMerch);
+        requestEnterPayment.addProperty(piCCMerch);
+
+        PropertyInfo piCCMaxAmount = new PropertyInfo();
+        piCCMaxAmount.setName("CCMaxAmount");
+        piCCMaxAmount.setType(Float.class);
+        piCCMaxAmount.setValue(CCMax);
+        requestEnterPayment.addProperty(piCCMaxAmount);
+
+        PropertyInfo piCVV = new PropertyInfo();
+        piCVV.setName("CVV");
+        piCVV.setValue(CVV);
+        requestEnterPayment.addProperty(piCVV);
+
+        PropertyInfo piFName = new PropertyInfo();
+        piFName.setName("FName");
+        piFName.setValue(FName);
+        requestEnterPayment.addProperty(piFName);
+
+
+        PropertyInfo piLName = new PropertyInfo();
+        piLName.setName("LName");
+        piLName.setValue(LName);
+        requestEnterPayment.addProperty(piLName);
+
+        PropertyInfo piAddress = new PropertyInfo();
+        piAddress.setName("Address");
+        piAddress.setValue(Address);
+        requestEnterPayment.addProperty(piAddress);
+
+        PropertyInfo piCity = new PropertyInfo();
+        piCity.setName("City");
+        piCity.setValue(City);
+        requestEnterPayment.addProperty(piCity);
+
+        PropertyInfo piState = new PropertyInfo();
+        piState.setName("State");
+        piState.setValue(State);
+        requestEnterPayment.addProperty(piState);
+
+        PropertyInfo piZip = new PropertyInfo();
+        piZip.setName("Zip");
+        piZip.setValue(Zip);
+        requestEnterPayment.addProperty(piZip);
+
+        PropertyInfo piSaveCard = new PropertyInfo();
+        piSaveCard.setName("saveCard");
+        piSaveCard.setValue(saveNewCreditCard);
+        requestEnterPayment.addProperty(piSaveCard);
+
+        PropertyInfo piChgID = new PropertyInfo();
+        piChgID.setName("ChgID");
+        piChgID.setValue(ChgID);
+        requestEnterPayment.addProperty(piChgID);
 
         SoapSerializationEnvelope envelopePayment = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);

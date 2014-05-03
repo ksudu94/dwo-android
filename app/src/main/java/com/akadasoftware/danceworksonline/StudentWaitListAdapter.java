@@ -23,12 +23,12 @@ public class StudentWaitListAdapter extends ArrayAdapter<StudentWaitList> {
     Activity activity;
     int resource;
     //Context newContext;
-    List<StudentWaitList> list;
+    List<StudentWaitList> StudentWaitLists;
 
     public StudentWaitListAdapter(Context context, int resource, List<StudentWaitList> items) {
         super(context, resource, items);
         this.resource = resource;
-        list = items;
+        StudentWaitLists = items;
     }
 
     public class ViewHolder {
@@ -93,59 +93,59 @@ public class StudentWaitListAdapter extends ArrayAdapter<StudentWaitList> {
         }
 
 
-        StudentWaitList waitList = list.get(position);
+        StudentWaitList oStudentWaitList = StudentWaitLists.get(position);
 
 
-        holder.tvClassType.setText(waitList.ClType);
+        holder.tvClassType.setText(oStudentWaitList.ClType);
         holder.tvClassType.setTag(position);
 
 
-        holder.tvClassLevel.setText(" - " + waitList.ClLevel + " - ");
+        holder.tvClassLevel.setText(" - " + oStudentWaitList.ClLevel + " - ");
 
-        holder.tvInstructor.setText(waitList.ClInstructor);
+        holder.tvInstructor.setText(oStudentWaitList.ClInstructor);
 
         String Day = "";
 
-        if (waitList.MultiDay) {
-            if (waitList.Monday) {
+        if (oStudentWaitList.MultiDay) {
+            if (oStudentWaitList.Monday) {
                 Day = "Mon";
             }
-            if (waitList.Tuesday) {
+            if (oStudentWaitList.Tuesday) {
                 if (Day.isEmpty()) {
                     Day = "Tue";
                 } else {
                     Day = Day + "/Tue";
                 }
             }
-            if (waitList.Wednesday) {
+            if (oStudentWaitList.Wednesday) {
                 if (Day.isEmpty()) {
                     Day = "Wed";
                 } else {
                     Day = Day + "/Wed";
                 }
             }
-            if (waitList.Thursday) {
+            if (oStudentWaitList.Thursday) {
                 if (Day.isEmpty()) {
                     Day = "Thu";
                 } else {
                     Day = Day + "/Thu";
                 }
             }
-            if (waitList.Friday) {
+            if (oStudentWaitList.Friday) {
                 if (Day.isEmpty()) {
                     Day = "Fri";
                 } else {
                     Day = Day + "/Fri";
                 }
             }
-            if (waitList.Saturday) {
+            if (oStudentWaitList.Saturday) {
                 if (Day.isEmpty()) {
                     Day = "Sat";
                 } else {
                     Day = Day + "/Sat";
                 }
             }
-            if (waitList.Sunday) {
+            if (oStudentWaitList.Sunday) {
                 if (Day.isEmpty()) {
                     Day = "Sun";
                 } else {
@@ -153,13 +153,13 @@ public class StudentWaitListAdapter extends ArrayAdapter<StudentWaitList> {
                 }
             }
         } else {
-            Day = waitList.ClDay;
+            Day = oStudentWaitList.ClDay;
         }
         holder.tvDay.setText(Day + " from ");
-        holder.tvStart.setText(waitList.ClStart + " - ");
-        holder.tvStop.setText(waitList.ClStop);
-        holder.tvRoom.setText(" - " + waitList.ClRoom);
-        holder.tvNotes.setText(waitList.Notes);
+        holder.tvStart.setText(oStudentWaitList.ClStart + " - ");
+        holder.tvStop.setText(oStudentWaitList.ClStop);
+        holder.tvRoom.setText(" - " + oStudentWaitList.ClRoom);
+        holder.tvNotes.setText(oStudentWaitList.Notes);
         return convertView;
 
     }

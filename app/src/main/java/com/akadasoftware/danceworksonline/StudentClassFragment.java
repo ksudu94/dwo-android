@@ -24,13 +24,7 @@ import org.ksoap2.transport.HttpTransportSE;
 import java.util.ArrayList;
 
 /**
- * A fragment representing a list of Items.
- * <p/>
- * Large screen devices (such as tablets) are supported by replacing the ListView
- * with a GridView.
- * <p/>
- * Activities containing this fragment MUST implement the {@link Callbacks}
- * interface.
+ * List Fragment that gets the array of student classes. Also has a spinner that chna
  */
 public class StudentClassFragment extends ListFragment {
 
@@ -40,10 +34,10 @@ public class StudentClassFragment extends ListFragment {
     String SOAP_ACTION = "";
     static SoapSerializationEnvelope envelopeOutput;
     Activity activity;
-    Student student;
+    Student oStudent;
     User user;
-    ArrayList<StudentClass> classes = new ArrayList<StudentClass>();
-    ArrayList<Student> students = new ArrayList<Student>();
+    ArrayList<StudentClass> studentClassArray = new ArrayList<StudentClass>();
+    ArrayList<Student> Students = new ArrayList<Student>();
 
 
     private OnStudentClassListener mListener;
@@ -80,10 +74,10 @@ public class StudentClassFragment extends ListFragment {
         activity = getActivity();
         _appPrefs = new AppPreferences(activity);
 
-        students = _appPrefs.getStudent();
+        Students = _appPrefs.getStudent();
         position = getArguments().getInt("Position");
 
-        student = students.get(position);
+        oStudent = Students.get(position);
 
         getStudentClasses getClass = new getStudentClasses();
         getClass.execute();
@@ -173,9 +167,9 @@ public class StudentClassFragment extends ListFragment {
 
         protected void onPostExecute(ArrayList<StudentClass> result) {
 
-            classes = result;
+            studentClassArray = result;
             classAdapter = new StudentClassAdapter(getActivity(),
-                    R.layout.item_studentclass, result);
+                    R.layout.item_studentclass, studentClassArray);
             setListAdapter(classAdapter);
             classAdapter.setNotifyOnChange(true);
 
@@ -194,20 +188,20 @@ public class StudentClassFragment extends ListFragment {
         SoapObject request = GetSoapObject(MethodName);
         user = _appPrefs.getUser();
 
-        PropertyInfo StuID = new PropertyInfo();
-        StuID.setName("StuID");
-        StuID.setValue(student.StuID);
-        request.addProperty(StuID);
+        PropertyInfo piStuID = new PropertyInfo();
+        piStuID.setName("StuID");
+        piStuID.setValue(oStudent.StuID);
+        request.addProperty(piStuID);
 
-        PropertyInfo SessionID = new PropertyInfo();
-        SessionID.setName("SessionID");
-        SessionID.setValue(_appPrefs.getSessionID());
-        request.addProperty(SessionID);
+        PropertyInfo piSessionID = new PropertyInfo();
+        piSessionID.setName("SessionID");
+        piSessionID.setValue(_appPrefs.getSessionID());
+        request.addProperty(piSessionID);
 
-        PropertyInfo OLReg = new PropertyInfo();
-        OLReg.setName("OLReg");
-        OLReg.setValue(false);
-        request.addProperty(OLReg);
+        PropertyInfo piOLReg = new PropertyInfo();
+        piOLReg.setName("OLReg");
+        piOLReg.setValue(false);
+        request.addProperty(piOLReg);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
@@ -241,7 +235,7 @@ public class StudentClassFragment extends ListFragment {
 
     public static ArrayList<StudentClass> RetrieveFromSoap(SoapObject soap) {
 
-        ArrayList<StudentClass> stuClasses = new ArrayList<StudentClass>();
+        ArrayList<StudentClass> stuClassesArray = new ArrayList<StudentClass>();
         for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
 
             SoapObject classItem = (SoapObject) soap.getProperty(i);
@@ -255,10 +249,10 @@ public class StudentClassFragment extends ListFragment {
                 }
 
             }
-            stuClasses.add(i, classes);
+            stuClassesArray.add(i, classes);
         }
 
-        return stuClasses;
+        return stuClassesArray;
     }
 
 

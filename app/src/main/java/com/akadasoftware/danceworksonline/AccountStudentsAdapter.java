@@ -12,7 +12,6 @@ import android.widget.TextView;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Student;
 
-import java.text.NumberFormat;
 import java.util.List;
 
 /**
@@ -70,34 +69,29 @@ public class AccountStudentsAdapter extends ArrayAdapter<Student> {
         }
 
 
+        Student oStudent = Students.get(position);
+        String strName = oStudent.FName + " " + oStudent.LName;
+        String strStatus = "";
 
-        Student stu = Students.get(position);
-        String name = stu.FName + " " + stu.LName;
-        String status = "";
-
-        switch (stu.Status) {
+        switch (oStudent.Status) {
             case 0:
-                status = "Active";
+                strStatus = "Active";
                 break;
             case 1:
-                status = "Inactive";
+                strStatus = "Inactive";
                 break;
             case 2:
-                status = "Prospect";
+                strStatus = "Prospect";
                 break;
             case 3:
-                status = "Deleted";
+                strStatus = "Deleted";
                 break;
         }
 
-        holder.tvFNameLName.setText(name + "     ");
+        holder.tvFNameLName.setText(strName + "     ");
         holder.tvFNameLName.setTag(position);
 
-        holder.tvStatus.setText(status);
-
-
-
-
+        holder.tvStatus.setText(strStatus);
 
 
         return convertView;

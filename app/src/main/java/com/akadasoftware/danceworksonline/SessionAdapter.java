@@ -20,12 +20,12 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 
     Activity activity;
     int resource;
-    List<Session> sessions;
+    List<Session> Sessions;
 
     public SessionAdapter(Context context, int resource, List<Session> items) {
         super(context, resource, items);
         this.resource = resource;
-        sessions = items;
+        Sessions = items;
     }
 
     public class ViewHolder {
@@ -54,10 +54,10 @@ public class SessionAdapter extends ArrayAdapter<Session> {
 
         convertView.setTag(holder);
 
-        Session session = sessions.get(position);
+        Session oSessions = Sessions.get(position);
 
-        holder.tvSessions.setText(session.SessionName);
-        holder.tvSessions.setTag(session);
+        holder.tvSessions.setText(oSessions.SessionName);
+        holder.tvSessions.setTag(oSessions);
 
 
         return convertView;
@@ -92,10 +92,10 @@ public class SessionAdapter extends ArrayAdapter<Session> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Session session = sessions.get(position);
+        Session oSessions = Sessions.get(position);
 
-        holder.tvSessions.setText(session.SessionName);
-        holder.tvSessions.setTag(session);
+        holder.tvSessions.setText(oSessions.SessionName);
+        holder.tvSessions.setTag(oSessions);
 
         return convertView;
 

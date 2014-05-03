@@ -23,13 +23,13 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClass> {
     Activity activity;
     int resource;
     //Context newContext;
-    List<StudentClass> classes;
+    List<StudentClass> Classes;
 
     public StudentClassAdapter(Context context, int resource, List<StudentClass> items) {
         super(context, resource, items);
         //newContext = context;
         this.resource = resource;
-        classes = items;
+        Classes = items;
 
     }
 
@@ -94,56 +94,56 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClass> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        StudentClass stuClass = classes.get(position);
+        StudentClass oStudentClasses = Classes.get(position);
         String Day = "";
-        holder.tvClassType.setText(stuClass.ClType);
+        holder.tvClassType.setText(oStudentClasses.ClType);
         holder.tvClassType.setTag(position);
 
 
-        holder.tvClassLevel.setText(" - " + stuClass.ClLevel + " - ");
-        holder.tvDescription.setText(stuClass.ClDescription);
-        holder.tvInstructor.setText(stuClass.ClInstructor);
+        holder.tvClassLevel.setText(" - " + oStudentClasses.ClLevel + " - ");
+        holder.tvDescription.setText(oStudentClasses.ClDescription);
+        holder.tvInstructor.setText(oStudentClasses.ClInstructor);
 
-        if (stuClass.MultiDay) {
-            if (stuClass.Monday) {
+        if (oStudentClasses.MultiDay) {
+            if (oStudentClasses.Monday) {
                 Day = "Mon";
             }
-            if (stuClass.Tuesday) {
+            if (oStudentClasses.Tuesday) {
                 if (Day.isEmpty()) {
                     Day = "Tue";
                 } else {
                     Day = Day + "/Tue";
                 }
             }
-            if (stuClass.Wednesday) {
+            if (oStudentClasses.Wednesday) {
                 if (Day.isEmpty()) {
                     Day = "Wed";
                 } else {
                     Day = Day + "/Wed";
                 }
             }
-            if (stuClass.Thursday) {
+            if (oStudentClasses.Thursday) {
                 if (Day.isEmpty()) {
                     Day = "Thu";
                 } else {
                     Day = Day + "/Thu";
                 }
             }
-            if (stuClass.Friday) {
+            if (oStudentClasses.Friday) {
                 if (Day.isEmpty()) {
                     Day = "Fri";
                 } else {
                     Day = Day + "/Fri";
                 }
             }
-            if (stuClass.Saturday) {
+            if (oStudentClasses.Saturday) {
                 if (Day.isEmpty()) {
                     Day = "Sat";
                 } else {
                     Day = Day + "/Sat";
                 }
             }
-            if (stuClass.Sunday) {
+            if (oStudentClasses.Sunday) {
                 if (Day.isEmpty()) {
                     Day = "Sun";
                 } else {
@@ -151,12 +151,12 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClass> {
                 }
             }
         } else {
-            Day = stuClass.ClDay;
+            Day = oStudentClasses.ClDay;
         }
         holder.tvDay.setText(Day + " from ");
-        holder.tvStart.setText(stuClass.ClStart + " - ");
-        holder.tvStop.setText(stuClass.ClStop);
-        holder.tvRoom.setText(stuClass.ClRoom);
+        holder.tvStart.setText(oStudentClasses.ClStart + " - ");
+        holder.tvStop.setText(oStudentClasses.ClStop);
+        holder.tvRoom.setText(oStudentClasses.ClRoom);
 
         return convertView;
 

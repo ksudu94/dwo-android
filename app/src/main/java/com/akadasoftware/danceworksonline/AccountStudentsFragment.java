@@ -33,8 +33,8 @@ import java.util.ArrayList;
 public class AccountStudentsFragment extends ListFragment implements AbsListView.OnItemClickListener {
 
 
-    ArrayList<Student> StudentsArray = new ArrayList<Student>();
-    ArrayList<Account> arrayAccounts;
+    ArrayList<Student> studentsArray = new ArrayList<Student>();
+    ArrayList<Account> accountsArray;
     private AppPreferences _appPrefs;
     private OnStudentFragmentInteractionListener mListener;
     private AccountStudentsAdapter stuAdapter;
@@ -42,7 +42,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
     String METHOD_NAME = "";
     static String SOAP_ACTION = "getStudents";
     Activity activity;
-    Account account;
+    Account oAccount;
 
     /**
      * The fragment's ListView/GridView.
@@ -79,10 +79,10 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
         activity = getActivity();
         _appPrefs = new AppPreferences(activity);
 
-        arrayAccounts = _appPrefs.getAccounts();
+        accountsArray = _appPrefs.getAccounts();
         int position = getArguments().getInt("Position");
 
-        account = arrayAccounts.get(position);
+        oAccount = accountsArray.get(position);
 
 
     }
@@ -123,8 +123,8 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
     @Override
     public void onResume() {
         super.onResume();
-        getAccountStudents students = new getAccountStudents();
-        students.execute();
+        getAccountStudentsAsync getStudents = new getAccountStudentsAsync();
+        getStudents.execute();
     }
 
 
@@ -139,7 +139,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
         private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
     }
 
-    public class getAccountStudents extends
+    public class getAccountStudentsAsync extends
             AsyncTask<Data, Void, ArrayList<Student>> {
 
         @Override
@@ -150,9 +150,9 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
 
         protected void onPostExecute(ArrayList<Student> students) {
 
-            StudentsArray = students;
+            studentsArray = students;
             stuAdapter = new AccountStudentsAdapter(activity,
-                    R.layout.item_accountstudents, StudentsArray);
+                    R.layout.item_accountstudents, studentsArray);
 
             setListAdapter(stuAdapter);
             stuAdapter.setNotifyOnChange(true);
@@ -163,7 +163,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
     public ArrayList<Student> getStudents() {
         String MethodName = "getStudents";
         SoapObject response = InvokeMethod(Data.URL, MethodName);
-        return RetrieveFromSoap(response);
+        return RetrieveAccountStudentsFromSoap(response);
 
     }
 
@@ -171,31 +171,31 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
 
         SoapObject request = GetSoapObject(MethodName);
 
-        PropertyInfo Where = new PropertyInfo();
-        Where.setName("Where");
-        Where.setValue(_appPrefs.getStudentQuery());
-        request.addProperty(Where);
+        PropertyInfo piWhere = new PropertyInfo();
+        piWhere.setName("Where");
+        piWhere.setValue(_appPrefs.getStudentQuery());
+        request.addProperty(piWhere);
 
-        PropertyInfo SchID = new PropertyInfo();
-        SchID.setName("SchID");
-        SchID.setValue(_appPrefs.getSchID());
-        request.addProperty(SchID);
+        PropertyInfo piSchID = new PropertyInfo();
+        piSchID.setName("SchID");
+        piSchID.setValue(_appPrefs.getSchID());
+        request.addProperty(piSchID);
 
-        PropertyInfo AcctID = new PropertyInfo();
-        AcctID.setName("AcctID");
-        AcctID.setValue(_appPrefs.getAcctID());
-        request.addProperty(AcctID);
+        PropertyInfo piAcctID = new PropertyInfo();
+        piAcctID.setName("AcctID");
+        piAcctID.setValue(_appPrefs.getAcctID());
+        request.addProperty(piAcctID);
 
-        PropertyInfo UserID = new PropertyInfo();
-        UserID.setName("UserID");
-        UserID.setValue(_appPrefs.getUserID());
-        request.addProperty(UserID);
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(_appPrefs.getUserID());
+        request.addProperty(piUserID);
 
-        PropertyInfo UserGUID = new PropertyInfo();
-        UserGUID.setType("STRING_CLASS");
-        UserGUID.setName("UserGUID");
-        UserGUID.setValue(_appPrefs.getUserGUID());
-        request.addProperty(UserGUID);
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(_appPrefs.getUserGUID());
+        request.addProperty(piUserGUID);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
@@ -217,9 +217,9 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
                     new Student().getClass());
             HttpTransport.call(SOAP_ACTION, envelope);
             envelopeOutput = envelope;
-            SoapObject response = (SoapObject) envelope.getResponse();
+            SoapObject responseAccountStudents = (SoapObject) envelope.getResponse();
 
-            return response;
+            return responseAccountStudents;
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -227,7 +227,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
         return null;
     }
 
-    public static ArrayList<Student> RetrieveFromSoap(SoapObject soap) {
+    public static ArrayList<Student> RetrieveAccountStudentsFromSoap(SoapObject soap) {
 
         ArrayList<Student> Students = new ArrayList<Student>();
         for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
