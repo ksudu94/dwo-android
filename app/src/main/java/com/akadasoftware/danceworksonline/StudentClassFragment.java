@@ -7,10 +7,13 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.Spinner;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.Globals.Data;
+import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.StudentClass;
 import com.akadasoftware.danceworksonline.classes.User;
@@ -36,10 +39,18 @@ public class StudentClassFragment extends ListFragment {
     Activity activity;
     Student oStudent;
     User user;
+    Session session;
+    int SessionID;
+    Globals oGlobal;
+
+    ArrayList<Session> sessionArrayList = new ArrayList<Session>();
+    SessionAdapter sessionAdapter;
+
     ArrayList<StudentClass> studentClassArray = new ArrayList<StudentClass>();
     ArrayList<Student> Students = new ArrayList<Student>();
 
 
+    Spinner sessionStudentClassesSpinner;
     private OnStudentClassListener mListener;
 
     int position;
@@ -78,9 +89,7 @@ public class StudentClassFragment extends ListFragment {
         position = getArguments().getInt("Position");
 
         oStudent = Students.get(position);
-
-        getStudentClasses getClass = new getStudentClasses();
-        getClass.execute();
+        oGlobal = new Globals();
 
     }
 
@@ -91,6 +100,7 @@ public class StudentClassFragment extends ListFragment {
                 savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_studentclass_list, container, false);
 
+        sessionStudentClassesSpinner = (Spinner) view.findViewById(R.id.sessionStudentClassesSpinner);
         return view;
     }
 
@@ -103,8 +113,10 @@ public class StudentClassFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        getStudentClasses getClass = new getStudentClasses();
-        getClass.execute();
+
+        getSessionsAsync getSessions = new getSessionsAsync();
+        getSessions.execute();
+
     }
 
     @Override
@@ -124,16 +136,6 @@ public class StudentClassFragment extends ListFragment {
         mListener = null;
     }
 
-    public void setEmptyText(CharSequence emptyText) {
-        ListView listView = (ListView) activity.findViewById(R.id.list);
-        //listView.setEmptyView( activity.findViewById( R.id.empty_list_item ) );
-        View emptyView = listView.getEmptyView();
-
-        if (emptyText instanceof TextView) {
-            ((TextView) emptyView).setText(emptyText);
-        }
-    }
-
 
     /**
      * This interface must be implemented by activities that contain this
@@ -150,13 +152,62 @@ public class StudentClassFragment extends ListFragment {
         public void onStudentClassInteraction(String id);
     }
 
-    class Data {
+    //Asycn task to get the ChgDesc field to be used to populate the spinner
+    public class getSessionsAsync extends
+            AsyncTask<Globals.Data, Void, ArrayList<Session>> {
 
-        private static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
-        private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
+        @Override
+        protected ArrayList<Session> doInBackground(Globals.Data... data) {
+
+            SoapObject session = oGlobal.getSoapRequest(Globals.Data.NAMESPACE, "getSessions");
+            session = oGlobal.setSessionPropertyInfo(session, oStudent.SchID, "getSessions");
+            return oGlobal.RetrieveSessionsFromSoap(session);
+
+
+        }
+
+        protected void onPostExecute(ArrayList<Session> result) {
+            sessionArrayList = result;
+            addItemsOnSpinner(sessionArrayList);
+
+        }
     }
 
-    public class getStudentClasses extends
+
+    //Adds all items from the Session field to the spinner
+    public void addItemsOnSpinner(ArrayList<Session> sess) {
+
+        sessionAdapter = new SessionAdapter(activity,
+                R.layout.fragment_studentclass_list, sess);
+
+        sessionStudentClassesSpinner.setAdapter(sessionAdapter);
+
+        sessionStudentClassesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                setSelectedSession(sessionStudentClassesSpinner);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+    }
+
+    //Handles if the selected field for the spinner
+    public void setSelectedSession(Spinner sessionSpinner) {
+
+        int selected = sessionSpinner.getSelectedItemPosition();
+        session = (Session) sessionSpinner.getItemAtPosition(selected);
+        SessionID = session.SessionID;
+
+        getStudentClassesAsync getStudentClass = new getStudentClassesAsync();
+        getStudentClass.execute();
+    }
+
+    public class getStudentClassesAsync extends
             AsyncTask<Data, Void, ArrayList<StudentClass>> {
 
         @Override
@@ -195,7 +246,7 @@ public class StudentClassFragment extends ListFragment {
 
         PropertyInfo piSessionID = new PropertyInfo();
         piSessionID.setName("SessionID");
-        piSessionID.setValue(_appPrefs.getSessionID());
+        piSessionID.setValue(SessionID);
         request.addProperty(piSessionID);
 
         PropertyInfo piOLReg = new PropertyInfo();

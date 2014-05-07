@@ -14,7 +14,7 @@
         <Spinner
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/sessionSpinner"
+            android:id="@+id/sessionAttendanceSpinner"
             android:spinnerMode="dropdown" />
 
 
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:divider="#33b5e6"
             android:dividerHeight="2px"
-            android:layout_below="@+id/sessionSpinner" />
+            android:layout_below="@+id/sessionAttendanceSpinner" />
 
         <TextView
             android:id="@android:id/empty"
