@@ -49,14 +49,14 @@ public class AccountInformationFragment extends Fragment {
      */
 
     private AppPreferences _appPrefs;
-    Account account;
-    School school;
-    User user;
+    Account oAccount;
+    School oSchool;
+    User oUser;
     Globals globals;
     Activity activity;
-    ArrayList<Account> accounts;
-    String status, expdate, cctype, ccnum, SOAP_ACTION, METHOD_NAME;
-    int acctid, position;
+    ArrayList<Account> arrayListAccounts;
+    String strStatus, strExpDate, strCCType, strCCNum, SOAP_ACTION, METHOD_NAME;
+    int AcctID, position;
 
     Button btnEditAccount, btnSave, btnCancel, btnSaveCard, btnEditCreditCard, btnCancelSaveCreditCard, btnAddCreditCard;
     EditText etFirst, etLast, etAddress, etCity, etState, etZip, etPhone, etEmail, etCC, etcard,
@@ -84,12 +84,12 @@ public class AccountInformationFragment extends Fragment {
         activity = getActivity();
         globals = new Globals();
         _appPrefs = new AppPreferences(activity);
-        accounts = _appPrefs.getAccounts();
+        arrayListAccounts = _appPrefs.getAccounts();
         position = getArguments().getInt("Position");
 
-        account = accounts.get(position);
-        acctid = account.AcctID;
-        _appPrefs.saveAcctID(account.AcctID);
+        oAccount = arrayListAccounts.get(position);
+        AcctID = oAccount.AcctID;
+        _appPrefs.saveAcctID(oAccount.AcctID);
     }
 
 
@@ -103,55 +103,55 @@ public class AccountInformationFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_account_information, container, false);
 
-        switch (account.Status) {
+        switch (oAccount.Status) {
             case 0:
-                status = "active";
+                strStatus = "active";
                 break;
             case 1:
-                status = "inactive";
+                strStatus = "inactive";
                 break;
             case 2:
-                status = "prospect";
+                strStatus = "prospect";
                 break;
             case 3:
-                status = "deleted";
+                strStatus = "deleted";
                 break;
             default:
-                status = "I have no freaking clue";
+                strStatus = "I have no freaking clue";
                 break;
         }
 
-        switch (account.CCType) {
+        switch (oAccount.CCType) {
             case 1:
-                cctype = "amex";
+                strCCType = "amex";
                 break;
             case 2:
-                cctype = "disc";
+                strCCType = "disc";
                 break;
             case 3:
-                cctype = "mc";
+                strCCType = "mc";
                 break;
             case 4:
-                cctype = "visa";
+                strCCType = "visa";
                 break;
             default:
-                cctype = "";
+                strCCType = "";
                 break;
         }
-        ccnum = "";
-        if (account.CCTrail.equals(""))
-            ccnum = " ";
+        strCCNum = "";
+        if (oAccount.CCTrail.equals(""))
+            strCCNum = " ";
         else {
             for (int j = 4; j > 0; j--) {
-                ccnum += account.CCTrail.charAt(account.CCTrail.length() - j);
+                strCCNum += oAccount.CCTrail.charAt(oAccount.CCTrail.length() - j);
             }
         }
         //Used to make exp date a string so we can use substring to put a / in b/w
-        String test = account.CCExpire.toString();
+        String test = oAccount.CCExpire.toString();
         if (test.equals("")) {
-            expdate = "";
+            strExpDate = "";
         } else {
-            expdate = test.substring(0, 2) + "/" + test.substring(2, test.length() - 1);
+            strExpDate = test.substring(0, 2) + "/" + test.substring(2, test.length() - 1);
         }
 
         etFirst = (EditText) rootView.findViewById(R.id.etFirst);
@@ -183,23 +183,23 @@ public class AccountInformationFragment extends Fragment {
         accountSwitcher = (ViewFlipper) rootView.findViewById(R.id.accountSwitcher);
 
         TextView acctname = (TextView) rootView.findViewById(R.id.tvacctnamefield);
-        acctname.setText(account.FName + " " + account.LName);
+        acctname.setText(oAccount.FName + " " + oAccount.LName);
 
         TextView acctaddress = (TextView) rootView.findViewById(R.id.tvacctaddressfield);
-        acctaddress.setText(account.Address + ", " + account.City + ", " + account.State + " " + account.ZipCode);
+        acctaddress.setText(oAccount.Address + ", " + oAccount.City + ", " + oAccount.State + " " + oAccount.ZipCode);
 
         TextView acctphone = (TextView) rootView.findViewById(R.id.tvacctphonefield);
-        acctphone.setText(account.Phone);
+        acctphone.setText(oAccount.Phone);
 
         TextView tvemail = (TextView) rootView.findViewById(R.id.tvacctemailfield);
-        tvemail.setText(account.EMail);
+        tvemail.setText(oAccount.EMail);
 
         TextView tvstatus = (TextView) rootView.findViewById(R.id.tvstatusfield);
-        tvstatus.setText(status);
+        tvstatus.setText(strStatus);
 
         TextView type = (TextView) rootView.findViewById(R.id.tvcc);
-        if (cctype.length() > 0)
-            type.setText(cctype + ": ");
+        if (strCCType.length() > 0)
+            type.setText(strCCType + ": ");
 
         tvcc = (TextView) rootView.findViewById(R.id.tvccfield);
         btnSaveCard = (Button) rootView.findViewById(R.id.btnSaveCard);
@@ -213,13 +213,13 @@ public class AccountInformationFragment extends Fragment {
 
 
         //No credit card saved on file
-        if (account.CCConsentID == 0) {
+        if (oAccount.CCConsentID == 0) {
             tvcc.setVisibility(View.GONE);
             btnEditCreditCard.setVisibility(View.GONE);
 
 
         } else {
-            tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " - Exp. " + expdate);
+            tvcc.setText(oAccount.CCFName + " " + oAccount.CCLName + " - ...." + strCCNum + " - Exp. " + strExpDate);
 
         }
 
@@ -233,20 +233,20 @@ public class AccountInformationFragment extends Fragment {
             public void onClick(View view) {
                 try {
                     accountSwitcher.setDisplayedChild(1);
-                    etFirst.setText(account.FName);
-                    etLast.setText(account.LName);
-                    etAddress.setText(account.Address);
-                    etAddress.setText(account.City);
-                    etAddress.setText(account.State);
-                    etAddress.setText(account.ZipCode);
-                    etPhone.setText(account.Phone);
-                    etEmail.setText(account.EMail);
+                    etFirst.setText(oAccount.FName);
+                    etLast.setText(oAccount.LName);
+                    etAddress.setText(oAccount.Address);
+                    etAddress.setText(oAccount.City);
+                    etAddress.setText(oAccount.State);
+                    etAddress.setText(oAccount.ZipCode);
+                    etPhone.setText(oAccount.Phone);
+                    etEmail.setText(oAccount.EMail);
 
                     List<String> spinnerlist = new ArrayList<String>();
                     spinnerlist.add("active");
                     spinnerlist.add("inactive");
                     spinnerlist.add("deleted");
-                    if (status.equals("prospect"))
+                    if (strStatus.equals("prospect"))
                         spinnerlist.add("prospect");
 
                     AccountStatusSpinner = (Spinner) activity.findViewById(R.id.AccountStatusSpinner);
@@ -299,12 +299,12 @@ public class AccountInformationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 accountSwitcher.setDisplayedChild(2);
-                etFirstCC.setText(account.FName);
-                etLastCC.setText(account.LName);
-                etAddressCC.setText(account.CCAddress);
-                etCityCC.setText(account.CCCity);
-                etStateCC.setText(account.CCState);
-                etZipCC.setText(account.CCZip);
+                etFirstCC.setText(oAccount.FName);
+                etLastCC.setText(oAccount.LName);
+                etAddressCC.setText(oAccount.CCAddress);
+                etCityCC.setText(oAccount.CCCity);
+                etStateCC.setText(oAccount.CCState);
+                etZipCC.setText(oAccount.CCZip);
 
 
             }
@@ -314,12 +314,12 @@ public class AccountInformationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 accountSwitcher.setDisplayedChild(2);
-                etFirstCC.setText(account.FName);
-                etLastCC.setText(account.LName);
-                etAddressCC.setText(account.CCAddress);
-                etCityCC.setText(account.CCCity);
-                etStateCC.setText(account.CCState);
-                etZipCC.setText(account.CCZip);
+                etFirstCC.setText(oAccount.FName);
+                etLastCC.setText(oAccount.LName);
+                etAddressCC.setText(oAccount.CCAddress);
+                etCityCC.setText(oAccount.CCCity);
+                etStateCC.setText(oAccount.CCState);
+                etZipCC.setText(oAccount.CCZip);
 
 
             }
@@ -353,17 +353,10 @@ public class AccountInformationFragment extends Fragment {
                             toast.show();
                         }
                     }
-                    saveCreditCardChanges changes = new saveCreditCardChanges();
-                    changes.execute();
+                    saveCreditCardChangesAsync saveCreditCardChanges = new saveCreditCardChangesAsync();
+                    saveCreditCardChanges.execute();
 
                 }
-                /*
-                accountSwitcher.setDisplayedChild(0);
-                etcard.setVisibility(View.GONE);
-                tvcc.setVisibility(View.VISIBLE);
-                btnEditCreditCard.setVisibility(View.VISIBLE);
-                tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " - Exp. " + expdate);*/
-
             }
         });
         /**
@@ -378,7 +371,7 @@ public class AccountInformationFragment extends Fragment {
                 tvcc.setVisibility(View.VISIBLE);
                 btnEditCreditCard.setVisibility(View.VISIBLE);
                 btnAddCreditCard.setVisibility(View.GONE);
-                tvcc.setText(account.CCFName + " " + account.CCLName + " - ...." + ccnum + " - Exp. " + expdate);
+                tvcc.setText(oAccount.CCFName + " " + oAccount.CCLName + " - ...." + strCCNum + " - Exp. " + strExpDate);
 
             }
         });
@@ -416,7 +409,7 @@ public class AccountInformationFragment extends Fragment {
 
         protected void onPostExecute(String result) {
             dialog.dismiss();
-            globals.updateAccount(account, position, activity);
+            globals.updateAccount(oAccount, position, activity);
             Toast toast = Toast.makeText(getActivity(), result, Toast.LENGTH_LONG);
             toast.show();
             //getAccount getAccount = new getAccount();
@@ -431,87 +424,88 @@ public class AccountInformationFragment extends Fragment {
 
         SoapObject Request = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
-        acctid = _appPrefs.getAcctID();
+        AcctID = _appPrefs.getAcctID();
 
-        PropertyInfo AcctID = new PropertyInfo();
-        AcctID.setName("AcctID");
-        AcctID.setValue(acctid);
-        Request.addProperty(AcctID);
+        PropertyInfo piAcctID = new PropertyInfo();
+        piAcctID.setName("AcctID");
+        piAcctID.setValue(AcctID);
+        Request.addProperty(piAcctID);
 
-        PropertyInfo first = new PropertyInfo();
-        first.setName("FName");
-        first.setValue(etFirst.getText().toString());
-        Request.addProperty(first);
+        PropertyInfo piFName = new PropertyInfo();
+        piFName.setName("FName");
+        piFName.setValue(etFirst.getText().toString());
+        Request.addProperty(piFName);
 
-        PropertyInfo last = new PropertyInfo();
-        last.setName("LName");
-        last.setValue(etLast.getText().toString());
-        Request.addProperty(last);
+        PropertyInfo piLName = new PropertyInfo();
+        piLName.setName("LName");
+        piLName.setValue(etLast.getText().toString());
+        Request.addProperty(piLName);
 
-        String address;
+        String strAddress;
         if (etAddress.getText().toString().trim().equals(""))
-            address = account.Address;
+            strAddress = oAccount.Address;
         else
-            address = etAddress.getText().toString().trim();
-        PropertyInfo Address = new PropertyInfo();
-        Address.setName("Address");
-        Address.setValue(address);
-        Request.addProperty(Address);
+            strAddress = etAddress.getText().toString().trim();
+        PropertyInfo piAddress = new PropertyInfo();
+        piAddress.setName("Address");
+        piAddress.setValue(strAddress);
+        Request.addProperty(piAddress);
 
-        String city;
+        String strCity;
         if (etCity.getText().toString().trim().equals(""))
-            city = account.City;
+            strCity = oAccount.City;
         else
-            city = etCity.getText().toString().trim();
-        PropertyInfo City = new PropertyInfo();
-        City.setName("City");
-        City.setValue(city);
-        Request.addProperty(City);
+            strCity = etCity.getText().toString().trim();
+        PropertyInfo piCity = new PropertyInfo();
+        piCity.setName("City");
+        piCity.setValue(strCity);
+        Request.addProperty(piCity);
 
-        String state;
+        String strState;
         if (etState.getText().toString().trim().equals(""))
-            state = account.State;
+            strState = oAccount.State;
         else
-            state = etState.getText().toString().trim();
-        PropertyInfo State = new PropertyInfo();
-        State.setName("State");
-        State.setValue(state);
-        Request.addProperty(State);
+            strState = etState.getText().toString().trim();
+        PropertyInfo piState = new PropertyInfo();
+        piState.setName("State");
+        piState.setValue(strState);
+        Request.addProperty(piState);
 
-        String zip;
+        String strZip;
         if (etZip.getText().toString().trim().equals(""))
-            zip = account.ZipCode;
+            strZip = oAccount.ZipCode;
         else
-            zip = etZip.getText().toString().trim();
-        PropertyInfo ZipCode = new PropertyInfo();
-        ZipCode.setName("ZipCode");
-        ZipCode.setValue(zip);
-        Request.addProperty(ZipCode);
+            strZip = etZip.getText().toString().trim();
 
-        String phone;
+        PropertyInfo piZip = new PropertyInfo();
+        piZip.setName("ZipCode");
+        piZip.setValue(strZip);
+        Request.addProperty(piZip);
+
+        String strPhone;
         if (etPhone.getText().toString().trim().equals(""))
-            phone = account.Phone;
+            strPhone = oAccount.Phone;
         else
-            phone = etEmail.getText().toString().trim();
-        PropertyInfo Phone = new PropertyInfo();
-        Phone.setName("Phone");
-        Phone.setValue(phone);
-        Request.addProperty(Phone);
+            strPhone = etEmail.getText().toString().trim();
+        PropertyInfo piPhone = new PropertyInfo();
+        piPhone.setName("Phone");
+        piPhone.setValue(strPhone);
+        Request.addProperty(piPhone);
 
-        String email;
+        String strEmail;
         if (etEmail.getText().toString().trim().equals(""))
-            email = account.EMail;
+            strEmail = oAccount.EMail;
         else
-            email = etEmail.getText().toString().trim();
-        PropertyInfo emailinfo = new PropertyInfo();
-        emailinfo.setName("EMail");
-        emailinfo.setValue(email);
-        Request.addProperty(emailinfo);
+            strEmail = etEmail.getText().toString().trim();
+        PropertyInfo piEmail = new PropertyInfo();
+        piEmail.setName("EMail");
+        piEmail.setValue(strEmail);
+        Request.addProperty(piEmail);
 
-        PropertyInfo checkName = new PropertyInfo();
-        checkName.setName("checkName");
-        checkName.setValue(true);
-        Request.addProperty(checkName);
+        PropertyInfo piCheckName = new PropertyInfo();
+        piCheckName.setName("checkName");
+        piCheckName.setValue(true);
+        Request.addProperty(piCheckName);
 
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
@@ -547,12 +541,13 @@ public class AccountInformationFragment extends Fragment {
 
     }
 
-    public class saveCreditCardChanges extends AsyncTask<Data, Void, SoapPrimitive> {
+    public class saveCreditCardChangesAsync extends AsyncTask<Data, Void, SoapPrimitive> {
 
 
         @Override
         protected SoapPrimitive doInBackground(Data... data) {
             publishProgress();
+
             return saveCreditCard();
         }
 
@@ -561,8 +556,8 @@ public class AccountInformationFragment extends Fragment {
 
             int response = Integer.valueOf(result.toString());
             if (response > 0) {
-                account.CCConsentID = response;
-                globals.updateAccount(account, position, activity);
+                oAccount.CCConsentID = response;
+                globals.updateAccount(oAccount, position, activity);
                 Toast toast = Toast.makeText(getActivity(), "Save successful", Toast.LENGTH_LONG);
                 toast.show();
                 accountSwitcher.setDisplayedChild(0);
@@ -581,109 +576,109 @@ public class AccountInformationFragment extends Fragment {
 
         SoapObject Request = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
-        school = _appPrefs.getSchool();
-        user = _appPrefs.getUser();
+        oSchool = _appPrefs.getSchool();
+        oUser = _appPrefs.getUser();
 
-        PropertyInfo userid = new PropertyInfo();
-        userid.setName("UserID");
-        userid.setValue(user.UserID);
-        Request.addProperty(userid);
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        Request.addProperty(piUserID);
 
-        PropertyInfo userguid = new PropertyInfo();
-        userguid.setName("UserGUID");
-        userguid.setValue(user.UserGUID);
-        Request.addProperty(userguid);
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        Request.addProperty(piUserGUID);
 
-        PropertyInfo acctid = new PropertyInfo();
-        acctid.setName("AcctID");
-        acctid.setValue(account.AcctID);
-        Request.addProperty(acctid);
+        PropertyInfo piAcctID = new PropertyInfo();
+        piAcctID.setName("AcctID");
+        piAcctID.setValue(oAccount.AcctID);
+        Request.addProperty(piAcctID);
 
-        PropertyInfo ccuser = new PropertyInfo();
-        ccuser.setName("ccuser");
-        ccuser.setValue(school.CCUserName);
-        Request.addProperty(ccuser);
+        PropertyInfo piCCUser = new PropertyInfo();
+        piCCUser.setName("ccuser");
+        piCCUser.setValue(oSchool.CCUserName);
+        Request.addProperty(piCCUser);
 
-        PropertyInfo ccpass = new PropertyInfo();
-        ccpass.setName("ccpass");
-        ccpass.setValue(school.CCPassword);
-        Request.addProperty(ccpass);
+        PropertyInfo piCCPass = new PropertyInfo();
+        piCCPass.setName("ccpass");
+        piCCPass.setValue(oSchool.CCPassword);
+        Request.addProperty(piCCPass);
 
-        PropertyInfo cardnumber = new PropertyInfo();
-        cardnumber.setName("CardNumber");
-        cardnumber.setValue(etNewCC.getText().toString().trim());
-        Request.addProperty(cardnumber);
+        PropertyInfo piCardNumber = new PropertyInfo();
+        piCardNumber.setName("CardNumber");
+        piCardNumber.setValue(etNewCC.getText().toString().trim());
+        Request.addProperty(piCardNumber);
 
-        PropertyInfo cardexpire = new PropertyInfo();
-        cardexpire.setName("CardExpire");
-        cardexpire.setValue(etNewCCExp.getText().toString().trim());
-        Request.addProperty(cardexpire);
+        PropertyInfo piCardExpire = new PropertyInfo();
+        piCardExpire.setName("CardExpire");
+        piCardExpire.setValue(etNewCCExp.getText().toString().trim());
+        Request.addProperty(piCardExpire);
 
-        PropertyInfo first = new PropertyInfo();
-        first.setName("FirstName");
-        first.setValue(etFirstCC.getText().toString().trim());
-        Request.addProperty(first);
+        PropertyInfo piFName = new PropertyInfo();
+        piFName.setName("FirstName");
+        piFName.setValue(etFirstCC.getText().toString().trim());
+        Request.addProperty(piFName);
 
-        PropertyInfo last = new PropertyInfo();
-        last.setName("LastName");
-        last.setValue(etLastCC.getText().toString().trim());
-        Request.addProperty(last);
+        PropertyInfo piLName = new PropertyInfo();
+        piLName.setName("LastName");
+        piLName.setValue(etLastCC.getText().toString().trim());
+        Request.addProperty(piLName);
 
-        String address;
+        String strAddress;
         if (etAddressCC.getText().toString().trim().equals(""))
-            address = account.Address;
+            strAddress = oAccount.Address;
         else
-            address = etAddressCC.getText().toString().trim();
-        PropertyInfo Address = new PropertyInfo();
-        Address.setName("Address");
-        Address.setValue(address);
-        Request.addProperty(Address);
+            strAddress = etAddressCC.getText().toString().trim();
+        PropertyInfo piAddress = new PropertyInfo();
+        piAddress.setName("Address");
+        piAddress.setValue(strAddress);
+        Request.addProperty(piAddress);
 
-        String city;
+        String strCity;
         if (etCityCC.getText().toString().trim().equals(""))
-            city = account.City;
+            strCity = oAccount.City;
         else
-            city = etCityCC.getText().toString().trim();
-        PropertyInfo City = new PropertyInfo();
-        City.setName("City");
-        City.setValue(city);
-        Request.addProperty(City);
+            strCity = etCityCC.getText().toString().trim();
+        PropertyInfo piCity = new PropertyInfo();
+        piCity.setName("City");
+        piCity.setValue(strCity);
+        Request.addProperty(piCity);
 
-        String state;
+        String strState;
         if (etStateCC.getText().toString().trim().equals(""))
-            state = account.State;
+            strState = oAccount.State;
         else
-            state = etStateCC.getText().toString().trim();
-        PropertyInfo State = new PropertyInfo();
-        State.setName("State");
-        State.setValue(state);
-        Request.addProperty(State);
+            strState = etStateCC.getText().toString().trim();
+        PropertyInfo piState = new PropertyInfo();
+        piState.setName("State");
+        piState.setValue(strState);
+        Request.addProperty(piState);
 
-        String zip;
+        String strZip;
         if (etZipCC.getText().toString().trim().equals(""))
-            zip = account.ZipCode;
+            strZip = oAccount.ZipCode;
         else
-            zip = etZipCC.getText().toString().trim();
-        PropertyInfo ZipCode = new PropertyInfo();
-        ZipCode.setName("ZipCode");
-        ZipCode.setValue(zip);
-        Request.addProperty(ZipCode);
+            strZip = etZipCC.getText().toString().trim();
+        PropertyInfo piZipCode = new PropertyInfo();
+        piZipCode.setName("ZipCode");
+        piZipCode.setValue(strZip);
+        Request.addProperty(piZipCode);
 
-        PropertyInfo maxamount = new PropertyInfo();
-        maxamount.setName("MaxAmount");
-        maxamount.setType(Float.class);
-        maxamount.setValue(school.CCMaxAmt);
-        Request.addProperty(maxamount);
+        PropertyInfo piMaxAmount = new PropertyInfo();
+        piMaxAmount.setName("MaxAmount");
+        piMaxAmount.setType(Float.class);
+        piMaxAmount.setValue(oSchool.CCMaxAmt);
+        Request.addProperty(piMaxAmount);
 
-        PropertyInfo merchantnumber = new PropertyInfo();
-        merchantnumber.setName("MerchantNumber");
-        merchantnumber.setValue(school.CCMerchantNo);
-        Request.addProperty(merchantnumber);
+        PropertyInfo piMerchantNumber = new PropertyInfo();
+        piMerchantNumber.setName("MerchantNumber");
+        piMerchantNumber.setValue(oSchool.CCMerchantNo);
+        Request.addProperty(piMerchantNumber);
 
-        PropertyInfo username = new PropertyInfo();
-        username.setName("UserName");
-        username.setValue(user.UserName);
-        Request.addProperty(username);
+        PropertyInfo piUserName = new PropertyInfo();
+        piUserName.setName("UserName");
+        piUserName.setValue(oUser.UserName);
+        Request.addProperty(piUserName);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
@@ -694,18 +689,18 @@ public class AccountInformationFragment extends Fragment {
         envelope.dotNet = true;
         envelope.setOutputSoapObject(Request);
 
-        SoapPrimitive response = null;
+        SoapPrimitive responseToSaveCreditCard = null;
         HttpTransportSE HttpTransport = new HttpTransportSE(Data.URL);
         try {
             HttpTransport.call(SOAP_ACTION, envelope);
 
-            response = (SoapPrimitive) envelope.getResponse();
+            responseToSaveCreditCard = (SoapPrimitive) envelope.getResponse();
 
         } catch (Exception e) {
 
             e.printStackTrace();
         }
-        return response;
+        return responseToSaveCreditCard;
     }
 
 }

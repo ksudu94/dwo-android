@@ -32,9 +32,9 @@ public class StudentInformationFragment extends Fragment {
     private AppPreferences _appPrefs;
     Activity activity;
     User user;
-    Student student;
+    Student oStudent;
     Globals globals;
-    ArrayList<Student> students;
+    ArrayList<Student> Students;
 
     int position;
     String status;
@@ -66,10 +66,10 @@ public class StudentInformationFragment extends Fragment {
         activity = getActivity();
         globals = new Globals();
         _appPrefs = new AppPreferences(activity);
-        students = _appPrefs.getStudent();
+        Students = _appPrefs.getStudent();
         position = getArguments().getInt("Position");
 
-        student = students.get(position);
+        oStudent = Students.get(position);
 
     }
 
@@ -81,7 +81,7 @@ public class StudentInformationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_student_information, container, false);
 
-        switch (student.Status) {
+        switch (oStudent.Status) {
             case 0:
                 status = "active";
                 break;
@@ -122,12 +122,12 @@ public class StudentInformationFragment extends Fragment {
         studentSwitcher = (ViewFlipper) rootView.findViewById(R.id.studentSwitcher);
 
 
-        tvName1.setText(student.FName + " " + student.LName);
-        tvAddress1.setText(student.Address + ", " + student.City + ", " + student.City + ", " +
-                student.ZipCode);
-        tvContact1.setText(student.Phone);
+        tvName1.setText(oStudent.FName + " " + oStudent.LName);
+        tvAddress1.setText(oStudent.Address + ", " + oStudent.City + ", " + oStudent.City + ", " +
+                oStudent.ZipCode);
+        tvContact1.setText(oStudent.Phone);
         tvStatus1.setText(status);
-        tvAccountName1.setText(student.AcctName);
+        tvAccountName1.setText(oStudent.AcctName);
 
 
         btnEditStudent.setOnClickListener(new View.OnClickListener() {
@@ -135,13 +135,13 @@ public class StudentInformationFragment extends Fragment {
             public void onClick(View v) {
                 try {
                     studentSwitcher.setDisplayedChild(1);
-                    etFName.setText(student.FName);
-                    etLName.setText(student.LName);
-                    etAddress.setText(student.Address);
-                    etCity.setText(student.City);
-                    etState.setText(student.State);
-                    etZip.setText(student.ZipCode);
-                    etAccountName.setText(student.AcctName);
+                    etFName.setText(oStudent.FName);
+                    etLName.setText(oStudent.LName);
+                    etAddress.setText(oStudent.Address);
+                    etCity.setText(oStudent.City);
+                    etState.setText(oStudent.State);
+                    etZip.setText(oStudent.ZipCode);
+                    etAccountName.setText(oStudent.AcctName);
 
                     List<String> spinnerlist = new ArrayList<String>();
                     spinnerlist.add("active");

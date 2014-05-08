@@ -6,19 +6,31 @@
     android:orientation="vertical"
     tools:context="com.akadasoftware.danceworksonline.StudentClassFragment">
 
-    <ListView
-        android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="#33b5e6"
-        android:dividerHeight="2px" />
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
-    <TextView
-        android:id="@android:id/empty"
-        android:text="Student has no classes."
-        android:textSize="30dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center" />
+        <!--Spinner width always has to be fill parent.!!!!!!!!!!!-->
+        <Spinner
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/sessionStudentClassesSpinner"
+            android:spinnerMode="dropdown" />
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="#33b5e6"
+            android:dividerHeight="2px"
+            android:layout_below="@+id/sessionStudentClassesSpinner" />
+
+        <TextView
+            android:id="@android:id/empty"
+            android:text="Student not currently enrolled in classes."
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center" />
+    </RelativeLayout>
 
 </FrameLayout>

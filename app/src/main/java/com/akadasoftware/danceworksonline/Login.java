@@ -282,15 +282,15 @@ public class Login extends ActionBarActivity {
                         piSchID.setValue(user.SchID);
                         requestSchool.addProperty(piSchID);
 
-                        PropertyInfo UserID = new PropertyInfo();
-                        UserID.setName("UserID");
-                        UserID.setValue(user.UserID);
-                        requestSchool.addProperty(UserID);
+                        PropertyInfo piUserID = new PropertyInfo();
+                        piUserID.setName("UserID");
+                        piUserID.setValue(user.UserID);
+                        requestSchool.addProperty(piUserID);
 
-                        PropertyInfo UserGUID = new PropertyInfo();
-                        UserGUID.setName("UserGUID");
-                        UserGUID.setValue(user.UserGUID);
-                        requestSchool.addProperty(UserGUID);
+                        PropertyInfo piUserGUID = new PropertyInfo();
+                        piUserGUID.setName("UserGUID");
+                        piUserGUID.setValue(user.UserGUID);
+                        requestSchool.addProperty(piUserGUID);
 
                         SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
                                 SoapEnvelope.VER11);

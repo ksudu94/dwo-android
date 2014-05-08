@@ -22,12 +22,12 @@ public class StudentListAdapter extends ArrayAdapter<Student> {
     Activity activity;
     int resource;
     private int selectedPos;
-    List<Student> students;
+    List<Student> Students;
 
     public StudentListAdapter(Context context, int resource, List<Student> items) {
         super(context, resource, items);
         this.resource = resource;
-        students = items;
+        Students = items;
     }
 
 
@@ -64,9 +64,9 @@ public class StudentListAdapter extends ArrayAdapter<Student> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Student student = students.get(position);
+        Student oStudent = Students.get(position);
 
-        holder.tvStudentInformation.setText(student.LName + ", " + student.FName);
+        holder.tvStudentInformation.setText(oStudent.LName + ", " + oStudent.FName);
 
         holder.tvStudentInformation.setTextSize(20);
 

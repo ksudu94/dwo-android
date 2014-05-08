@@ -28,15 +28,14 @@ import java.util.List;
 public class ChargeCodeAdapter extends ArrayAdapter<ChargeCodes> {
 
     private AppPreferences _appPrefs;
-    List<ChargeCodes> codes;
+    List<ChargeCodes> Codes;
     Context context;
     int resource;
-    String response;
 
     public ChargeCodeAdapter(Context context, int resource, List<ChargeCodes> items) {
         super(context, resource, items);
         this.resource = resource;
-        codes = items;
+        Codes = items;
     }
 
     public class ViewHolder {
@@ -67,11 +66,11 @@ public class ChargeCodeAdapter extends ArrayAdapter<ChargeCodes> {
 
         convertView.setTag(holder);
 
-        ChargeCodes chgcodes = codes.get(position);
+        ChargeCodes oChargeCodes = Codes.get(position);
 
 
-        holder.tvChargeCode.setText(chgcodes.ChgDesc);
-        holder.tvChargeCode.setTag(chgcodes);
+        holder.tvChargeCode.setText(oChargeCodes.ChgDesc);
+        holder.tvChargeCode.setTag(oChargeCodes);
 
 
         return convertView;
@@ -102,11 +101,11 @@ public class ChargeCodeAdapter extends ArrayAdapter<ChargeCodes> {
         }
 
 
-        ChargeCodes chgcodes = codes.get(position);
+        ChargeCodes oChargeCodes = Codes.get(position);
 
 
-        holder.tvChargeCode.setText(chgcodes.ChgDesc);
-        holder.tvChargeCode.setTag(chgcodes);
+        holder.tvChargeCode.setText(oChargeCodes.ChgDesc);
+        holder.tvChargeCode.setTag(oChargeCodes);
 
 
         return convertView;

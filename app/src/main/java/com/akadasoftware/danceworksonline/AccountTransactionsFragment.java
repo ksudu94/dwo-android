@@ -45,9 +45,9 @@ public class AccountTransactionsFragment extends ListFragment {
     String METHOD_NAME = "";
     static String SOAP_ACTION = "getAccountTransactions";
     static SoapSerializationEnvelope envelopeOutput;
-    static User user;
+    static User oUser;
     private AppPreferences _appPrefs;
-    Account account;
+    Account oAccount;
     Activity activity;
     ArrayList<Account> arrayAccounts;
 
@@ -90,7 +90,7 @@ public class AccountTransactionsFragment extends ListFragment {
         arrayAccounts = _appPrefs.getAccounts();
         int position = getArguments().getInt("Position");
 
-        account = arrayAccounts.get(position);
+        oAccount = arrayAccounts.get(position);
 
     }
 
@@ -249,36 +249,36 @@ public class AccountTransactionsFragment extends ListFragment {
     public ArrayList<AccountTransactions> getTransactions() {
         String MethodName = "getAccountTransactions";
         SoapObject response = InvokeMethod(Data.URL, MethodName);
-        return RetrieveFromSoap(response);
+        return RetrieveAccountTransactionsFromSoap(response);
 
     }
 
     public SoapObject InvokeMethod(String URL, String MethodName) {
 
         SoapObject request = GetSoapObject(MethodName);
-        user = _appPrefs.getUser();
+        oUser = _appPrefs.getUser();
 
-        PropertyInfo Order = new PropertyInfo();
-        Order.setType("STRING_CLASS");
-        Order.setName("Order");
-        Order.setValue(" ORDER BY TDate DESC");
-        request.addProperty(Order);
+        PropertyInfo piOrder = new PropertyInfo();
+        piOrder.setType("STRING_CLASS");
+        piOrder.setName("Order");
+        piOrder.setValue(" ORDER BY TDate DESC");
+        request.addProperty(piOrder);
 
-        PropertyInfo AcctID = new PropertyInfo();
-        AcctID.setName("AcctID");
-        AcctID.setValue(account.AcctID);
-        request.addProperty(AcctID);
+        PropertyInfo piAcctID = new PropertyInfo();
+        piAcctID.setName("AcctID");
+        piAcctID.setValue(oAccount.AcctID);
+        request.addProperty(piAcctID);
 
-        PropertyInfo UserID = new PropertyInfo();
-        UserID.setName("UserID");
-        UserID.setValue(user.UserID);
-        request.addProperty(UserID);
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        request.addProperty(piUserID);
 
-        PropertyInfo UserGUID = new PropertyInfo();
-        UserGUID.setType("STRING_CLASS");
-        UserGUID.setName("UserGUID");
-        UserGUID.setValue(user.UserGUID);
-        request.addProperty(UserGUID);
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        request.addProperty(piUserGUID);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
@@ -310,7 +310,7 @@ public class AccountTransactionsFragment extends ListFragment {
         return null;
     }
 
-    public static ArrayList<AccountTransactions> RetrieveFromSoap(SoapObject soap) {
+    public static ArrayList<AccountTransactions> RetrieveAccountTransactionsFromSoap(SoapObject soap) {
 
         ArrayList<AccountTransactions> AccountTrans = new ArrayList<AccountTransactions>();
         for (int i = 0; i < soap.getPropertyCount() - 1; i++) {

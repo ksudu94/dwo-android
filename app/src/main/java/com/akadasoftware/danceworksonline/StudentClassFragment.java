@@ -7,10 +7,13 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.Spinner;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.Globals.Data;
+import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.StudentClass;
 import com.akadasoftware.danceworksonline.classes.User;
@@ -24,13 +27,7 @@ import org.ksoap2.transport.HttpTransportSE;
 import java.util.ArrayList;
 
 /**
- * A fragment representing a list of Items.
- * <p/>
- * Large screen devices (such as tablets) are supported by replacing the ListView
- * with a GridView.
- * <p/>
- * Activities containing this fragment MUST implement the {@link Callbacks}
- * interface.
+ * List Fragment that gets the array of student classes. Also has a spinner that chna
  */
 public class StudentClassFragment extends ListFragment {
 
@@ -40,12 +37,20 @@ public class StudentClassFragment extends ListFragment {
     String SOAP_ACTION = "";
     static SoapSerializationEnvelope envelopeOutput;
     Activity activity;
-    Student student;
+    Student oStudent;
     User user;
-    ArrayList<StudentClass> classes = new ArrayList<StudentClass>();
-    ArrayList<Student> students = new ArrayList<Student>();
+    Session session;
+    int SessionID;
+    Globals oGlobal;
+
+    ArrayList<Session> sessionArrayList = new ArrayList<Session>();
+    SessionAdapter sessionAdapter;
+
+    ArrayList<StudentClass> studentClassArray = new ArrayList<StudentClass>();
+    ArrayList<Student> Students = new ArrayList<Student>();
 
 
+    Spinner sessionStudentClassesSpinner;
     private OnStudentClassListener mListener;
 
     int position;
@@ -80,13 +85,11 @@ public class StudentClassFragment extends ListFragment {
         activity = getActivity();
         _appPrefs = new AppPreferences(activity);
 
-        students = _appPrefs.getStudent();
+        Students = _appPrefs.getStudent();
         position = getArguments().getInt("Position");
 
-        student = students.get(position);
-
-        getStudentClasses getClass = new getStudentClasses();
-        getClass.execute();
+        oStudent = Students.get(position);
+        oGlobal = new Globals();
 
     }
 
@@ -97,6 +100,7 @@ public class StudentClassFragment extends ListFragment {
                 savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_studentclass_list, container, false);
 
+        sessionStudentClassesSpinner = (Spinner) view.findViewById(R.id.sessionStudentClassesSpinner);
         return view;
     }
 
@@ -109,8 +113,10 @@ public class StudentClassFragment extends ListFragment {
     @Override
     public void onResume() {
         super.onResume();
-        getStudentClasses getClass = new getStudentClasses();
-        getClass.execute();
+
+        getSessionsAsync getSessions = new getSessionsAsync();
+        getSessions.execute();
+
     }
 
     @Override
@@ -130,16 +136,6 @@ public class StudentClassFragment extends ListFragment {
         mListener = null;
     }
 
-    public void setEmptyText(CharSequence emptyText) {
-        ListView listView = (ListView) activity.findViewById(R.id.list);
-        //listView.setEmptyView( activity.findViewById( R.id.empty_list_item ) );
-        View emptyView = listView.getEmptyView();
-
-        if (emptyText instanceof TextView) {
-            ((TextView) emptyView).setText(emptyText);
-        }
-    }
-
 
     /**
      * This interface must be implemented by activities that contain this
@@ -156,13 +152,62 @@ public class StudentClassFragment extends ListFragment {
         public void onStudentClassInteraction(String id);
     }
 
-    class Data {
+    //Asycn task to get the ChgDesc field to be used to populate the spinner
+    public class getSessionsAsync extends
+            AsyncTask<Globals.Data, Void, ArrayList<Session>> {
 
-        private static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
-        private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
+        @Override
+        protected ArrayList<Session> doInBackground(Globals.Data... data) {
+
+            SoapObject session = oGlobal.getSoapRequest(Globals.Data.NAMESPACE, "getSessions");
+            session = oGlobal.setSessionPropertyInfo(session, oStudent.SchID, "getSessions");
+            return oGlobal.RetrieveSessionsFromSoap(session);
+
+
+        }
+
+        protected void onPostExecute(ArrayList<Session> result) {
+            sessionArrayList = result;
+            addItemsOnSpinner(sessionArrayList);
+
+        }
     }
 
-    public class getStudentClasses extends
+
+    //Adds all items from the Session field to the spinner
+    public void addItemsOnSpinner(ArrayList<Session> sess) {
+
+        sessionAdapter = new SessionAdapter(activity,
+                R.layout.fragment_studentclass_list, sess);
+
+        sessionStudentClassesSpinner.setAdapter(sessionAdapter);
+
+        sessionStudentClassesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                setSelectedSession(sessionStudentClassesSpinner);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+    }
+
+    //Handles if the selected field for the spinner
+    public void setSelectedSession(Spinner sessionSpinner) {
+
+        int selected = sessionSpinner.getSelectedItemPosition();
+        session = (Session) sessionSpinner.getItemAtPosition(selected);
+        SessionID = session.SessionID;
+
+        getStudentClassesAsync getStudentClass = new getStudentClassesAsync();
+        getStudentClass.execute();
+    }
+
+    public class getStudentClassesAsync extends
             AsyncTask<Data, Void, ArrayList<StudentClass>> {
 
         @Override
@@ -173,9 +218,9 @@ public class StudentClassFragment extends ListFragment {
 
         protected void onPostExecute(ArrayList<StudentClass> result) {
 
-            classes = result;
+            studentClassArray = result;
             classAdapter = new StudentClassAdapter(getActivity(),
-                    R.layout.item_studentclass, result);
+                    R.layout.item_studentclass, studentClassArray);
             setListAdapter(classAdapter);
             classAdapter.setNotifyOnChange(true);
 
@@ -194,20 +239,20 @@ public class StudentClassFragment extends ListFragment {
         SoapObject request = GetSoapObject(MethodName);
         user = _appPrefs.getUser();
 
-        PropertyInfo StuID = new PropertyInfo();
-        StuID.setName("StuID");
-        StuID.setValue(student.StuID);
-        request.addProperty(StuID);
+        PropertyInfo piStuID = new PropertyInfo();
+        piStuID.setName("StuID");
+        piStuID.setValue(oStudent.StuID);
+        request.addProperty(piStuID);
 
-        PropertyInfo SessionID = new PropertyInfo();
-        SessionID.setName("SessionID");
-        SessionID.setValue(_appPrefs.getSessionID());
-        request.addProperty(SessionID);
+        PropertyInfo piSessionID = new PropertyInfo();
+        piSessionID.setName("SessionID");
+        piSessionID.setValue(SessionID);
+        request.addProperty(piSessionID);
 
-        PropertyInfo OLReg = new PropertyInfo();
-        OLReg.setName("OLReg");
-        OLReg.setValue(false);
-        request.addProperty(OLReg);
+        PropertyInfo piOLReg = new PropertyInfo();
+        piOLReg.setName("OLReg");
+        piOLReg.setValue(false);
+        request.addProperty(piOLReg);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
@@ -241,7 +286,7 @@ public class StudentClassFragment extends ListFragment {
 
     public static ArrayList<StudentClass> RetrieveFromSoap(SoapObject soap) {
 
-        ArrayList<StudentClass> stuClasses = new ArrayList<StudentClass>();
+        ArrayList<StudentClass> stuClassesArray = new ArrayList<StudentClass>();
         for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
 
             SoapObject classItem = (SoapObject) soap.getProperty(i);
@@ -255,10 +300,10 @@ public class StudentClassFragment extends ListFragment {
                 }
 
             }
-            stuClasses.add(i, classes);
+            stuClassesArray.add(i, classes);
         }
 
-        return stuClasses;
+        return stuClassesArray;
     }
 
 

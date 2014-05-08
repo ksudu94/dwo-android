@@ -2,6 +2,12 @@ package com.akadasoftware.danceworksonline.classes;
 
 import android.app.Activity;
 
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+
 import java.util.ArrayList;
 
 /**
@@ -115,5 +121,80 @@ public class Globals {
         _appPrefs.saveAccounts(AccountsArray);
 
     }
+
+    public static SoapObject GetSoapObject(String NAMESPACE, String MethodName) {
+        return new SoapObject(NAMESPACE, MethodName);
+    }
+
+    public class Data {
+
+        public static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
+        public static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
+    }
+
+
+    public SoapObject getSoapRequest(String NameSpace, String MethodName) {
+        SoapObject Request = new SoapObject(NameSpace, MethodName);
+
+        return Request;
+    }
+
+    public SoapObject setSessionPropertyInfo(SoapObject objRequest, int SchID, String SoapAction) {
+
+        PropertyInfo Order = new PropertyInfo();
+        Order.setName("Order");
+        Order.setValue(" WHERE SchID= " + SchID + "AND DisplaySession='True' ORDER BY SDate,EDate,SessionName");
+        objRequest.addProperty(Order);
+
+        objRequest = getNewSoapObject(SoapAction, objRequest);
+
+        return objRequest;
+    }
+
+    public SoapObject getNewSoapObject(String SoapAction, SoapObject Request) {
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(Request);
+
+        SoapObject response = null;
+        HttpTransportSE HttpTransport = new HttpTransportSE(Data.URL);
+        try {
+            HttpTransport.call(SoapAction, envelope);
+            response = (SoapObject) envelope.getResponse();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+        return response;
+
+    }
+
+    public static ArrayList<Session> RetrieveSessionsFromSoap(SoapObject soap) {
+
+        ArrayList<Session> sessionArray = new ArrayList<Session>();
+
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
+
+            SoapObject sessionItem = (SoapObject) soap.getProperty(i);
+
+            Session Session = new Session();
+            for (int j = 0; j < sessionItem.getPropertyCount(); j++) {
+                Session.setProperty(j, sessionItem.getProperty(j)
+                        .toString());
+                if (sessionItem.getProperty(j).equals("anyType{}")) {
+                    sessionItem.setProperty(j, "");
+                }
+
+            }
+            sessionArray.add(i, Session);
+        }
+
+        return sessionArray;
+    }
+
 
 }

@@ -25,8 +25,8 @@ import java.util.Calendar;
 public class EditCreditCardDialog extends DialogFragment {
 
     EditText etCCNo, etCVV;
-    String CCNo, Date, CVV;
-    Boolean saveCard;
+    String strCCNo, strDate, strCVV;
+    Boolean boolSaveCard;
     Spinner spinnerMonth, spinnerYear;
     CheckBox chkSaveCreditCard;
     Activity activity;
@@ -82,7 +82,7 @@ public class EditCreditCardDialog extends DialogFragment {
         activity = getActivity();
 
 
-        saveCard = false;
+        boolSaveCard = false;
 
 
         ArrayAdapter<CharSequence> monthAdapter = ArrayAdapter.createFromResource(getActivity(),
@@ -110,40 +110,40 @@ public class EditCreditCardDialog extends DialogFragment {
                 .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        CCNo = etCCNo.getText().toString();
-                        CVV = etCVV.getText().toString();
-                        Date = spinnerMonth.getSelectedItem().toString() + spinnerYear.getSelectedItem().toString().substring(2);
+                        strCCNo = etCCNo.getText().toString();
+                        strCVV = etCVV.getText().toString();
+                        strDate = spinnerMonth.getSelectedItem().toString() + spinnerYear.getSelectedItem().toString().substring(2);
 
                         //No blank fields
-                        if (CCNo.trim().length() == 0) {
+                        if (strCCNo.trim().length() == 0) {
                             Toast toast = Toast.makeText(activity, "No Credit Card entered", Toast.LENGTH_LONG);
                             toast.show();
 
                         } else {
                             //Amex, needs to be length 15
-                            if (CCNo.charAt(0) == '3') {
-                                if (CCNo.length() != 15) {
+                            if (strCCNo.charAt(0) == '3') {
+                                if (strCCNo.length() != 15) {
                                     Toast toast = Toast.makeText(activity, "Invalid Credit Card #", Toast.LENGTH_LONG);
                                     toast.show();
-                                } else if (CVV.length() != 3 || CVV.length() != 0) {
+                                } else if (strCVV.length() != 3 || strCVV.length() != 0) {
                                     Toast toast = Toast.makeText(activity, "Invalid CVV #", Toast.LENGTH_LONG);
                                     toast.show();
                                 }
                                 //All other card lengths are 16
                             } else {
-                                if (CCNo.length() != 16) {
+                                if (strCCNo.length() != 16) {
                                     Toast toast = Toast.makeText(activity, "Invalid Credit Card #", Toast.LENGTH_LONG);
                                     toast.show();
-                                } else if (CVV.length() != 4 || CVV.length() != 0) {
+                                } else if (strCVV.length() != 4 || strCVV.length() != 0) {
                                     Toast toast = Toast.makeText(activity, "Invalid CVV #", Toast.LENGTH_LONG);
                                     toast.show();
                                 }
                             }
 
                             if (chkSaveCreditCard.isChecked()) {
-                                saveCard = true;
+                                boolSaveCard = true;
                             }
-                            ccListener.onDialogPositiveClick(CCNo, CVV, Date, saveCard);
+                            ccListener.onDialogPositiveClick(strCCNo, strCVV, strDate, boolSaveCard);
                         }
                     }
                 })
