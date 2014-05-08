@@ -21,7 +21,7 @@ import java.util.Locale;
  */
 public class StudentInformation extends ActionBarActivity implements ActionBar.TabListener,
         StudentClassFragment.OnStudentClassListener,
-        StudentWaitListFragment.OnWaitListListener,
+        StudentsWaitListFragment.OnWaitListListener,
         StudentAttendanceFragment.OnAttendanceInteractionListener {
 
     ViewPager mViewPager;
