@@ -38,7 +38,7 @@ public class StudentClassFragment extends ListFragment {
     static SoapSerializationEnvelope envelopeOutput;
     Activity activity;
     Student oStudent;
-    User user;
+    User oUser;
     Session session;
     int SessionID;
     Globals oGlobal;
@@ -89,6 +89,7 @@ public class StudentClassFragment extends ListFragment {
         position = getArguments().getInt("Position");
 
         oStudent = Students.get(position);
+        oUser = _appPrefs.getUser();
         oGlobal = new Globals();
 
     }
@@ -160,7 +161,7 @@ public class StudentClassFragment extends ListFragment {
         protected ArrayList<Session> doInBackground(Globals.Data... data) {
 
             SoapObject session = oGlobal.getSoapRequest(Globals.Data.NAMESPACE, "getSessions");
-            session = oGlobal.setSessionPropertyInfo(session, oStudent.SchID, "getSessions");
+            session = oGlobal.setSessionPropertyInfo(session, oStudent.SchID, "getSessions", oUser);
             return oGlobal.RetrieveSessionsFromSoap(session);
 
 
@@ -207,6 +208,7 @@ public class StudentClassFragment extends ListFragment {
         getStudentClass.execute();
     }
 
+
     public class getStudentClassesAsync extends
             AsyncTask<Data, Void, ArrayList<StudentClass>> {
 
@@ -237,7 +239,18 @@ public class StudentClassFragment extends ListFragment {
     public SoapObject InvokeMethod(String URL, String MethodName) {
 
         SoapObject request = GetSoapObject(MethodName);
-        user = _appPrefs.getUser();
+
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        request.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        request.addProperty(piUserGUID);
 
         PropertyInfo piStuID = new PropertyInfo();
         piStuID.setName("StuID");

@@ -17,6 +17,7 @@ import com.akadasoftware.danceworksonline.classes.Globals.Data;
 import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.StudentAttendance;
+import com.akadasoftware.danceworksonline.classes.User;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -36,11 +37,12 @@ public class StudentAttendanceFragment extends ListFragment {
     Activity activity;
     private AppPreferences _appPrefs;
     Globals oGlobal;
+    User oUser;
     static SoapSerializationEnvelope envelopeOutput;
     String METHOD_NAME = "";
     String SOAP_ACTION = "";
-    Student student;
-    Session session;
+    Student oStudent;
+    Session oSession;
 
     ArrayList<Session> sessionArrayList = new ArrayList<Session>();
     SessionAdapter sessionAdapter;
@@ -81,7 +83,8 @@ public class StudentAttendanceFragment extends ListFragment {
         students = _appPrefs.getStudent();
         position = getArguments().getInt("Position");
 
-        student = students.get(position);
+        oStudent = students.get(position);
+        oUser = _appPrefs.getUser();
 
         oGlobal = new Globals();
     }
@@ -148,7 +151,7 @@ public class StudentAttendanceFragment extends ListFragment {
         protected ArrayList<Session> doInBackground(Data... data) {
 
             SoapObject session = oGlobal.getSoapRequest(Data.NAMESPACE, "getSessions");
-            session = oGlobal.setSessionPropertyInfo(session, student.SchID, "getSessions");
+            session = oGlobal.setSessionPropertyInfo(session, oStudent.SchID, "getSessions", oUser);
             return oGlobal.RetrieveSessionsFromSoap(session);
 
 
@@ -188,8 +191,8 @@ public class StudentAttendanceFragment extends ListFragment {
     public void setSelectedSession(Spinner sessionSpinner) {
 
         int selected = sessionSpinner.getSelectedItemPosition();
-        session = (Session) sessionSpinner.getItemAtPosition(selected);
-        SessionID = session.SessionID;
+        oSession = (Session) sessionSpinner.getItemAtPosition(selected);
+        SessionID = oSession.SessionID;
 
         getStudentAttendanceAsync getStudentAttendance = new getStudentAttendanceAsync();
         getStudentAttendance.execute();
@@ -228,9 +231,20 @@ public class StudentAttendanceFragment extends ListFragment {
 
         SoapObject request = GetSoapObject(MethodName);
 
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        request.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        request.addProperty(piUserGUID);
+
         PropertyInfo piStuID = new PropertyInfo();
         piStuID.setName("StuID");
-        piStuID.setValue(student.StuID);
+        piStuID.setValue(oStudent.StuID);
         request.addProperty(piStuID);
 
         PropertyInfo piSessionID = new PropertyInfo();

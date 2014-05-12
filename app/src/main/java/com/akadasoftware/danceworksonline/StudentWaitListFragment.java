@@ -17,6 +17,7 @@ import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.StudentWaitList;
+import com.akadasoftware.danceworksonline.classes.User;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -38,11 +39,10 @@ public class StudentWaitListFragment extends ListFragment {
     static SoapSerializationEnvelope envelope;
     Activity activity;
     Student oStudent;
+    User oUser;
     Globals oGlobal;
     ArrayList<Session> sessionArrayList = new ArrayList<Session>();
     SessionAdapter sessionAdapter;
-    Spinner sessionSpinner;
-    StudentWaitList oStudentWaitList;
     ArrayList<Student> Students = new ArrayList<Student>();
 
     Spinner sessionWaitListSpinner;
@@ -80,7 +80,7 @@ public class StudentWaitListFragment extends ListFragment {
         position = getArguments().getInt("Position");
 
         oStudent = Students.get(position);
-
+        oUser = _appPrefs.getUser();
     }
 
     @Override
@@ -166,7 +166,7 @@ public class StudentWaitListFragment extends ListFragment {
         protected ArrayList<Session> doInBackground(Globals.Data... data) {
 
             SoapObject session = oGlobal.getSoapRequest(Globals.Data.NAMESPACE, "getSessions");
-            session = oGlobal.setSessionPropertyInfo(session, oStudent.SchID, "getSessions");
+            session = oGlobal.setSessionPropertyInfo(session, oStudent.SchID, "getSessions", oUser);
             return oGlobal.RetrieveSessionsFromSoap(session);
 
 
@@ -246,6 +246,18 @@ public class StudentWaitListFragment extends ListFragment {
     public SoapObject InvokeMethod(String URL, String MethodName) {
 
         SoapObject request = Globals.GetSoapObject(Data.NAMESPACE, MethodName);
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        request.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        request.addProperty(piUserGUID);
+
 
         PropertyInfo piStuID = new PropertyInfo();
         piStuID.setName("StuID");

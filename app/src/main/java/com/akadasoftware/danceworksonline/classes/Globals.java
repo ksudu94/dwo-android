@@ -139,7 +139,18 @@ public class Globals {
         return Request;
     }
 
-    public SoapObject setSessionPropertyInfo(SoapObject objRequest, int SchID, String SoapAction) {
+    public SoapObject setSessionPropertyInfo(SoapObject objRequest, int SchID, String SoapAction, User inputUser) {
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(inputUser.UserID);
+        objRequest.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(inputUser.UserGUID);
+        objRequest.addProperty(piUserGUID);
 
         PropertyInfo Order = new PropertyInfo();
         Order.setName("Order");

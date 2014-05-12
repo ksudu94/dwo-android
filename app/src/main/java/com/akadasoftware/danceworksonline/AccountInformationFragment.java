@@ -63,8 +63,9 @@ public class AccountInformationFragment extends Fragment {
             etFirstCC, etLastCC, etNewCC, etNewCCExp, etAddressCC, etCityCC, etStateCC, etZipCC;
     TextView tvcc;
     ViewFlipper accountSwitcher;
+    View rootView;
     Spinner AccountStatusSpinner;
-    ArrayAdapter<String> spinneradapter;
+    ArrayAdapter<String> statusSpinnerAdapter;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -102,58 +103,7 @@ public class AccountInformationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_account_information, container, false);
-
-        switch (oAccount.Status) {
-            case 0:
-                strStatus = "active";
-                break;
-            case 1:
-                strStatus = "inactive";
-                break;
-            case 2:
-                strStatus = "prospect";
-                break;
-            case 3:
-                strStatus = "deleted";
-                break;
-            default:
-                strStatus = "I have no freaking clue";
-                break;
-        }
-
-        switch (oAccount.CCType) {
-            case 1:
-                strCCType = "amex";
-                break;
-            case 2:
-                strCCType = "disc";
-                break;
-            case 3:
-                strCCType = "mc";
-                break;
-            case 4:
-                strCCType = "visa";
-                break;
-            default:
-                strCCType = "";
-                break;
-        }
-        strCCNum = "";
-        if (oAccount.CCTrail.equals(""))
-            strCCNum = " ";
-        else {
-            for (int j = 4; j > 0; j--) {
-                strCCNum += oAccount.CCTrail.charAt(oAccount.CCTrail.length() - j);
-            }
-        }
-        //Used to make exp date a string so we can use substring to put a / in b/w
-        String test = oAccount.CCExpire.toString();
-        if (test.equals("")) {
-            strExpDate = "";
-        } else {
-            strExpDate = test.substring(0, 2) + "/" + test.substring(2, test.length() - 1);
-        }
+        rootView = inflater.inflate(R.layout.fragment_account_information, container, false);
 
         etFirst = (EditText) rootView.findViewById(R.id.etFirst);
         etLast = (EditText) rootView.findViewById(R.id.etLast);
@@ -163,6 +113,7 @@ public class AccountInformationFragment extends Fragment {
         etZip = (EditText) rootView.findViewById(R.id.etZip);
         etPhone = (EditText) rootView.findViewById(R.id.etPhone);
         etEmail = (EditText) rootView.findViewById(R.id.etEmail);
+
         etFirstCC = (EditText) rootView.findViewById(R.id.etFirstCC);
         etLastCC = (EditText) rootView.findViewById(R.id.etLastCC);
         etNewCC = (EditText) rootView.findViewById(R.id.etNewCC);
@@ -183,27 +134,21 @@ public class AccountInformationFragment extends Fragment {
 
         accountSwitcher = (ViewFlipper) rootView.findViewById(R.id.accountSwitcher);
 
-        TextView acctname = (TextView) rootView.findViewById(R.id.tvacctnamefield);
-        acctname.setText(oAccount.FName + " " + oAccount.LName);
-
-        TextView acctaddress = (TextView) rootView.findViewById(R.id.tvacctaddressfield);
-        acctaddress.setText(oAccount.Address + ", " + oAccount.City + ", " + oAccount.State + " " + oAccount.ZipCode);
-
-        TextView acctphone = (TextView) rootView.findViewById(R.id.tvacctphonefield);
-        acctphone.setText(oAccount.Phone);
-
-        TextView tvemail = (TextView) rootView.findViewById(R.id.tvacctemailfield);
-        tvemail.setText(oAccount.EMail);
-
-        TextView tvstatus = (TextView) rootView.findViewById(R.id.tvstatusfield);
-        tvstatus.setText(strStatus);
-
-        TextView type = (TextView) rootView.findViewById(R.id.tvcc);
-        if (strCCType.length() > 0)
-            type.setText(strCCType + ": ");
 
         tvcc = (TextView) rootView.findViewById(R.id.tvccfield);
         btnSaveCard = (Button) rootView.findViewById(R.id.btnSaveCard);
+
+        /**
+         * Method that builds the status, credit card exp date, and ccnum strings as well as displays
+         * credit card information
+         */
+
+        buildString(oAccount);
+
+        /**
+         * Updates the textview fields so that after an edit is run the fields are refreshed
+         */
+        setAccountFields(oAccount, rootView);
 
 
         tvcc.setVisibility(View.VISIBLE);
@@ -221,7 +166,7 @@ public class AccountInformationFragment extends Fragment {
 
         } else {
             btnAddCreditCard.setVisibility(View.GONE);
-            tvcc.setText(oAccount.CCFName + " " + oAccount.CCLName + " - ...." + strCCNum + " - Exp. " + strExpDate);
+            //tvcc.setText(oAccount.CCFName + " " + oAccount.CCLName + " - ...." + strCCNum + " - Exp. " + strExpDate);
 
         }
 
@@ -238,9 +183,9 @@ public class AccountInformationFragment extends Fragment {
                     etFirst.setText(oAccount.FName);
                     etLast.setText(oAccount.LName);
                     etAddress.setText(oAccount.Address);
-                    etAddress.setText(oAccount.City);
-                    etAddress.setText(oAccount.State);
-                    etAddress.setText(oAccount.ZipCode);
+                    etCity.setText(oAccount.City);
+                    etState.setText(oAccount.State);
+                    etZip.setText(oAccount.ZipCode);
                     etPhone.setText(oAccount.Phone);
                     etEmail.setText(oAccount.EMail);
 
@@ -252,11 +197,11 @@ public class AccountInformationFragment extends Fragment {
                         spinnerlist.add("prospect");
 
                     AccountStatusSpinner = (Spinner) activity.findViewById(R.id.AccountStatusSpinner);
-                    spinneradapter = new ArrayAdapter<String>(getActivity(),
+                    statusSpinnerAdapter = new ArrayAdapter<String>(getActivity(),
                             android.R.layout.simple_list_item_1, spinnerlist);
 
-                    spinneradapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    AccountStatusSpinner.setAdapter(spinneradapter);
+                    statusSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    AccountStatusSpinner.setAdapter(statusSpinnerAdapter);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -272,7 +217,7 @@ public class AccountInformationFragment extends Fragment {
                 try {
                     saveAccountChanges save = new saveAccountChanges();
                     save.execute();
-                    spinneradapter.notifyDataSetChanged();
+                    statusSpinnerAdapter.notifyDataSetChanged();
                     accountSwitcher.setDisplayedChild(0);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -304,10 +249,10 @@ public class AccountInformationFragment extends Fragment {
                 accountSwitcher.setDisplayedChild(2);
                 etFirstCC.setText(oAccount.FName);
                 etLastCC.setText(oAccount.LName);
-                etAddressCC.setText(oAccount.CCAddress);
-                etCityCC.setText(oAccount.CCCity);
-                etStateCC.setText(oAccount.CCState);
-                etZipCC.setText(oAccount.CCZip);
+                etAddressCC.setText(oAccount.Address);
+                etCityCC.setText(oAccount.City);
+                etStateCC.setText(oAccount.State);
+                etZipCC.setText(oAccount.ZipCode);
 
 
             }
@@ -319,10 +264,10 @@ public class AccountInformationFragment extends Fragment {
                 accountSwitcher.setDisplayedChild(2);
                 etFirstCC.setText(oAccount.FName);
                 etLastCC.setText(oAccount.LName);
-                etAddressCC.setText(oAccount.CCAddress);
-                etCityCC.setText(oAccount.CCCity);
-                etStateCC.setText(oAccount.CCState);
-                etZipCC.setText(oAccount.CCZip);
+                etAddressCC.setText(oAccount.Address);
+                etCityCC.setText(oAccount.City);
+                etStateCC.setText(oAccount.State);
+                etZipCC.setText(oAccount.ZipCode);
 
 
             }
@@ -383,6 +328,88 @@ public class AccountInformationFragment extends Fragment {
         return rootView;
     }
 
+    public void setAccountFields(Account account, View rootView) {
+        TextView acctname = (TextView) rootView.findViewById(R.id.tvacctnamefield);
+        acctname.setText(account.FName + " " + account.LName);
+
+        TextView acctaddress = (TextView) rootView.findViewById(R.id.tvacctaddressfield);
+        acctaddress.setText(account.Address + ", " + account.City + ", " + account.State + " " + account.ZipCode);
+
+        TextView acctphone = (TextView) rootView.findViewById(R.id.tvacctphonefield);
+        acctphone.setText(account.Phone);
+
+        TextView tvemail = (TextView) rootView.findViewById(R.id.tvacctemailfield);
+        tvemail.setText(account.EMail);
+
+        TextView tvstatus = (TextView) rootView.findViewById(R.id.tvstatusfield);
+        tvstatus.setText(strStatus);
+
+        TextView type = (TextView) rootView.findViewById(R.id.tvcc);
+        if (strCCType.length() > 0)
+            type.setText(strCCType + ": ");
+
+    }
+
+    public void buildString(Account inputAccount) {
+
+        switch (inputAccount.Status) {
+            case 0:
+                strStatus = "active";
+                break;
+            case 1:
+                strStatus = "inactive";
+                break;
+            case 2:
+                strStatus = "prospect";
+                break;
+            case 3:
+                strStatus = "deleted";
+                break;
+            default:
+                strStatus = "I have no freaking clue";
+                break;
+        }
+
+        switch (inputAccount.CCType) {
+            case 1:
+                strCCType = "amex";
+                break;
+            case 2:
+                strCCType = "disc";
+                break;
+            case 3:
+                strCCType = "mc";
+                break;
+            case 4:
+                strCCType = "visa";
+                break;
+            default:
+                strCCType = "";
+                break;
+        }
+
+
+        strCCNum = "";
+        if (inputAccount.CCTrail.equals(""))
+            strCCNum = " ";
+        else {
+            for (int j = 4; j > 0; j--) {
+                strCCNum += inputAccount.CCTrail.charAt(inputAccount.CCTrail.length() - j);
+            }
+        }
+
+        //Used to make exp date a string so we can use substring to put a / in b/w
+        String testEmptyString = inputAccount.CCExpire.toString();
+        if (testEmptyString.equals("")) {
+            strExpDate = "";
+        } else {
+            strExpDate = testEmptyString.substring(0, 2) + "/" + testEmptyString.substring(2, testEmptyString.length());
+        }
+
+        //Displays the credit card string if applicable
+        tvcc.setText(oAccount.CCFName + " " + oAccount.CCLName + " - ...." + strCCNum + " - Exp. " + strExpDate);
+    }
+
     class Data {
 
         static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
@@ -412,11 +439,25 @@ public class AccountInformationFragment extends Fragment {
 
         protected void onPostExecute(String result) {
             dialog.dismiss();
-            globals.updateAccount(oAccount, position, activity);
-            Toast toast = Toast.makeText(getActivity(), result, Toast.LENGTH_LONG);
-            toast.show();
-            //getAccount getAccount = new getAccount();
-            //getAccount.execute();
+            if (result.equals("Changes saved")) {
+                oAccount.FName = etFirst.getText().toString().trim();
+                oAccount.LName = etLast.getText().toString().trim();
+                oAccount.Address = etAddress.getText().toString().trim();
+                oAccount.City = etCity.getText().toString().trim();
+                oAccount.State = etState.getText().toString().trim();
+                oAccount.ZipCode = etZip.getText().toString().trim();
+                oAccount.Phone = etPhone.getText().toString().trim();
+                oAccount.EMail = etEmail.getText().toString().trim();
+                globals.updateAccount(oAccount, position, activity);
+                setAccountFields(oAccount, rootView);
+                Toast toast = Toast.makeText(getActivity(), result, Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                Toast toast2 = Toast.makeText(getActivity(), result, Toast.LENGTH_LONG);
+                toast2.show();
+            }
+
+
         }
     }
 
@@ -428,6 +469,16 @@ public class AccountInformationFragment extends Fragment {
         SoapObject Request = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
         AcctID = _appPrefs.getAcctID();
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        Request.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        Request.addProperty(piUserGUID);
 
         PropertyInfo piAcctID = new PropertyInfo();
         piAcctID.setName("AcctID");
@@ -560,7 +611,20 @@ public class AccountInformationFragment extends Fragment {
             int response = Integer.valueOf(result.toString());
             if (response > 0) {
                 oAccount.CCConsentID = response;
+                oAccount.CCFName = etFirstCC.getText().toString().trim();
+                oAccount.LName = etLastCC.getText().toString().trim();
+                oAccount.CCAddress = etAddressCC.getText().toString().trim();
+                oAccount.CCCity = etCityCC.getText().toString().trim();
+                oAccount.CCState = etStateCC.getText().toString().trim();
+                oAccount.CCZip = etZipCC.getText().toString().trim();
+                oAccount.CCTrail = etNewCC.getText().toString().trim().substring(etNewCC.getText().
+                        toString().trim().length() - 4, etNewCC.getText().toString().length());
+                oAccount.CCExpire = etNewCCExp.getText().toString().trim();
+
                 globals.updateAccount(oAccount, position, activity);
+                buildString(oAccount);
+
+
                 Toast toast = Toast.makeText(getActivity(), "Save successful", Toast.LENGTH_LONG);
                 toast.show();
                 accountSwitcher.setDisplayedChild(0);
