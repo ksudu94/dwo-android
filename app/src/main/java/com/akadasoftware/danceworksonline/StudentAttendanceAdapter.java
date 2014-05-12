@@ -33,6 +33,7 @@ public class StudentAttendanceAdapter extends ArrayAdapter<StudentAttendance> {
 
     public class ViewHolder {
         TextView tvAttendance;
+        TextView tvClassDate;
 
     }
 
@@ -57,6 +58,10 @@ public class StudentAttendanceAdapter extends ArrayAdapter<StudentAttendance> {
 
             holder.tvAttendance = (TextView) convertView
                     .findViewById(R.id.tvAttendance);
+
+            holder.tvClassDate = (TextView) convertView
+                    .findViewById(R.id.tvClassDate);
+
 
             convertView.setTag(holder);
 
@@ -114,8 +119,36 @@ public class StudentAttendanceAdapter extends ArrayAdapter<StudentAttendance> {
 
         }
 
-        holder.tvAttendance.setText(strStatus);
+        String day = "";
+        switch(oStudentAttendance.ClDayNo){
+            case 1:
+                day = "Monday";
+                break;
+            case 2:
+                day = "Tuesday";
+                break;
+            case 3:
+                day = "Wednesday";
+                break;
+            case 4:
+                day = "Thursday";
+                break;
+            case 5:
+                day = "Friday";
+                break;
+            case 6:
+                day = "Saturday";
+                break;
+            case 7:
+                day = "Sunday";
+                break;
 
+        }
+
+        holder.tvAttendance.setText(strStatus + " for -" + oStudentAttendance.ClLevel + " - " + oStudentAttendance.ClDescription);
+        String date = oStudentAttendance.ADate.substring(0,9);
+
+        holder.tvClassDate.setText( day + ", " + date + " at " + oStudentAttendance.ClStart);
         return convertView;
 
     }

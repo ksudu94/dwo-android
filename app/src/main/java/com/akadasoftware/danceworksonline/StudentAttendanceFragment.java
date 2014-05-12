@@ -210,7 +210,9 @@ public class StudentAttendanceFragment extends ListFragment {
             studentAttenanceArray = result;
             attendanceAdapter = new StudentAttendanceAdapter(activity,
                     R.layout.item_student_attendance, studentAttenanceArray);
+            setListAdapter(attendanceAdapter);
             attendanceAdapter.setNotifyOnChange(true);
+
 
         }
     }

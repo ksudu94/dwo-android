@@ -326,6 +326,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="2dip"
+                    android:inputType="number"
                     android:hint="Zip Code"
                     android:padding="5dip" />
 
@@ -343,6 +344,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="2dip"
                     android:hint="Phone Number"
+                    android:inputType="phone"
                     android:padding="5dip" />
 
                 <TextView
@@ -358,6 +360,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="2dip"
+                    android:inputType="textEmailAddress"
                     android:hint="Email"
                     android:padding="5dip" />
 
@@ -471,7 +474,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="2dip"
                     android:imeOptions="actionNext"
-                    android:inputType="numberDecimal"
+                    android:inputType="date"
                     android:hint="Expiration Date"
                     android:padding="5dip" />
 
@@ -539,6 +542,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="2dip"
+                    android:inputType="number"
                     android:hint="Zip Code"
                     android:padding="5dip" />
 

@@ -64,6 +64,7 @@ public class AccountInformationFragment extends Fragment {
     TextView tvcc;
     ViewFlipper accountSwitcher;
     Spinner AccountStatusSpinner;
+    ArrayAdapter<String> spinneradapter;
 
     /**
      * Returns a new instance of this fragment for the given section
@@ -219,6 +220,7 @@ public class AccountInformationFragment extends Fragment {
 
 
         } else {
+            btnAddCreditCard.setVisibility(View.GONE);
             tvcc.setText(oAccount.CCFName + " " + oAccount.CCLName + " - ...." + strCCNum + " - Exp. " + strExpDate);
 
         }
@@ -250,7 +252,7 @@ public class AccountInformationFragment extends Fragment {
                         spinnerlist.add("prospect");
 
                     AccountStatusSpinner = (Spinner) activity.findViewById(R.id.AccountStatusSpinner);
-                    ArrayAdapter<String> spinneradapter = new ArrayAdapter<String>(getActivity(),
+                    spinneradapter = new ArrayAdapter<String>(getActivity(),
                             android.R.layout.simple_list_item_1, spinnerlist);
 
                     spinneradapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -270,6 +272,7 @@ public class AccountInformationFragment extends Fragment {
                 try {
                     saveAccountChanges save = new saveAccountChanges();
                     save.execute();
+                    spinneradapter.notifyDataSetChanged();
                     accountSwitcher.setDisplayedChild(0);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -486,7 +489,7 @@ public class AccountInformationFragment extends Fragment {
         if (etPhone.getText().toString().trim().equals(""))
             strPhone = oAccount.Phone;
         else
-            strPhone = etEmail.getText().toString().trim();
+            strPhone = etPhone.getText().toString().trim();
         PropertyInfo piPhone = new PropertyInfo();
         piPhone.setName("Phone");
         piPhone.setValue(strPhone);

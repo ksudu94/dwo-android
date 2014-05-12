@@ -5,32 +5,6 @@
     android:layout_height="match_parent"
     tools:context="com.akadasoftware.danceworksonline.AccountStudentsFragment">
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="Name"
-                android:textSize="20dp"
-                android:textStyle="bold"
-                android:layout_marginRight="25dp" />
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="Status"
-                android:textSize="20dp"
-                android:textStyle="bold"
-                android:layout_marginRight="25dp" />
-        </LinearLayout>
 
         <ListView
             android:id="@android:id/list"
@@ -46,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center" />
-    </LinearLayout>
+
 
 
 </FrameLayout>

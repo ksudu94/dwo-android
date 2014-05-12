@@ -131,7 +131,7 @@ public class Splash extends ActionBarActivity {
                     }
 
                     isTablet = getResources().getBoolean(R.bool.isTablet);
-                    if (isTablet) {
+                    if (!isTablet) {
                         fm.setScaleX(Float.valueOf("0.5"));
                         fm.setScaleY(Float.valueOf("0.5"));
                     }

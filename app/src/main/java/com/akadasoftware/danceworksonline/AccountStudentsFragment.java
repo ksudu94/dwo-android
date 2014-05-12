@@ -171,9 +171,10 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
 
         SoapObject request = GetSoapObject(MethodName);
 
+        //This where string is built server side.
         PropertyInfo piWhere = new PropertyInfo();
         piWhere.setName("Where");
-        piWhere.setValue(_appPrefs.getStudentQuery());
+        piWhere.setValue("");
         request.addProperty(piWhere);
 
         PropertyInfo piSchID = new PropertyInfo();
