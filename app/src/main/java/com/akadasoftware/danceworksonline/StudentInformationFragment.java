@@ -1,6 +1,7 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -44,7 +45,7 @@ public class StudentInformationFragment extends Fragment {
 
     EditText etFName, etLName, etAddress, etCity, etState, etZip, etContact, etAccountName;
 
-    Button btnEditStudent, btnSave, btnCancel;
+    Button btnEditStudent, btnEnrollStudent, btnSave, btnCancel;
 
     ViewFlipper studentSwitcher;
 
@@ -116,6 +117,7 @@ public class StudentInformationFragment extends Fragment {
 
 
         btnEditStudent = (Button) rootView.findViewById(R.id.btnEditStudent);
+        btnEnrollStudent = (Button) rootView.findViewById(R.id.btnEnrollStudent);
         btnSave = (Button) rootView.findViewById(R.id.btnSave);
         btnCancel = (Button) rootView.findViewById(R.id.btnCancel);
 
@@ -160,6 +162,16 @@ public class StudentInformationFragment extends Fragment {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        btnEnrollStudent.setOnClickListener(new View.OnClickListener() {
+
+
+            @Override
+            public void onClick(View v) {
+                Intent openEnrollPage = new Intent("com.akadasoftware.danceworksonline.Enroll");
+                startActivity(openEnrollPage);
             }
         });
 

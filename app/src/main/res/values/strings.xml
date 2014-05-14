@@ -21,10 +21,8 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
-
     <string name="title_activity_account_information">Account Information</string>
     <string name="title_activity_student_information">Student Information</string>
-
     <string name="title_account_info">Information</string>
     <string name="title_account_students">Students</string>
     <string name="empty_student_list">No students registered to this account.</string>
@@ -32,17 +30,14 @@
     <string name="title_account_transactions">Transactions</string>
     <string name="title_account_payment">Payment</string>
     <string name="title_account_charge">Charge</string>
-
     <string name="title_student_info">Information</string>
     <string name="title_student_classes">Classes</string>
     <string name="title_student_waitlist">Waitlist</string>
     <string name="title_student_Attendance">Attendance</string>
     <string name="title_student_enroll">Enroll</string>
-
     <string name="title_activity_splash">Splash</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_student">Student</string>
-
 
     <string-array name="payment_types1">
         <item>Select Charge Type</item>
@@ -50,7 +45,6 @@
         <item>Check</item>
         <item>Other</item>
     </string-array>
-
     <string-array name="payment_types2">
         <item>Select Charge Type</item>
         <item>Cash</item>
@@ -58,7 +52,6 @@
         <item>Other</item>
         <item>Use New Credit Card</item>
     </string-array>
-
     <string-array name="payment_types3">
         <item>Select Charge Type</item>
         <item>Cash</item>
@@ -67,7 +60,6 @@
         <item>Use New Credit Card</item>
         <item>Use Saved Credit Card</item>
     </string-array>
-
     <string-array name="months">
         <item>01</item>
         <item>02</item>
@@ -82,7 +74,6 @@
         <item>11</item>
         <item>12</item>
     </string-array>
-
     <string-array name="SortBy">
         <item>Last Name</item>
         <item>First Name</item>
@@ -90,7 +81,6 @@
         <item>Phone</item>
         <item>Email</item>
     </string-array>
-
     <string-array name="SelectBy">
         <item>Active</item>
         <item>Inactive</item>
@@ -99,7 +89,6 @@
         <item>Deleted</item>
         <item>All Accounts</item>
     </string-array>
-
     <string-array name="StudentSortBy">
         <item>Last Name</item>
         <item>First Name</item>
@@ -108,7 +97,6 @@
         <item>Birth Date</item>
         <item>Account Number</item>
     </string-array>
-
     <string-array name="StudentSelectBy">
         <item>Active</item>
         <item>Inactive</item>
@@ -116,5 +104,7 @@
         <item>Prospects</item>
         <item>All Students</item>
     </string-array>
+
+    <string name="title_activity_enroll">Enroll</string>
 
 </resources>

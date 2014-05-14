@@ -43,6 +43,14 @@
                         android:layout_gravity="right"
                         android:clickable="true"
                         android:text="Edit Student" />
+
+                    <Button
+                        android:id="@+id/btnEnrollStudent"
+                        android:layout_width="75dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="right"
+                        android:clickable="true"
+                        android:text="Enroll Student" />
                 </LinearLayout>
             </LinearLayout>
 

@@ -18,6 +18,9 @@ public class Globals {
 
     private AppPreferences _appPrefs;
 
+    /**
+     * Builds the query string for filter and select by dialogs
+     */
     public String BuildQuery(int selection, int sort, String mTitle) {
 
         String Query, Sort = "", Select = "";
@@ -111,6 +114,9 @@ public class Globals {
         return Query;
     }
 
+    /**
+     * Updates the account and then resaves it into the arraylist
+     */
 
     public void updateAccount(Account account, int position, Activity activity) {
 
@@ -122,6 +128,9 @@ public class Globals {
 
     }
 
+    /**
+     * Creates a new soap object
+     */
     public static SoapObject GetSoapObject(String NAMESPACE, String MethodName) {
         return new SoapObject(NAMESPACE, MethodName);
     }
@@ -133,12 +142,18 @@ public class Globals {
     }
 
 
+    /**
+     * Creates a new soap request
+     */
     public SoapObject getSoapRequest(String NameSpace, String MethodName) {
         SoapObject Request = new SoapObject(NameSpace, MethodName);
 
         return Request;
     }
 
+    /**
+     * Property info's for the session b/c we use it in a spinner on several pages.
+     */
     public SoapObject setSessionPropertyInfo(SoapObject objRequest, int SchID, String SoapAction, User inputUser) {
 
         PropertyInfo piUserID = new PropertyInfo();

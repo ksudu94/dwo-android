@@ -12,7 +12,7 @@
         <activity
             android:name="com.akadasoftware.danceworksonline.Splash"
             android:label="@string/app_name">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -21,7 +21,7 @@
         <activity
             android:name="com.akadasoftware.danceworksonline.Login"
             android:label="@string/app_name">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="com.akadasoftware.danceworksonline.Login" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -30,7 +30,7 @@
         <activity
             android:name="com.akadasoftware.danceworksonline.Home"
             android:label="@string/title_activity_home">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="com.akadasoftware.danceworksonline.Home" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -40,7 +40,7 @@
             android:name="com.akadasoftware.danceworksonline.AccountInformation"
             android:label="@string/title_activity_account_information"
             android:parentActivityName="com.akadasoftware.danceworksonline.Home">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="com.akadasoftware.danceworksonline.AccountInformation" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -50,12 +50,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="Home" />
         </activity>
-
         <activity
             android:name="com.akadasoftware.danceworksonline.StudentInformation"
             android:label="@string/title_activity_student_information"
             android:parentActivityName="com.akadasoftware.danceworksonline.Home">
-            <intent-filter>
+        <intent-filter>
                 <action android:name="com.akadasoftware.danceworksonline.StudentInformation" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -65,7 +64,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="Home" />
         </activity>
+        <activity
+            android:name="com.akadasoftware.danceworksonline.Enroll"
+            android:label="@string/title_activity_enroll">
 
+            <intent-filter>
+                <action android:name="com.akadasoftware.danceworksonline.Enroll" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
