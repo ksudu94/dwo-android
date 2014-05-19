@@ -214,7 +214,7 @@ public class EnterPaymentFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (tvChangeAmount.getText().toString().trim().length() > 0) {
-                    Float floatAmount = Float.parseFloat(tvChangeAmount.getText().toString());
+                    Float floatAmount = Float.parseFloat(tvChangeAmount.getText().toString().replace("$", ""));
                     if (floatAmount == 0) {
                         Toast toast = Toast.makeText(getActivity(), "Cannot enter a payment with an amount of $0 ",
                                 Toast.LENGTH_LONG);
@@ -319,7 +319,7 @@ public class EnterPaymentFragment extends Fragment {
                                 Kind = "V";
                                 break;
                         }
-                        CCard = oAccount.CCTrail.substring(oAccount.CCTrail.length() - 4);
+                        CCard = oAccount.CCTrail;
                         CCExpire = String.valueOf(oAccount.CCExpire);
                         consentID = oAccount.CCConsentID;
                         break;
@@ -398,7 +398,7 @@ public class EnterPaymentFragment extends Fragment {
             acctID = oAccount.AcctID;
             PDesc = etDescription.getText().toString();
 
-            floAmount = Float.valueOf(tvChangeAmount.getText().toString());
+            floAmount = Float.valueOf(tvChangeAmount.getText().toString().replace("$", ""));
             FName = oAccount.CCFName;
             LName = oAccount.CCLName;
             Address = oAccount.CCAddress;

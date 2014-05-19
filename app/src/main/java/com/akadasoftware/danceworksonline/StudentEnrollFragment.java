@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Spinner;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
@@ -56,6 +57,19 @@ public class StudentEnrollFragment extends ListFragment {
 
     Spinner sessionStudentEnrollSpinner;
     private StudentClassAdapter classAdapter;
+
+    private onEnrollDialog dialogListener;
+
+
+    public interface onEnrollDialog {
+
+        public void onEnrollDialog(StudentEnrollFragment objStudentEnroll);
+    }
+
+    public interface OnStudentEnrollListener {
+
+        public void onStudentEnrollInteraction(String id);
+    }
 
     public StudentEnrollFragment() {
     }
@@ -121,6 +135,13 @@ public class StudentEnrollFragment extends ListFragment {
             throw new ClassCastException(activity.toString()
                     + " must implement onStudentEnrollInteraction");
         }
+
+        try {
+            dialogListener = (onEnrollDialog) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement onEnrollDialog");
+        }
     }
 
     @Override
@@ -129,20 +150,16 @@ public class StudentEnrollFragment extends ListFragment {
         enrollListener = null;
     }
 
-    public interface OnStudentEnrollListener {
 
-        public void onStudentEnrollInteraction(String id);
-    }
+    /**
+     * Creates a new instance of the AccountTransaction = to the position of the listview
+     */
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        // Notify the parent activity of selected item
+        super.onListItemClick(l, v, position, id);
+        StudentEnrollFragment oStudentEnroll = (StudentEnrollFragment) this.getListAdapter().getItem(position);
+        dialogListener.onEnrollDialog(oStudentEnroll);
 
-    public void onBackPressed() {
-        // Catch back action and pops from backstack
-        // (if you called previously to addToBackStack() in your transaction)
-        if (getFragmentManager().getBackStackEntryCount() > 0) {
-            getFragmentManager().popBackStack();
-        }
-        // Default action on back pressed
-        else
-            return;
     }
 
     //Asycn task to get the ChgDesc field to be used to populate the spinner

@@ -181,7 +181,8 @@ public class AccountTransactionsFragment extends ListFragment {
         setListAdapter(null);
     }
 
-    /* Creates a new instance of the AccountTransaction = to the position of the listview
+    /**
+     *  Creates a new instance of the AccountTransaction = to the position of the listview
      */
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Notify the parent activity of selected item

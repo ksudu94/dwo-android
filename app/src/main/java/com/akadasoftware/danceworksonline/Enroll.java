@@ -2,12 +2,15 @@ package com.akadasoftware.danceworksonline;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
 public class Enroll extends FragmentActivity implements
-        StudentEnrollFragment.OnStudentEnrollListener {
+        StudentEnrollFragment.OnStudentEnrollListener,
+        StudentEnrollFragment.onEnrollDialog,
+        EnrollDialog.EnrollDialogListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,4 +47,21 @@ public class Enroll extends FragmentActivity implements
     public void onStudentEnrollInteraction(String id) {
 
     }
+
+    @Override
+    public void onEnrollDialog(StudentEnrollFragment objStudentEnroll) {
+        FragmentManager fm = getSupportFragmentManager();
+        EnrollDialog enrollDialog = new EnrollDialog();
+
+        //getIntent().putExtra("Class", objStudentEnroll);
+        //Just the name of the dialog. Has no effect on it.
+        enrollDialog.show(fm, "");
+    }
+
+    @Override
+    public void onEnrollDialogPositiveClick() {
+
+    }
+
+
 }

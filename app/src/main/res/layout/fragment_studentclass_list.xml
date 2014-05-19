@@ -25,11 +25,6 @@
             android:dividerHeight="2px"
             android:layout_below="@+id/sessionStudentClassesSpinner" />
 
-        <Button
-            android:layout_width="75dp"
-            android:layout_height="40dp"
-            android:text="Cancel" />
-
         <TextView
             android:id="@android:id/empty"
             android:text="Student not currently enrolled in classes."
