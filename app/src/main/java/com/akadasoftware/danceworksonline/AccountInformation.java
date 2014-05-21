@@ -341,6 +341,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
 
         int position = getActionBar().getSelectedTab().getPosition();
 
+
         if (position == 3) {
             EnterPaymentFragment pf = (EnterPaymentFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 3);
             pf.tvChangeAmount.setText(inputText);

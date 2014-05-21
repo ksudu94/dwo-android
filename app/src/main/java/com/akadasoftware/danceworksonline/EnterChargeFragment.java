@@ -202,7 +202,7 @@ public class EnterChargeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (tvChangeAmount.getText().toString().trim().length() > 0) {
-                    Float floatAmount = Float.parseFloat(tvChangeAmount.getText().toString());
+                    Float floatAmount = Float.parseFloat(tvChangeAmount.getText().toString().substring(1, tvChangeAmount.length()));
                     if (floatAmount == 0) {
                         Toast toast = Toast.makeText(getActivity(), "Cannot enter a charge with an amount of $0 ",
                                 Toast.LENGTH_LONG);
@@ -239,7 +239,7 @@ public class EnterChargeFragment extends Fragment {
                             Toast.LENGTH_LONG);
                     toast.show();
                 } else
-                    mListener.onEditAmountDialog(tvChangeAmount.getText().toString());
+                    mListener.onEditAmountDialog(tvChangeAmount.getText().toString().substring(1, tvChangeAmount.length()));
             }
         });
 
@@ -403,7 +403,7 @@ public class EnterChargeFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 setSelectedCharge(ChargeCodeSpinner);
 
-                if (!tvChangeAmount.getText().toString().equals("0.00")) {
+                if (!tvChangeAmount.getText().toString().equals("$0.00")) {
                     runChargeAmountAsync();
                 }
 
@@ -433,15 +433,15 @@ public class EnterChargeFragment extends Fragment {
 
 
         if (oChargeCodes.ChgID == 0) {
-            tvChangeAmount.setText("0.00");
+            tvChangeAmount.setText("$0.00");
             etDescription.setText("");
 
         } else if (oChargeCodes.Kind.equals("T") && Integer.parseInt(oChargeCodes.ChgNo) < 4) {
 
-            tvChangeAmount.setText(String.valueOf(oAccount.MTuition));
+            tvChangeAmount.setText("$" + String.valueOf(oAccount.MTuition));
             etDescription.setText(oChargeCodes.ChgDesc);
         } else {
-            tvChangeAmount.setText(String.valueOf(oChargeCodes.Amount));
+            tvChangeAmount.setText("$" + String.valueOf(oChargeCodes.Amount));
             etDescription.setText(oChargeCodes.ChgDesc);
         }
     }
@@ -465,7 +465,7 @@ public class EnterChargeFragment extends Fragment {
 
             float ST1Rate = _appPrefs.getST1Rate();
             float ST2Rate = _appPrefs.getST2Rate();
-            newCodes = getChargeAmount(userID, userGUID, oChargeCodes.ChgID, oAccount.AcctID, oAccount.BillingFreq, Float.parseFloat(tvChangeAmount.getText().toString()),
+            newCodes = getChargeAmount(userID, userGUID, oChargeCodes.ChgID, oAccount.AcctID, oAccount.BillingFreq, Float.parseFloat(tvChangeAmount.getText().toString().substring(1, tvChangeAmount.length())),
                     oAccount.TuitionSel, oAccount.AccountFeeAmount, ST1Rate, ST2Rate);
             return RetrieveChargeCodeFromSoap(newCodes);
 
@@ -476,7 +476,7 @@ public class EnterChargeFragment extends Fragment {
         protected void onPostExecute(Float[] result) {
 
             NumberFormat format = NumberFormat.getCurrencyInstance();
-            floatAmount = Float.parseFloat(tvChangeAmount.getText().toString());
+            floatAmount = Float.parseFloat(tvChangeAmount.getText().toString().substring(1, tvChangeAmount.length()));
             floatDiscAmount = result[0];
             floatSTax1 = result[1];
             floatSTax2 = result[2];

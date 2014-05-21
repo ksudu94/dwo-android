@@ -15,7 +15,7 @@ import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.Globals.Data;
 import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
-import com.akadasoftware.danceworksonline.classes.StudentClass;
+import com.akadasoftware.danceworksonline.classes.StudentClasses;
 import com.akadasoftware.danceworksonline.classes.User;
 
 import org.ksoap2.SoapEnvelope;
@@ -46,7 +46,7 @@ public class StudentClassFragment extends ListFragment {
     ArrayList<Session> sessionArrayList = new ArrayList<Session>();
     SessionAdapter sessionAdapter;
 
-    ArrayList<StudentClass> studentClassArray = new ArrayList<StudentClass>();
+    ArrayList<StudentClasses> studentClassesArray = new ArrayList<StudentClasses>();
     ArrayList<Student> Students = new ArrayList<Student>();
 
 
@@ -210,26 +210,26 @@ public class StudentClassFragment extends ListFragment {
 
 
     public class getStudentClassesAsync extends
-            AsyncTask<Data, Void, ArrayList<StudentClass>> {
+            AsyncTask<Data, Void, ArrayList<StudentClasses>> {
 
         @Override
-        protected ArrayList<StudentClass> doInBackground(Data... data) {
+        protected ArrayList<StudentClasses> doInBackground(Data... data) {
 
             return getClasses();
         }
 
-        protected void onPostExecute(ArrayList<StudentClass> result) {
+        protected void onPostExecute(ArrayList<StudentClasses> result) {
 
-            studentClassArray = result;
+            studentClassesArray = result;
             classAdapter = new StudentClassAdapter(getActivity(),
-                    R.layout.item_studentclass, studentClassArray);
+                    R.layout.item_studentclass, studentClassesArray);
             setListAdapter(classAdapter);
             classAdapter.setNotifyOnChange(true);
 
         }
     }
 
-    public ArrayList<StudentClass> getClasses() {
+    public ArrayList<StudentClasses> getClasses() {
         String MethodName = "getStuClasses";
         SoapObject response = InvokeMethod(Data.URL, MethodName);
         return RetrieveFromSoap(response);
@@ -283,8 +283,8 @@ public class StudentClassFragment extends ListFragment {
                                       String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
         try {
-            envelope.addMapping(Data.NAMESPACE, "StudentClass",
-                    new StudentClass().getClass());
+            envelope.addMapping(Data.NAMESPACE, "StudentClasses",
+                    new StudentClasses().getClass());
             HttpTransport.call("getStuClasses", envelope);
             envelopeOutput = envelope;
             SoapObject response = (SoapObject) envelope.getResponse();
@@ -297,14 +297,14 @@ public class StudentClassFragment extends ListFragment {
         return null;
     }
 
-    public static ArrayList<StudentClass> RetrieveFromSoap(SoapObject soap) {
+    public static ArrayList<StudentClasses> RetrieveFromSoap(SoapObject soap) {
 
-        ArrayList<StudentClass> stuClassesArray = new ArrayList<StudentClass>();
+        ArrayList<StudentClasses> stuClassesArray = new ArrayList<StudentClasses>();
         for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
 
             SoapObject classItem = (SoapObject) soap.getProperty(i);
 
-            StudentClass classes = new StudentClass();
+            StudentClasses classes = new StudentClasses();
             for (int j = 0; j < classItem.getPropertyCount() - 1; j++) {
                 classes.setProperty(j, classItem.getProperty(j)
                         .toString());

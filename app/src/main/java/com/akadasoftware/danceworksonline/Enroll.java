@@ -6,6 +6,9 @@ import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.akadasoftware.danceworksonline.classes.Student;
+import com.google.gson.Gson;
+
 
 public class Enroll extends FragmentActivity implements
         StudentEnrollFragment.OnStudentEnrollListener,
@@ -49,11 +52,20 @@ public class Enroll extends FragmentActivity implements
     }
 
     @Override
-    public void onEnrollDialog(StudentEnrollFragment objStudentEnroll) {
+    public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent) {
         FragmentManager fm = getSupportFragmentManager();
         EnrollDialog enrollDialog = new EnrollDialog();
 
-        //getIntent().putExtra("Class", objStudentEnroll);
+        SchoolClasses[] arraySchoolClasses = new SchoolClasses[1];
+        arraySchoolClasses[0] = objSchoolClass;
+
+        Gson gson = new Gson();
+        String strJsonSchoolClasses = gson.toJson(arraySchoolClasses);
+
+        getIntent().putExtra("SchoolClasses", strJsonSchoolClasses);
+        getIntent().putExtra("StuID", oStudent.StuID);
+
+
         //Just the name of the dialog. Has no effect on it.
         enrollDialog.show(fm, "");
     }

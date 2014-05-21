@@ -73,24 +73,22 @@ public class SessionAdapter extends ArrayAdapter<Session> {
         ViewHolder holder = null;
 
 
-        // Inflate the view
-        if (convertView == null) {
+        /**
+         * WE took out the if statement cause it caused the thign to break for some reason.?
+         */
 
-            String inflater = Context.LAYOUT_INFLATER_SERVICE;
-            LayoutInflater vi;
-            vi = (LayoutInflater) getContext().getSystemService(inflater);
-            convertView = vi.inflate(R.layout.sessions, null);
 
-            holder = new ViewHolder();
+        String inflater = Context.LAYOUT_INFLATER_SERVICE;
+        LayoutInflater vi;
+        vi = (LayoutInflater) getContext().getSystemService(inflater);
+        convertView = vi.inflate(R.layout.sessions, null);
 
-            holder.tvSessions = (TextView) convertView
-                    .findViewById(R.id.tvSessions);
+        holder = new ViewHolder();
 
-            convertView.setTag(holder);
+        holder.tvSessions = (TextView) convertView
+                .findViewById(R.id.tvSessions);
 
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
+        convertView.setTag(holder);
 
         Session oSessions = Sessions.get(position);
 

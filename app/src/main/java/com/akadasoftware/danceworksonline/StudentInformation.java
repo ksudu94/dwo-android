@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Student;
 
 import java.util.Locale;
 
@@ -23,7 +24,8 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
         StudentClassFragment.OnStudentClassListener,
         StudentWaitListFragment.OnWaitListListener,
         StudentAttendanceFragment.OnAttendanceInteractionListener,
-        StudentEnrollFragment.OnStudentEnrollListener {
+        StudentEnrollFragment.OnStudentEnrollListener,
+        StudentEnrollFragment.onEnrollDialog {
 
     ViewPager mViewPager;
     private AppPreferences _appPrefs;
@@ -163,7 +165,7 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
                     newFragment = StudentAttendanceFragment.newInstance(listPosition);
                     break;
                 default:
-                    newFragment = StudentEnrollFragment.newInstance(listPosition);
+                    newFragment = StudentInformationFragment.newInstance(listPosition);
                     break;
             }
 
@@ -188,14 +190,23 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
                     return getString(R.string.title_student_waitlist).toUpperCase(l);
                 case 3:
                     return getString(R.string.title_student_Attendance).toUpperCase(l);
-                case 4:
-                    return getString(R.string.title_student_enroll).toUpperCase(l);
+                /**
+                 * case 4:
+                 return getString(R.string.title_student_enroll).toUpperCase(l);
+                 */
+
                 default:
                     return "";
             }
         }
     }
 
+
+    /**
+     * Eventually these will be overriden when we decide we want to expand on future options if they
+     * say click a list item or something.
+     */
+    @Override
     public void onStudentClassInteraction(String id) {
     }
 
@@ -212,6 +223,15 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
     @Override
     public void onStudentEnrollInteraction(String id) {
 
+    }
+
+    @Override
+    public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent) {
+
+        /**
+         * Don't really need this here. It is handled ona button click that starts a whole new activity
+         * and thats where the interface really needs to be implemented...
+         */
     }
 
 }

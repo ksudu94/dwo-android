@@ -10,22 +10,21 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.StudentClasses;
 
 import java.util.List;
 
 /**
- * Created by Kyle on 4/9/2014.
+ * Created by Kyle on 5/21/2014.
  */
-public class StudentClassAdapter extends ArrayAdapter<StudentClasses> {
+public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
 
     private AppPreferences _appPrefs;
     Activity activity;
     int resource;
     //Context newContext;
-    List<StudentClasses> Classes;
+    List<SchoolClasses> Classes;
 
-    public StudentClassAdapter(Context context, int resource, List<StudentClasses> items) {
+    public SchoolClassAdapter(Context context, int resource, List<SchoolClasses> items) {
         super(context, resource, items);
         //newContext = context;
         this.resource = resource;
@@ -94,56 +93,56 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClasses> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        StudentClasses oStudentClasses = Classes.get(position);
+        SchoolClasses oSchoolClasses = Classes.get(position);
         String Day = "";
-        holder.tvClassType.setText(oStudentClasses.ClType);
+        holder.tvClassType.setText(oSchoolClasses.ClType);
         holder.tvClassType.setTag(position);
 
 
-        holder.tvClassLevel.setText(" - " + oStudentClasses.ClLevel + " - ");
-        holder.tvDescription.setText(oStudentClasses.ClDescription);
-        holder.tvInstructor.setText(oStudentClasses.ClInstructor);
+        holder.tvClassLevel.setText(" - " + oSchoolClasses.ClLevel + " - ");
+        holder.tvDescription.setText(oSchoolClasses.ClDescription);
+        holder.tvInstructor.setText(oSchoolClasses.ClInstructor);
 
-        if (oStudentClasses.MultiDay) {
-            if (oStudentClasses.Monday) {
+        if (oSchoolClasses.MultiDay) {
+            if (oSchoolClasses.Monday) {
                 Day = "Mon";
             }
-            if (oStudentClasses.Tuesday) {
+            if (oSchoolClasses.Tuesday) {
                 if (Day.isEmpty()) {
                     Day = "Tue";
                 } else {
                     Day = Day + "/Tue";
                 }
             }
-            if (oStudentClasses.Wednesday) {
+            if (oSchoolClasses.Wednesday) {
                 if (Day.isEmpty()) {
                     Day = "Wed";
                 } else {
                     Day = Day + "/Wed";
                 }
             }
-            if (oStudentClasses.Thursday) {
+            if (oSchoolClasses.Thursday) {
                 if (Day.isEmpty()) {
                     Day = "Thu";
                 } else {
                     Day = Day + "/Thu";
                 }
             }
-            if (oStudentClasses.Friday) {
+            if (oSchoolClasses.Friday) {
                 if (Day.isEmpty()) {
                     Day = "Fri";
                 } else {
                     Day = Day + "/Fri";
                 }
             }
-            if (oStudentClasses.Saturday) {
+            if (oSchoolClasses.Saturday) {
                 if (Day.isEmpty()) {
                     Day = "Sat";
                 } else {
                     Day = Day + "/Sat";
                 }
             }
-            if (oStudentClasses.Sunday) {
+            if (oSchoolClasses.Sunday) {
                 if (Day.isEmpty()) {
                     Day = "Sun";
                 } else {
@@ -151,12 +150,12 @@ public class StudentClassAdapter extends ArrayAdapter<StudentClasses> {
                 }
             }
         } else {
-            Day = oStudentClasses.ClDay;
+            Day = oSchoolClasses.ClDay;
         }
         holder.tvDay.setText(Day + " from ");
-        holder.tvStart.setText(oStudentClasses.ClStart + " - ");
-        holder.tvStop.setText(oStudentClasses.ClStop);
-        holder.tvRoom.setText(oStudentClasses.ClRoom);
+        holder.tvStart.setText(oSchoolClasses.ClStart + " - ");
+        holder.tvStop.setText(oSchoolClasses.ClStop);
+        holder.tvRoom.setText(oSchoolClasses.ClRoom);
 
         return convertView;
 

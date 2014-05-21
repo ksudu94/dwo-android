@@ -17,7 +17,7 @@ import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
-import com.akadasoftware.danceworksonline.classes.StudentClass;
+import com.akadasoftware.danceworksonline.classes.StudentClasses;
 import com.akadasoftware.danceworksonline.classes.User;
 
 import org.ksoap2.SoapEnvelope;
@@ -48,7 +48,7 @@ public class StudentEnrollFragment extends ListFragment {
 
     private OnStudentEnrollListener enrollListener;
 
-    ArrayList<StudentClass> studentClassArray = new ArrayList<StudentClass>();
+    ArrayList<SchoolClasses> schoolClassesArray = new ArrayList<SchoolClasses>();
     ArrayList<Student> Students = new ArrayList<Student>();
 
     ArrayList<Student> studentsArray = new ArrayList<Student>();
@@ -56,14 +56,14 @@ public class StudentEnrollFragment extends ListFragment {
     SessionAdapter sessionAdapter;
 
     Spinner sessionStudentEnrollSpinner;
-    private StudentClassAdapter classAdapter;
+    private SchoolClassAdapter classAdapter;
 
     private onEnrollDialog dialogListener;
 
 
     public interface onEnrollDialog {
 
-        public void onEnrollDialog(StudentEnrollFragment objStudentEnroll);
+        public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent);
     }
 
     public interface OnStudentEnrollListener {
@@ -152,13 +152,13 @@ public class StudentEnrollFragment extends ListFragment {
 
 
     /**
-     * Creates a new instance of the AccountTransaction = to the position of the listview
+     * Creates a new instance
      */
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Notify the parent activity of selected item
         super.onListItemClick(l, v, position, id);
-        StudentEnrollFragment oStudentEnroll = (StudentEnrollFragment) this.getListAdapter().getItem(position);
-        dialogListener.onEnrollDialog(oStudentEnroll);
+        SchoolClasses oSchoolClass = (SchoolClasses) this.getListAdapter().getItem(position);
+        dialogListener.onEnrollDialog(oSchoolClass, oStudent);
 
     }
 
@@ -188,7 +188,7 @@ public class StudentEnrollFragment extends ListFragment {
     public void addItemsOnSpinner(ArrayList<Session> sess) {
 
         sessionAdapter = new SessionAdapter(activity,
-                R.layout.fragment_studentclass_list, sess);
+                R.layout.fragment_studentenroll, sess);
 
         sessionStudentEnrollSpinner.setAdapter(sessionAdapter);
 
@@ -219,27 +219,27 @@ public class StudentEnrollFragment extends ListFragment {
     }
 
     public class getStudentClassesAsync extends
-            AsyncTask<Globals.Data, Void, ArrayList<StudentClass>> {
+            AsyncTask<Globals.Data, Void, ArrayList<SchoolClasses>> {
 
         @Override
-        protected ArrayList<StudentClass> doInBackground(Globals.Data... data) {
+        protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
 
             return getClasses();
         }
 
-        protected void onPostExecute(ArrayList<StudentClass> result) {
+        protected void onPostExecute(ArrayList<SchoolClasses> result) {
 
-            studentClassArray = result;
-            classAdapter = new StudentClassAdapter(getActivity(),
-                    R.layout.item_studentclass, studentClassArray);
+            schoolClassesArray = result;
+            classAdapter = new SchoolClassAdapter(getActivity(),
+                    R.layout.item_studentclass, schoolClassesArray);
             setListAdapter(classAdapter);
             classAdapter.setNotifyOnChange(true);
 
         }
     }
 
-    public ArrayList<StudentClass> getClasses() {
-        String MethodName = "getStuClasses";
+    public ArrayList<SchoolClasses> getClasses() {
+        String MethodName = "getSchoolClasses";
         SoapObject response = InvokeMethod(Globals.Data.URL, MethodName);
         return RetrieveFromSoap(response);
 
@@ -261,20 +261,21 @@ public class StudentEnrollFragment extends ListFragment {
         piUserGUID.setValue(oUser.UserGUID);
         request.addProperty(piUserGUID);
 
-        PropertyInfo piStuID = new PropertyInfo();
-        piStuID.setName("StuID");
-        piStuID.setValue(oStudent.StuID);
-        request.addProperty(piStuID);
-
         PropertyInfo piSessionID = new PropertyInfo();
-        piSessionID.setName("SessionID");
+        piSessionID.setName("intSessionID");
         piSessionID.setValue(SessionID);
         request.addProperty(piSessionID);
 
-        PropertyInfo piOLReg = new PropertyInfo();
-        piOLReg.setName("OLReg");
-        piOLReg.setValue(false);
-        request.addProperty(piOLReg);
+        PropertyInfo piBoolEnroll = new PropertyInfo();
+        piBoolEnroll.setName("boolEnroll");
+        piBoolEnroll.setValue(true);
+        request.addProperty(piBoolEnroll);
+
+        PropertyInfo piStuID = new PropertyInfo();
+        piStuID.setName("intStuID");
+        piStuID.setValue(oStudent.StuID);
+        request.addProperty(piStuID);
+
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
@@ -292,9 +293,9 @@ public class StudentEnrollFragment extends ListFragment {
                                       String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
         try {
-            envelope.addMapping(Globals.Data.NAMESPACE, "StudentClass",
-                    new StudentClass().getClass());
-            HttpTransport.call("getStuClasses", envelope);
+            envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",
+                    new StudentClasses().getClass());
+            HttpTransport.call("getSchoolClasses", envelope);
             envelopeOutput = envelope;
             SoapObject response = (SoapObject) envelope.getResponse();
 
@@ -306,14 +307,14 @@ public class StudentEnrollFragment extends ListFragment {
         return null;
     }
 
-    public static ArrayList<StudentClass> RetrieveFromSoap(SoapObject soap) {
+    public static ArrayList<SchoolClasses> RetrieveFromSoap(SoapObject soap) {
 
-        ArrayList<StudentClass> stuClassesArray = new ArrayList<StudentClass>();
+        ArrayList<SchoolClasses> schClassesArray = new ArrayList<SchoolClasses>();
         for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
 
             SoapObject classItem = (SoapObject) soap.getProperty(i);
 
-            StudentClass classes = new StudentClass();
+            SchoolClasses classes = new SchoolClasses();
             for (int j = 0; j < classItem.getPropertyCount() - 1; j++) {
                 classes.setProperty(j, classItem.getProperty(j)
                         .toString());
@@ -322,10 +323,10 @@ public class StudentEnrollFragment extends ListFragment {
                 }
 
             }
-            stuClassesArray.add(i, classes);
+            schClassesArray.add(i, classes);
         }
 
-        return stuClassesArray;
+        return schClassesArray;
     }
 
 }

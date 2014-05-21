@@ -8,7 +8,7 @@ import java.util.Hashtable;
 /**
  * Created by Kyle on 4/9/2014.
  */
-public class StudentClass implements KvmSerializable {
+public class StudentClasses implements KvmSerializable {
 
     public int ClID, Length, ClTchID, ClLAge, ClUAge, ClCur, ClMax;
 
@@ -18,15 +18,15 @@ public class StudentClass implements KvmSerializable {
 
     public String ClType, ClLevel, ClRoom, ClDay, ClDescription, ClStart, ClStop, ClInstructor, ClKey, ClWait;
 
-    public StudentClass() {
+    public StudentClasses() {
     }
 
-    public StudentClass(int clid, String cltype, String cllevel, String clroom, String clday,
-                        String cldescription, String clstart, String clstop, String clinstructor,
-                        float tuition, Boolean recital, Boolean edit, int length, int cltchid, Boolean multiday,
-                        Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday,
-                        Boolean saturday, Boolean sunday, int cllage, int cluage, String clkey, int clcur, int clmax,
-                        String clwait, float discount) {
+    public StudentClasses(int clid, String cltype, String cllevel, String clroom, String clday,
+                          String cldescription, String clstart, String clstop, String clinstructor,
+                          float tuition, Boolean recital, Boolean edit, int length, int cltchid, Boolean multiday,
+                          Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday,
+                          Boolean saturday, Boolean sunday, int cllage, int cluage, String clkey, int clcur, int clmax,
+                          String clwait, float discount) {
 
         clid = ClID;
         cltype = ClType;

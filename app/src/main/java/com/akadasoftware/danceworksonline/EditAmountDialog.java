@@ -10,6 +10,8 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.text.NumberFormat;
 // ...
 
 public class EditAmountDialog extends DialogFragment implements TextView.OnEditorActionListener {
@@ -34,6 +36,7 @@ public class EditAmountDialog extends DialogFragment implements TextView.OnEdito
         tvAmount = (TextView) view.findViewById(R.id.tvAmount);
         etAmount = (EditText) view.findViewById(R.id.etAmount);
 
+        NumberFormat format = NumberFormat.getCurrencyInstance();
         /**
          * Automatically displays the keyboard when the dialog pops up
          */
@@ -47,7 +50,7 @@ public class EditAmountDialog extends DialogFragment implements TextView.OnEdito
         });
 
         String strInput = getArguments().getString("Input");
-        etAmount.setText(strInput);
+        etAmount.setText(String.valueOf(format.format(strInput)));
         getDialog().setTitle("Enter Amount");
         etAmount.setOnEditorActionListener(this);
         return view;
