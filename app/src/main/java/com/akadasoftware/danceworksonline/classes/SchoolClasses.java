@@ -1,4 +1,4 @@
-package com.akadasoftware.danceworksonline;
+package com.akadasoftware.danceworksonline.classes;
 
 
 import org.ksoap2.serialization.KvmSerializable;
@@ -11,7 +11,8 @@ import java.util.Hashtable;
  */
 public class SchoolClasses implements KvmSerializable {
 
-    public int ClID, ClLength, ClTchID, ClLAge, ClUAge, ClCur, ClMax, EnrollmentStatus, WaitID, ClRID;
+    public int ClID, ClLength, ClTchID, ClLAge, ClUAge, ClCur, ClMax, EnrollmentStatus, WaitID, ClRID,
+    ClDayNo;
 
     public float ClTuition;
 
@@ -29,7 +30,7 @@ public class SchoolClasses implements KvmSerializable {
                          String clinstructor, float cltuition, int cllength, int cltchid, Boolean multiday,
                          Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday,
                          Boolean saturday, Boolean sunday, int cllage, int cluage, String clkey, int clcur, int clmax,
-                         String clwait, int enrollmentstatus, int waitid, int clrid) {
+                         String clwait, int enrollmentstatus, int waitid, int clrid, int cldayno) {
 
         clid = ClID;
         cltype = ClType;
@@ -61,6 +62,7 @@ public class SchoolClasses implements KvmSerializable {
         enrollmentstatus = EnrollmentStatus;
         waitid = WaitID;
         clrid = ClRID;
+        cldayno = ClDayNo;
 
     }
 
@@ -128,6 +130,8 @@ public class SchoolClasses implements KvmSerializable {
                 return WaitID;
             case 29:
                 return ClRID;
+            case 30:
+                return ClDayNo;
         }
 
 
@@ -137,7 +141,7 @@ public class SchoolClasses implements KvmSerializable {
     @Override
     public int getPropertyCount() {
         // TODO Auto-generated method stub
-        return 30;
+        return 31;
     }
 
     @Override
@@ -261,6 +265,10 @@ public class SchoolClasses implements KvmSerializable {
             case 29:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "ClRID";
+                break;
+            case 30:
+                info.type = PropertyInfo.INTEGER_CLASS;
+                info.name = "ClDayNo";
                 break;
             default:
                 break;
@@ -403,6 +411,9 @@ public class SchoolClasses implements KvmSerializable {
                 break;
             case 29:
                 ClRID = Integer.parseInt(value.toString());
+                break;
+            case 30:
+                ClDayNo = Integer.parseInt(value.toString());
                 break;
             default:
                 break;

@@ -240,6 +240,12 @@ public class NavigationDrawerFragment extends Fragment {
                 transaction.addToBackStack(null);
                 transaction.commit();
                 break;
+            case 2:
+                newFragment = new ClassesListFragment();
+                transaction.replace(R.id.container, newFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+                break;
         }
 
         /**

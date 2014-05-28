@@ -15,6 +15,7 @@ import android.widget.Spinner;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.StudentClasses;
@@ -40,6 +41,7 @@ public class StudentEnrollFragment extends ListFragment {
     Activity activity;
     Student oStudent;
     User oUser;
+    SchoolClasses oSchoolClass;
     Session session;
     int SessionID, position;
     Globals oGlobal;
@@ -157,7 +159,7 @@ public class StudentEnrollFragment extends ListFragment {
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Notify the parent activity of selected item
         super.onListItemClick(l, v, position, id);
-        SchoolClasses oSchoolClass = (SchoolClasses) this.getListAdapter().getItem(position);
+        oSchoolClass = (SchoolClasses) this.getListAdapter().getItem(position);
         dialogListener.onEnrollDialog(oSchoolClass, oStudent);
 
     }
@@ -218,10 +220,11 @@ public class StudentEnrollFragment extends ListFragment {
 
     }
 
+
     public class getStudentClassesAsync extends
             AsyncTask<Globals.Data, Void, ArrayList<SchoolClasses>> {
 
-        @Override
+              @Override
         protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
 
             return getClasses();
