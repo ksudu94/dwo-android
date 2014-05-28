@@ -12,7 +12,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.SchoolClasses;
@@ -29,9 +28,7 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 
-public class ClassesListFragment extends ListFragment  {
-
-
+public class ClassesListFragment extends ListFragment {
 
 
     Globals oGlobal;
@@ -72,7 +69,7 @@ public class ClassesListFragment extends ListFragment  {
     public static ClassesListFragment newInstance(int position) {
         ClassesListFragment fragment = new ClassesListFragment();
         Bundle args = new Bundle();
-        args.putInt("Position",position);
+        args.putInt("Position", position);
         fragment.setArguments(args);
         return fragment;
     }
@@ -116,7 +113,7 @@ public class ClassesListFragment extends ListFragment  {
             classListener = (OnClassesInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                + " must implement OnClassesInteractionListener");
+                    + " must implement OnClassesInteractionListener");
         }
     }
 
@@ -135,6 +132,7 @@ public class ClassesListFragment extends ListFragment  {
         getSessions.execute();
 
     }
+
     /**
      * Creates a new instance
      */
@@ -142,25 +140,20 @@ public class ClassesListFragment extends ListFragment  {
         // Notify the parent activity of selected item
         super.onListItemClick(l, v, position, id);
         oSchoolClass = (SchoolClasses) this.getListAdapter().getItem(position);
-        String test = oSchoolClass.ClDay;
-
-        checkClassConflicks checkConflicks = new checkClassConflicks();
-        checkConflicks.execute();
-
 
 
     }
 
     /**
-    * This interface must be implemented by activities that contain this
-    * fragment to allow an interaction in this fragment to be communicated
-    * to the activity and potentially other fragments contained in that
-    * activity.
-    * <p>
-    * See the Android Training lesson <a href=
-    * "http://developer.android.com/training/basics/fragments/communicating.html"
-    * >Communicating with Other Fragments</a> for more information.
-    */
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
     public interface OnClassesInteractionListener {
         // TODO: Update argument type and name
         public void onClassesInteraction(String id);
@@ -341,170 +334,4 @@ public class ClassesListFragment extends ListFragment  {
     }
 
 
-
-    public class checkClassConflicks extends AsyncTask<Globals.Data, Void, ArrayList<String>>
-    {
-        @Override
-        protected ArrayList<String> doInBackground(Globals.Data... data) {
-
-            return CheckConflicks();
-        }
-
-        protected void onPostExecute(ArrayList<String> result) {
-
-            conflicksArray = result;
-
-
-        }
-    }
-
-    public ArrayList<String> CheckConflicks() {
-        String MethodName = "checkClassEnrollment";
-        SoapObject response = InvokeEnrollmentMethod(Globals.Data.URL, MethodName);
-        return RetrieveConflicksFromSoap(response);
-
-    }
-
-    public static SoapObject MakeConflickCall(String URL,
-                                      SoapSerializationEnvelope envelope, String NAMESPACE,
-                                      String METHOD_NAME) {
-        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
-        try {
-            envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",
-                    new StudentClasses().getClass());
-            HttpTransport.call("getSchoolClasses", envelope);
-            envelopeOutput = envelope;
-            SoapObject response = (SoapObject) envelope.getResponse();
-
-            return response;
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
-        return null;
-    }
-
-    public SoapObject InvokeEnrollmentMethod(String URL, String MethodName) {
-
-        SoapObject request = GetSoapObject(MethodName);
-
-        PropertyInfo piUserID = new PropertyInfo();
-        piUserID.setName("UserID");
-        piUserID.setValue(oUser.UserID);
-        request.addProperty(piUserID);
-
-        PropertyInfo piUserGUID = new PropertyInfo();
-        piUserGUID.setType("STRING_CLASS");
-        piUserGUID.setName("UserGUID");
-        piUserGUID.setValue(oUser.UserGUID);
-        request.addProperty(piUserGUID);
-
-        PropertyInfo piClMax = new PropertyInfo();
-        piClMax.setName("intClMax");
-        piClMax.setValue(oSchoolClass.ClMax);
-        request.addProperty(piClMax);
-
-        PropertyInfo piClCur = new PropertyInfo();
-        piClCur.setName("intClCur");
-        piClCur.setValue(oSchoolClass.ClCur);
-        request.addProperty(piClCur);
-
-        PropertyInfo piClTime = new PropertyInfo();
-        piClTime.setName("strClTime");
-        piClTime.setValue(oSchoolClass.ClTime);
-        request.addProperty(piClTime);
-
-        PropertyInfo piClStop = new PropertyInfo();
-        piClStop.setName("strClStop");
-        piClStop.setValue(oSchoolClass.ClStop);
-        request.addProperty(piClStop);
-
-        PropertyInfo piMultiDay = new PropertyInfo();
-        piMultiDay.setName("boolMultiDay");
-        piMultiDay.setValue(oSchoolClass.MultiDay);
-        request.addProperty(piMultiDay);
-
-        PropertyInfo piMonday = new PropertyInfo();
-        piMonday.setName("boolMonday");
-        piMonday.setValue(oSchoolClass.Monday);
-        request.addProperty(piMonday);
-
-        PropertyInfo piTuesday = new PropertyInfo();
-        piTuesday.setName("boolTuesday");
-        piTuesday.setValue(oSchoolClass.Tuesday);
-        request.addProperty(piTuesday);
-
-        PropertyInfo piWednesday = new PropertyInfo();
-        piWednesday.setName("boolWednesday");
-        piWednesday.setValue(oSchoolClass.Wednesday);
-        request.addProperty(piWednesday);
-
-        PropertyInfo piThursday = new PropertyInfo();
-        piThursday.setName("boolThursday");
-        piThursday.setValue(oSchoolClass.Thursday);
-        request.addProperty(piThursday);
-
-        PropertyInfo piFriday = new PropertyInfo();
-        piFriday.setName("boolFriday");
-        piFriday.setValue(oSchoolClass.Friday);
-        request.addProperty(piFriday);
-
-        PropertyInfo piSaturday = new PropertyInfo();
-        piSaturday.setName("boolSaturday");
-        piSaturday.setValue(oSchoolClass.Saturday);
-        request.addProperty(piSaturday);
-
-        PropertyInfo piSunday = new PropertyInfo();
-        piSunday.setName("boolSunday");
-        piSunday.setValue(oSchoolClass.Sunday);
-        request.addProperty(piSunday);
-
-        PropertyInfo piClDayNo = new PropertyInfo();
-        piClDayNo.setName("intClDayNo");
-        piClDayNo.setValue(oSchoolClass.ClDayNo);
-        request.addProperty(piClDayNo);
-
-        PropertyInfo piStuID = new PropertyInfo();
-        piStuID.setName("intStuID");
-        piStuID.setValue(oStudent.StuID);
-        request.addProperty(piStuID);
-
-        PropertyInfo piClID = new PropertyInfo();
-        piClID.setName("intClID");
-        piClID.setValue(oSchoolClass.ClID);
-        request.addProperty(piClID);
-
-        PropertyInfo piSessionID = new PropertyInfo();
-        piSessionID.setName("intSessionID");
-        piSessionID.setValue(SessionID);
-        request.addProperty(piSessionID);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                SoapEnvelope.VER11);
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(request);
-        return MakeConflickCall(URL, envelope, Globals.Data.NAMESPACE, MethodName);
-    }
-
-    public static ArrayList<String> RetrieveConflicksFromSoap(SoapObject soap) {
-
-        ArrayList<String> strConflicksArray = new ArrayList<String>();
-        for (int i = 0; i < soap.getPropertyCount(); i++) {
-
-            SoapObject conflickItem = (SoapObject) soap.getProperty(i);
-
-
-            for (int j = 0; j < conflickItem.getPropertyCount(); j++) {
-               if (conflickItem.getProperty(j).equals("anyType{}") || conflickItem.getProperty(j) == null) {
-                    conflickItem.setProperty(j, "");
-                }
-                else
-                   strConflicksArray.add(i, conflickItem.toString());
-
-            }
-
-        }
-
-        return strConflicksArray;
-    }
 }

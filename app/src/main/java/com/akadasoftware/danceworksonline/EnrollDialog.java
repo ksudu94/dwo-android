@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -15,6 +16,8 @@ import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
+
+import java.util.ArrayList;
 
 
 /**
@@ -59,7 +62,7 @@ public class EnrollDialog extends DialogFragment {
         SchoolClasses objSchoolClasses = new SchoolClasses();
 
         String strJsonSchoolClasses = getActivity().getIntent().getStringExtra("SchoolClasses");
-        ;
+
         if (strJsonSchoolClasses != "None found") {
             Gson gson = new Gson();
             JsonParser parser = new JsonParser();
@@ -67,7 +70,12 @@ public class EnrollDialog extends DialogFragment {
             objSchoolClasses = gson.fromJson(array.get(0), SchoolClasses.class);
         }
 
+        Intent I = getActivity().getIntent();
+        ArrayList<String> conflicksArray = I.getStringArrayListExtra("Conflicks");
+
         int intStuID = getActivity().getIntent().getIntExtra("SchID", 0);
+
+        TextView tvConflicks = (TextView) view.findViewById(R.id.tvConflicks);
 
         TextView tvClassType = (TextView) view.findViewById(R.id.tvClassType);
 
@@ -91,6 +99,8 @@ public class EnrollDialog extends DialogFragment {
 
         TextView tvRoom = (TextView)
                 view.findViewById(R.id.tvRoom);
+
+        tvConflicks.setText(conflicksArray.toString() + " conflicks with classes");
 
         String Day = "";
         tvClassType.setText(objSchoolClasses.ClType);

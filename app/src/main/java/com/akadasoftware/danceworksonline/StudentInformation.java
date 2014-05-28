@@ -16,6 +16,7 @@ import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Student;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -227,7 +228,7 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
     }
 
     @Override
-    public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent) {
+    public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent, ArrayList<String> conflicksArray) {
 
         /**
          * Don't really need this here. It is handled ona button click that starts a whole new activity

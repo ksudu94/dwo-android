@@ -10,6 +10,8 @@ import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+
 
 public class Enroll extends FragmentActivity implements
         StudentEnrollFragment.OnStudentEnrollListener,
@@ -53,9 +55,10 @@ public class Enroll extends FragmentActivity implements
     }
 
     @Override
-    public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent) {
+    public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent, ArrayList<String> conflicksArray) {
         FragmentManager fm = getSupportFragmentManager();
         EnrollDialog enrollDialog = new EnrollDialog();
+
 
         SchoolClasses[] arraySchoolClasses = new SchoolClasses[1];
         arraySchoolClasses[0] = objSchoolClass;
@@ -63,9 +66,11 @@ public class Enroll extends FragmentActivity implements
         Gson gson = new Gson();
         String strJsonSchoolClasses = gson.toJson(arraySchoolClasses);
 
+
         getIntent().putExtra("SchoolClasses", strJsonSchoolClasses);
         getIntent().putExtra("StuID", oStudent.StuID);
 
+        getIntent().putStringArrayListExtra("Conflicks", conflicksArray);
 
         //Just the name of the dialog. Has no effect on it.
         enrollDialog.show(fm, "");

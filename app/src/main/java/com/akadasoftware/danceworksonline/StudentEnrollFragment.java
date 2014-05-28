@@ -53,6 +53,8 @@ public class StudentEnrollFragment extends ListFragment {
     ArrayList<SchoolClasses> schoolClassesArray = new ArrayList<SchoolClasses>();
     ArrayList<Student> Students = new ArrayList<Student>();
 
+    ArrayList<String> conflicksArray = new ArrayList<String>();
+
     ArrayList<Student> studentsArray = new ArrayList<Student>();
     ArrayList<Session> sessionArrayList = new ArrayList<Session>();
     SessionAdapter sessionAdapter;
@@ -65,7 +67,7 @@ public class StudentEnrollFragment extends ListFragment {
 
     public interface onEnrollDialog {
 
-        public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent);
+        public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent, ArrayList<String> conflicksArray);
     }
 
     public interface OnStudentEnrollListener {
@@ -160,7 +162,11 @@ public class StudentEnrollFragment extends ListFragment {
         // Notify the parent activity of selected item
         super.onListItemClick(l, v, position, id);
         oSchoolClass = (SchoolClasses) this.getListAdapter().getItem(position);
-        dialogListener.onEnrollDialog(oSchoolClass, oStudent);
+
+        checkClassConflicks checkConflicks = new checkClassConflicks();
+        checkConflicks.execute();
+
+
 
     }
 
@@ -330,6 +336,166 @@ public class StudentEnrollFragment extends ListFragment {
         }
 
         return schClassesArray;
+    }
+
+
+    public class checkClassConflicks extends AsyncTask<Globals.Data, Void, ArrayList<String>> {
+        @Override
+        protected ArrayList<String> doInBackground(Globals.Data... data) {
+
+            return CheckConflicks();
+        }
+
+        protected void onPostExecute(ArrayList<String> result) {
+
+            conflicksArray = result;
+            dialogListener.onEnrollDialog(oSchoolClass, oStudent, conflicksArray);
+
+        }
+    }
+
+    public ArrayList<String> CheckConflicks() {
+        String MethodName = "checkClassEnrollment";
+        SoapObject response = InvokeEnrollmentMethod(Globals.Data.URL, MethodName);
+        return RetrieveConflicksFromSoap(response);
+
+    }
+
+    public static SoapObject MakeConflickCall(String URL,
+                                              SoapSerializationEnvelope envelope, String NAMESPACE,
+                                              String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        try {
+            envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",
+                    new SchoolClasses().getClass());
+            HttpTransport.call(METHOD_NAME, envelope);
+            envelopeOutput = envelope;
+            SoapObject response = (SoapObject) envelope.getResponse();
+
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return null;
+    }
+
+    public SoapObject InvokeEnrollmentMethod(String URL, String MethodName) {
+
+        SoapObject request = GetSoapObject(MethodName);
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        request.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        request.addProperty(piUserGUID);
+
+        PropertyInfo piClMax = new PropertyInfo();
+        piClMax.setName("intClMax");
+        piClMax.setValue(oSchoolClass.ClMax);
+        request.addProperty(piClMax);
+
+        PropertyInfo piClCur = new PropertyInfo();
+        piClCur.setName("intClCur");
+        piClCur.setValue(oSchoolClass.ClCur);
+        request.addProperty(piClCur);
+
+        PropertyInfo piClTime = new PropertyInfo();
+        piClTime.setName("strClTime");
+        piClTime.setValue(oSchoolClass.ClTime);
+        request.addProperty(piClTime);
+
+        PropertyInfo piClStop = new PropertyInfo();
+        piClStop.setName("strClStop");
+        piClStop.setValue(oSchoolClass.ClStop);
+        request.addProperty(piClStop);
+
+        PropertyInfo piMultiDay = new PropertyInfo();
+        piMultiDay.setName("boolMultiDay");
+        piMultiDay.setValue(oSchoolClass.MultiDay);
+        request.addProperty(piMultiDay);
+
+        PropertyInfo piMonday = new PropertyInfo();
+        piMonday.setName("boolMonday");
+        piMonday.setValue(oSchoolClass.Monday);
+        request.addProperty(piMonday);
+
+        PropertyInfo piTuesday = new PropertyInfo();
+        piTuesday.setName("boolTuesday");
+        piTuesday.setValue(oSchoolClass.Tuesday);
+        request.addProperty(piTuesday);
+
+        PropertyInfo piWednesday = new PropertyInfo();
+        piWednesday.setName("boolWednesday");
+        piWednesday.setValue(oSchoolClass.Wednesday);
+        request.addProperty(piWednesday);
+
+        PropertyInfo piThursday = new PropertyInfo();
+        piThursday.setName("boolThursday");
+        piThursday.setValue(oSchoolClass.Thursday);
+        request.addProperty(piThursday);
+
+        PropertyInfo piFriday = new PropertyInfo();
+        piFriday.setName("boolFriday");
+        piFriday.setValue(oSchoolClass.Friday);
+        request.addProperty(piFriday);
+
+        PropertyInfo piSaturday = new PropertyInfo();
+        piSaturday.setName("boolSaturday");
+        piSaturday.setValue(oSchoolClass.Saturday);
+        request.addProperty(piSaturday);
+
+        PropertyInfo piSunday = new PropertyInfo();
+        piSunday.setName("boolSunday");
+        piSunday.setValue(oSchoolClass.Sunday);
+        request.addProperty(piSunday);
+
+        PropertyInfo piClDayNo = new PropertyInfo();
+        piClDayNo.setName("intClDayNo");
+        piClDayNo.setValue(oSchoolClass.ClDayNo);
+        request.addProperty(piClDayNo);
+
+        PropertyInfo piStuID = new PropertyInfo();
+        piStuID.setName("intStuID");
+        piStuID.setValue(oStudent.StuID);
+        request.addProperty(piStuID);
+
+        PropertyInfo piClID = new PropertyInfo();
+        piClID.setName("intClID");
+        piClID.setValue(oSchoolClass.ClID);
+        request.addProperty(piClID);
+
+        PropertyInfo piSessionID = new PropertyInfo();
+        piSessionID.setName("intSessionID");
+        piSessionID.setValue(SessionID);
+        request.addProperty(piSessionID);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(request);
+        return MakeConflickCall(URL, envelope, Globals.Data.NAMESPACE, MethodName);
+    }
+
+    public static ArrayList<String> RetrieveConflicksFromSoap(SoapObject soap) {
+
+        ArrayList<String> strConflicksArray = new ArrayList<String>();
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
+
+            //SoapObject conflickItem = (SoapObject) soap.getProperty(i);
+            if (soap.getProperty(i).equals("anyType{}"))
+                strConflicksArray.add(i, "");
+            else
+                strConflicksArray.add(i, soap.getProperty(i).toString());
+
+        }
+
+        return strConflicksArray;
     }
 
 }

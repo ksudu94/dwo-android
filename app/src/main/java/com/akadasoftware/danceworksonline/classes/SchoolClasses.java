@@ -11,16 +11,14 @@ import java.util.Hashtable;
  */
 public class SchoolClasses implements KvmSerializable {
 
-    public int ClID, ClLength, ClTchID, ClLAge, ClUAge, ClCur, ClMax, EnrollmentStatus, WaitID, ClRID,
-    ClDayNo;
+    public int ClID, ClLength, ClTchID, ClLAge, ClUAge, ClCur, ClMax, EnrollmentStatus, WaitID, ClRID;
 
     public float ClTuition;
 
     public Boolean MultiDay, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday;
 
     public String ClType, ClLevel, ClRoom, ClDay, ClDescription, ClStart, ClStop, ClTime,
-            ClInstructor, ClKey,
-            ClWait;
+            ClInstructor, ClKey, ClWait, ClDayNo;
 
     public SchoolClasses() {
     }
@@ -30,7 +28,7 @@ public class SchoolClasses implements KvmSerializable {
                          String clinstructor, float cltuition, int cllength, int cltchid, Boolean multiday,
                          Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday,
                          Boolean saturday, Boolean sunday, int cllage, int cluage, String clkey, int clcur, int clmax,
-                         String clwait, int enrollmentstatus, int waitid, int clrid, int cldayno) {
+                         String clwait, String cldayno, int enrollmentstatus, int waitid, int clrid) {
 
         clid = ClID;
         cltype = ClType;
@@ -59,10 +57,11 @@ public class SchoolClasses implements KvmSerializable {
         clcur = ClCur;
         clmax = ClMax;
         clwait = ClWait;
+        cldayno = ClDayNo;
         enrollmentstatus = EnrollmentStatus;
         waitid = WaitID;
         clrid = ClRID;
-        cldayno = ClDayNo;
+
 
     }
 
@@ -125,13 +124,14 @@ public class SchoolClasses implements KvmSerializable {
             case 26:
                 return ClWait;
             case 27:
-                return EnrollmentStatus;
-            case 28:
-                return WaitID;
-            case 29:
-                return ClRID;
-            case 30:
                 return ClDayNo;
+            case 28:
+                return ClRID;
+            case 29:
+                return WaitID;
+            case 30:
+                return EnrollmentStatus;
+
         }
 
 
@@ -256,20 +256,21 @@ public class SchoolClasses implements KvmSerializable {
                 info.name = "ClWait";
                 break;
             case 27:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "EnrollmentStatus";
-            case 28:
-                info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "WaitID";
+                info.type = PropertyInfo.STRING_CLASS;
+                info.name = "ClDayNo";
                 break;
-            case 29:
+            case 28:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "ClRID";
                 break;
+            case 29:
+                info.type = PropertyInfo.INTEGER_CLASS;
+                info.name = "WaitID";
+                break;
             case 30:
                 info.type = PropertyInfo.INTEGER_CLASS;
-                info.name = "ClDayNo";
-                break;
+                info.name = "EnrollmentStatus";
+
             default:
                 break;
         }
@@ -404,16 +405,20 @@ public class SchoolClasses implements KvmSerializable {
                     ClWait = value.toString();
                 }
             case 27:
-                EnrollmentStatus = Integer.parseInt(value.toString());
+                if (value.equals("anyType{}")) {
+                    ClDayNo = "";
+                } else {
+                    ClDayNo = value.toString();
+                }
                 break;
             case 28:
-                WaitID = Integer.parseInt(value.toString());
-                break;
-            case 29:
                 ClRID = Integer.parseInt(value.toString());
                 break;
+            case 29:
+                WaitID = Integer.parseInt(value.toString());
+                break;
             case 30:
-                ClDayNo = Integer.parseInt(value.toString());
+                EnrollmentStatus = Integer.parseInt(value.toString());
                 break;
             default:
                 break;
