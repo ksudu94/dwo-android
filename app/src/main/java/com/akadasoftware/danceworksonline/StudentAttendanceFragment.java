@@ -80,7 +80,7 @@ public class StudentAttendanceFragment extends ListFragment {
         _appPrefs = new AppPreferences(activity);
 
 
-        students = _appPrefs.getStudent();
+        students = _appPrefs.getStudents();
         position = getArguments().getInt("Position");
 
         oStudent = students.get(position);

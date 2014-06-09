@@ -90,23 +90,17 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
         activity = getActivity();
         globals = new Globals();
         _appPrefs = new AppPreferences(activity);
-        studentsArray = _appPrefs.getStudent();
+        studentsArray = _appPrefs.getStudents();
         strQuery = _appPrefs.getStudentQuery();
         if (strQuery.length() == 0) {
             strQuery = globals.BuildQuery(_appPrefs.getStudentSelectBy(), _appPrefs.getStudentSortBy(), "Students");
         }
         oUser = _appPrefs.getUser();
 
-
-        if (studentsArray.size() > 0) {
             stuListAdapter = new StudentListAdapter(activity,
                     R.layout.item_studentlist, studentsArray);
             setListAdapter(stuListAdapter);
             stuListAdapter.setNotifyOnChange(true);
-        } else {
-            getStudentsList stuList = new getStudentsList();
-            stuList.execute();
-        }
 
 
     }

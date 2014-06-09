@@ -309,7 +309,7 @@ public class AppPreferences {
         prefsEditor.commit();
     }
 
-    public ArrayList<Student> getStudent() {
+    public ArrayList<Student> getStudents() {
         ArrayList<Student> students = new ArrayList<Student>();
         jsonStudents = sharedPrefs.getString("Students", "None found");
         if (jsonStudents != "None found") {

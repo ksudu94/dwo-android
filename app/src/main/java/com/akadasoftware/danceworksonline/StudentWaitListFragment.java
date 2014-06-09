@@ -76,7 +76,7 @@ public class StudentWaitListFragment extends ListFragment {
 
         oGlobal = new Globals();
 
-        Students = _appPrefs.getStudent();
+        Students = _appPrefs.getStudents();
         position = getArguments().getInt("Position");
 
         oStudent = Students.get(position);

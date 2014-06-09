@@ -67,7 +67,7 @@ public class StudentInformationFragment extends Fragment {
         activity = getActivity();
         globals = new Globals();
         _appPrefs = new AppPreferences(activity);
-        Students = _appPrefs.getStudent();
+        Students = _appPrefs.getStudents();
         position = getArguments().getInt("Position");
 
         oStudent = Students.get(position);

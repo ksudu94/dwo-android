@@ -1,6 +1,7 @@
 package com.akadasoftware.danceworksonline.classes;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
  */
 public class Globals {
 
-    private AppPreferences _appPrefs;
+    private static AppPreferences _appPrefs;
 
     /**
      * Builds the query string for filter and select by dialogs
@@ -222,5 +223,192 @@ public class Globals {
         return sessionArray;
     }
 
+    private class getStudentsList extends AsyncTask<Data, Void, ArrayList<Student>> {
+
+        protected ArrayList<Student> doInBackground(Data... data) {
+            return getStudents();
+        }
+
+        protected void onPostExecute(ArrayList<Student> result) {
+            _appPrefs.saveStudents(result);
+        }
+
+    }
+
+    public static ArrayList<Student> getStudents() {
+        String MethodName = "getStudents";
+        SoapObject response = InvokeMethod(Data.URL, MethodName);
+        return RetrieveFromSoap(response);
+    }
+
+    public static SoapObject InvokeMethod(String URL, String MethodName) {
+
+        SoapObject request = GetSoapObject(MethodName);
+
+        User oUser = _appPrefs.getUser();
+        String strStudentQuery = _appPrefs.getStudentQuery();
+
+        PropertyInfo piWhere = new PropertyInfo();
+        piWhere.setType("STRING_CLASS");
+        piWhere.setName("Where");
+        piWhere.setValue(strStudentQuery);
+        request.addProperty(piWhere);
+
+        PropertyInfo piSchID = new PropertyInfo();
+        piSchID.setName("SchID");
+        piSchID.setValue(oUser.SchID);
+        request.addProperty(piSchID);
+
+        PropertyInfo piAcctID = new PropertyInfo();
+        piAcctID.setName("AcctID");
+        piAcctID.setValue(0);
+        request.addProperty(piAcctID);
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        request.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        request.addProperty(piUserGUID);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(request);
+        return MakeCall(URL, envelope, Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject GetSoapObject(String MethodName) {
+        return new SoapObject(Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject MakeCall(String URL, SoapSerializationEnvelope envelope, String NAMESPACE,
+                                      String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        try {
+            envelope.addMapping(Data.NAMESPACE, "Student",
+                    new Student().getClass());
+            HttpTransport.call("getStudents", envelope);
+            SoapSerializationEnvelope envelopeOutput = envelope;
+            SoapObject response = (SoapObject) envelope.getResponse();
+
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static ArrayList<Student> RetrieveFromSoap(SoapObject soap) {
+        ArrayList<Student> Students = new ArrayList<Student>();
+        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
+
+            SoapObject studentlistitem = (SoapObject) soap.getProperty(i);
+            Student student = new Student();
+            for (int j = 0; j < studentlistitem.getPropertyCount(); j++) {
+                student.setProperty(j, studentlistitem.getProperty(j)
+                        .toString());
+                if (studentlistitem.getProperty(j).equals("anyType{}")) {
+                    studentlistitem.setProperty(j, "");
+                }
+
+            }
+            Students.add(i, student);
+        }
+
+        return Students;
+    }
+
+
+    public static ArrayList<Account> getAccounts(AppPreferences _appPrefsNew) {
+        _appPrefs = _appPrefsNew;
+        String MethodName = "getAccounts";
+        SoapObject response = InvokeAccountMethod(Data.URL, MethodName);
+        return RetrieveAccountsFromSoap(response);
+
+    }
+
+    public static SoapObject InvokeAccountMethod(String URL, String MethodName) {
+
+        SoapObject requestAccounts = GetAccountSoapObject(MethodName);
+
+        User oUser = _appPrefs.getUser();
+        String strAccontQuery = _appPrefs.getAccountQuery();
+
+        PropertyInfo piOrder = new PropertyInfo();
+        piOrder.setType("STRING_CLASS");
+        piOrder.setName("Order");
+        piOrder.setValue(strAccontQuery);
+        requestAccounts.addProperty(piOrder);
+
+        PropertyInfo piSchID = new PropertyInfo();
+        piSchID.setName("SchID");
+        piSchID.setValue(oUser.SchID);
+        requestAccounts.addProperty(piSchID);
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        requestAccounts.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        requestAccounts.addProperty(piUserGUID);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(requestAccounts);
+        return MakeAccountCall(URL, envelope, Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject GetAccountSoapObject(String MethodName) {
+        return new SoapObject(Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject MakeAccountCall(String URL,
+                                             SoapSerializationEnvelope envelope, String NAMESPACE,
+                                             String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        try {
+            envelope.addMapping(Data.NAMESPACE, "Account",
+                    new Account().getClass());
+            HttpTransport.call("getAccounts", envelope);
+            SoapSerializationEnvelope envelopeOutput = envelope;
+            SoapObject responseAccounts = (SoapObject) envelope.getResponse();
+
+            return responseAccounts;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static ArrayList<Account> RetrieveAccountsFromSoap(SoapObject soap) {
+
+        ArrayList<Account> Accounts = new ArrayList<Account>();
+        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
+
+            SoapObject accountlistitem = (SoapObject) soap.getProperty(i);
+            Account account = new Account();
+            for (int j = 0; j < accountlistitem.getPropertyCount(); j++) {
+                account.setProperty(j, accountlistitem.getProperty(j)
+                        .toString());
+                if (accountlistitem.getProperty(j).equals("anyType{}")) {
+                    accountlistitem.setProperty(j, "");
+                }
+
+            }
+            Accounts.add(i, account);
+        }
+
+        return Accounts;
+    }
 
 }

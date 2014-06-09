@@ -1,6 +1,7 @@
 package com.akadasoftware.danceworksonline;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -35,21 +36,21 @@ public class Splash extends ActionBarActivity {
     private AppPreferences _appPrefs;
     User user = new User();
     String METHOD_NAME, SOAP_ACTION, UserGUID, newLogoName, LogoName, logoUrl;
-    static String strQuery;
+    static String strQuery, strStudentQuery;
 
     int UserID, SchID;
     Boolean isTablet;
 
+    ArrayList<Student> studentsArray = new ArrayList<Student>();
+    static SoapSerializationEnvelope envelopeOutput;
+    Activity activity;
+    static User oUser;
+    Globals oGlobals;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        _appPrefs = new AppPreferences(getApplicationContext());
-        LogoName = _appPrefs.getLogoName();
-        _appPrefs.saveNavDrawerPosition(0);
-        /**
-         * Test if they have an api high enough to be able to set their own icon otherwise goes to
-         * spalsh page with default
-         */
+
         if (android.os.Build.VERSION.SDK_INT > 16) {
             setContentView(R.layout.activity_logo_splash);
             getBackground bg = new getBackground();
@@ -58,7 +59,6 @@ public class Splash extends ActionBarActivity {
         } else {
             setContentView(R.layout.activity_default_splash);
         }
-
         /**
          * Uses loginPreferences to get the loggedin field to check whether or not the user has a
          * saved profile. From there it either goes to the login screen or the home screen.
@@ -66,6 +66,21 @@ public class Splash extends ActionBarActivity {
         loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
         loginEditor = loginPreferences.edit();
         _appPrefs = new AppPreferences(getApplicationContext());
+
+        LogoName = _appPrefs.getLogoName();
+        _appPrefs.saveNavDrawerPosition(0);
+
+
+        oUser = _appPrefs.getUser();
+        oGlobals = new Globals();
+
+        /**
+         * Test if they have an api high enough to be able to set their own icon otherwise goes to
+         * spalsh page with default
+         */
+
+
+
 
 
         Thread timer = new Thread() {
@@ -224,14 +239,26 @@ public class Splash extends ActionBarActivity {
                     _appPrefs.saveUser(userarray);
                     _appPrefs.saveAccountQuery(strQuery);
 
-                    /**
-                     * Blank out Accounts and Students lists
-                     */
-                    ArrayList<Account> AccountsArray = new ArrayList<Account>();
-                    _appPrefs.saveAccounts(AccountsArray);
+                    boolean isBeingDebugged = android.os.Debug.isDebuggerConnected();
+                    if (isBeingDebugged) {
+                        ArrayList<Account> AccountsArray = new ArrayList<Account>();
+                        _appPrefs.saveAccounts(AccountsArray);
 
-                    ArrayList<Student> StudentArray = new ArrayList<Student>();
-                    _appPrefs.saveStudents(StudentArray);
+                        ArrayList<Student> StudentArray = new ArrayList<Student>();
+                        _appPrefs.saveStudents(StudentArray);
+
+                    } else {
+                        /**
+                         * If all 3 are false it loads all 3 lists else it loads the list according which
+                         * variables are true
+                         */
+                        getAccountsListAsync getAccounts = new getAccountsListAsync();
+                        getAccounts.execute();
+
+                    }
+
+
+
 
                     METHOD_NAME = "getSchool";
                     SOAP_ACTION = "getSchool";
@@ -292,6 +319,7 @@ public class Splash extends ActionBarActivity {
         protected void onPostExecute(User user) {
             if (user.UserID > 0) {
 
+
                 Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.Home");
                 startActivity(openMainPage);
             } else {
@@ -302,4 +330,21 @@ public class Splash extends ActionBarActivity {
         }
 
     }
+
+    private class getAccountsListAsync extends
+            AsyncTask<Data, Void, ArrayList<Account>> {
+
+        @Override
+        protected ArrayList<Account> doInBackground(Data... data) {
+
+            return oGlobals.getAccounts(_appPrefs);
+        }
+
+        protected void onPostExecute(ArrayList<Account> result) {
+            _appPrefs.saveAccounts(result);
+
+        }
+    }
+
+
 }

@@ -2,6 +2,7 @@ package com.akadasoftware.danceworksonline;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,7 +17,7 @@ import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.Student;
+import com.akadasoftware.danceworksonline.classes.Globals;
 
 import java.util.ArrayList;
 
@@ -217,24 +218,17 @@ public class Home extends ActionBarActivity
     public void onFilterDialogPositiveClick(String mTitle) {
 
         if (mTitle.equals("Accounts") || mTitle.equals("Home")) {
-            /**
-             * Clears the saved Accounts List so that it refreshes it with the new select and sort values
-             */
-            ArrayList<Account> AccountsArray = new ArrayList<Account>();
-            _appPrefs.saveAccounts(AccountsArray);
 
-            Fragment newFragment;
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            newFragment = new AccountListFragment();
-            ft.replace(R.id.container, newFragment);
-            ft.addToBackStack(null);
-            ft.commit();
-        } else if (mTitle.equals("Students")) {
             /**
              * Clears the saved Accounts List so that it refreshes it with the new select and sort values
              */
-            ArrayList<Student> StudentsArray = new ArrayList<Student>();
-            _appPrefs.saveStudents(StudentsArray);
+
+            getAccountsListAsync getAccounts = new getAccountsListAsync();
+            getAccounts.execute();
+
+
+        } else if (mTitle.equals("Students")) {
+
 
             Fragment newFragment;
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -242,6 +236,30 @@ public class Home extends ActionBarActivity
             ft.replace(R.id.container, newFragment);
             ft.addToBackStack(null);
             ft.commit();
+        }
+    }
+
+    private class getAccountsListAsync extends
+            AsyncTask<Globals.Data, Void, ArrayList<Account>> {
+
+        @Override
+        protected ArrayList<Account> doInBackground(Globals.Data... data) {
+
+            Globals oGlobals = new Globals();
+            return oGlobals.getAccounts(_appPrefs);
+        }
+
+        protected void onPostExecute(ArrayList<Account> result) {
+            _appPrefs.saveAccounts(result);
+
+            Fragment newFragment;
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            newFragment = new AccountListFragment();
+            ft.replace(R.id.container, newFragment);
+            ft.addToBackStack(null);
+            ft.commit();
+
+
         }
     }
 

@@ -85,7 +85,7 @@ public class StudentClassFragment extends ListFragment {
         activity = getActivity();
         _appPrefs = new AppPreferences(activity);
 
-        Students = _appPrefs.getStudent();
+        Students = _appPrefs.getStudents();
         position = getArguments().getInt("Position");
 
         oStudent = Students.get(position);

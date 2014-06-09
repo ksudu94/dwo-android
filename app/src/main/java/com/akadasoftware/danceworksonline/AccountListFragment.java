@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
@@ -38,7 +39,6 @@ public class AccountListFragment extends ListFragment {
 
     Activity activity;
     static User oUser;
-
     /**
      * Listener to handle clicks on the list
      */
@@ -71,16 +71,26 @@ public class AccountListFragment extends ListFragment {
         oUser = _appPrefs.getUser();
         strQuery = _appPrefs.getAccountQuery();
 
-        if (AccountsArray.size() > 0) {
             acctListAdpater = new AccountListAdapater(getActivity(),
                     R.layout.item_accountlist, AccountsArray);
             setListAdapter(acctListAdpater);
             acctListAdpater.setNotifyOnChange(true);
-        } else {
-            getAccountsListAsync accountslist = new getAccountsListAsync();
-            accountslist.execute();
-        }
 
+
+    }
+
+    /**
+     * The default content for this Fragment has a TextView that is shown when
+     * the list is empty. If you would like to change the text, call this method
+     * to supply the text it should use.
+     */
+    public void setEmptyText(CharSequence emptyText) {
+        ListView listView = (ListView) activity.findViewById(R.id.list);
+        View emptyView = listView.getEmptyView();
+
+        if (emptyText instanceof TextView) {
+            ((TextView) emptyView).setText("There ain't no accounts in here");
+        }
     }
 
     /**
@@ -128,6 +138,7 @@ public class AccountListFragment extends ListFragment {
         private static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
         private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
     }
+
 
     private class getAccountsListAsync extends
             AsyncTask<Data, Void, ArrayList<Account>> {

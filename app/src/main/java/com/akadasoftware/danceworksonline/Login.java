@@ -53,6 +53,7 @@ public class Login extends ActionBarActivity {
                     .commit();
         }
 
+
     }
 
     //May want in future
@@ -109,6 +110,7 @@ public class Login extends ActionBarActivity {
         String SOAP_ACTION = "";
         Integer UserID = 0;
         String UserGUID = "";
+        Globals oGlobal;
 
         public LoginFragment() {
         }
@@ -261,15 +263,21 @@ public class Login extends ActionBarActivity {
                         _appPrefs.saveUser(userarray);
                         _appPrefs.saveAccountQuery(strQuery);
 
+                        boolean isBeingDebugged = android.os.Debug.isDebuggerConnected();
+                        if (isBeingDebugged) {
+                            ArrayList<Account> AccountsArray = new ArrayList<Account>();
+                            _appPrefs.saveAccounts(AccountsArray);
 
-                        /**
-                         * Blank out Accounts and Students lists
-                         */
-                        ArrayList<Account> AccountsArray = new ArrayList<Account>();
-                        _appPrefs.saveAccounts(AccountsArray);
+                            ArrayList<Student> StudentArray = new ArrayList<Student>();
+                            _appPrefs.saveStudents(StudentArray);
 
-                        ArrayList<Student> StudentArray = new ArrayList<Student>();
-                        _appPrefs.saveStudents(StudentArray);
+                        } else {
+                            /**
+                             * If all 3 are false it loads all 3 lists else it loads the list according which
+                             * variables are true
+                             */
+                        }
+
 
                         METHOD_NAME = "getSchool";
                         SOAP_ACTION = "getSchool";

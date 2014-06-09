@@ -93,7 +93,7 @@ public class StudentEnrollFragment extends ListFragment {
         activity = getActivity();
         _appPrefs = new AppPreferences(activity);
 
-        studentsArray = _appPrefs.getStudent();
+        studentsArray = _appPrefs.getStudents();
         position = _appPrefs.getStudentListPosition();
 
         oStudent = studentsArray.get(position);
@@ -167,7 +167,6 @@ public class StudentEnrollFragment extends ListFragment {
         checkConflicks.execute();
 
 
-
     }
 
     //Asycn task to get the ChgDesc field to be used to populate the spinner
@@ -230,7 +229,7 @@ public class StudentEnrollFragment extends ListFragment {
     public class getStudentClassesAsync extends
             AsyncTask<Globals.Data, Void, ArrayList<SchoolClasses>> {
 
-              @Override
+        @Override
         protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
 
             return getClasses();

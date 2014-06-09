@@ -16,7 +16,6 @@ import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Session;
-import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.StudentClasses;
 import com.akadasoftware.danceworksonline.classes.User;
 
@@ -34,7 +33,6 @@ public class ClassesListFragment extends ListFragment {
     Globals oGlobal;
     Activity activity;
     User oUser;
-    Student oStudent;
     SchoolClasses oSchoolClass;
     private AppPreferences _appPrefs;
     Session session;
@@ -43,8 +41,6 @@ public class ClassesListFragment extends ListFragment {
     String SOAP_ACTION = "";
     static SoapSerializationEnvelope envelopeOutput;
 
-
-    ArrayList<Student> studentsArray = new ArrayList<Student>();
 
     ArrayList<Session> sessionArrayList = new ArrayList<Session>();
     SessionAdapter sessionAdapter;
@@ -86,11 +82,6 @@ public class ClassesListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         activity = getActivity();
         _appPrefs = new AppPreferences(activity);
-
-        studentsArray = _appPrefs.getStudent();
-        position = _appPrefs.getStudentListPosition();
-
-        oStudent = studentsArray.get(position);
         oUser = _appPrefs.getUser();
         oGlobal = new Globals();
 
@@ -100,7 +91,7 @@ public class ClassesListFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_classeslistfragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_classeslistfragment_list, container, false);
 
         sessionClassSpinner = (Spinner) view.findViewById(R.id.sessionClassSpinner);
         return view;
@@ -173,7 +164,7 @@ public class ClassesListFragment extends ListFragment {
         protected ArrayList<Session> doInBackground(Globals.Data... data) {
 
             SoapObject session = oGlobal.getSoapRequest(Globals.Data.NAMESPACE, "getSessions");
-            session = oGlobal.setSessionPropertyInfo(session, oStudent.SchID, "getSessions", oUser);
+            session = oGlobal.setSessionPropertyInfo(session, oUser.SchID, "getSessions", oUser);
             return oGlobal.RetrieveSessionsFromSoap(session);
 
 
@@ -277,7 +268,7 @@ public class ClassesListFragment extends ListFragment {
 
         PropertyInfo piStuID = new PropertyInfo();
         piStuID.setName("intStuID");
-        piStuID.setValue(oStudent.StuID);
+        piStuID.setValue(0);
         request.addProperty(piStuID);
 
 

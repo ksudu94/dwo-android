@@ -65,6 +65,8 @@ public class FilterDialog extends DialogFragment {
         ArrayAdapter<CharSequence> sortAdapter = null;
         ArrayAdapter<CharSequence> selectAdapter = null;
 
+        int intSelect = 0;
+        int intSort = 0;
         if (mTitle.equals("Accounts") || mTitle.equals("Home")) {
             sortAdapter = ArrayAdapter.createFromResource(getActivity(),
                     R.array.SortBy, android.R.layout.simple_spinner_item);
@@ -72,17 +74,16 @@ public class FilterDialog extends DialogFragment {
             selectAdapter = ArrayAdapter.createFromResource(getActivity(),
                     R.array.SelectBy, android.R.layout.simple_spinner_item);
 
-            spinnerSelect.setSelection(_appPrefs.getAccountSelectBy());
-            spinnerSort.setSelection(_appPrefs.getAccountSortBy());
+            intSelect = _appPrefs.getAccountSelectBy();
+            intSort = _appPrefs.getAccountSortBy();
         } else if (mTitle.equals("Students")) {
             sortAdapter = ArrayAdapter.createFromResource(getActivity(),
                     R.array.StudentSortBy, android.R.layout.simple_spinner_item);
 
             selectAdapter = ArrayAdapter.createFromResource(getActivity(),
                     R.array.StudentSelectBy, android.R.layout.simple_spinner_item);
-
-            spinnerSelect.setSelection(_appPrefs.getStudentSelectBy());
-            spinnerSort.setSelection(_appPrefs.getStudentSortBy());
+            intSelect = _appPrefs.getStudentSelectBy();
+            intSort = _appPrefs.getStudentSortBy();
 
         } else if (mTitle.equals("Classes")) {
 
@@ -90,6 +91,8 @@ public class FilterDialog extends DialogFragment {
 
         spinnerSort.setAdapter(sortAdapter);
         spinnerSelect.setAdapter(selectAdapter);
+        spinnerSelect.setSelection(intSelect);
+        spinnerSort.setSelection(intSort);
 
         builder.setView(view)
                 // Title of dialog
