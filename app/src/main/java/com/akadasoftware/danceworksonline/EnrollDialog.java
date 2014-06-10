@@ -73,7 +73,7 @@ public class EnrollDialog extends DialogFragment {
         Intent I = getActivity().getIntent();
         ArrayList<String> conflicksArray = I.getStringArrayListExtra("Conflicks");
 
-        int intStuID = getActivity().getIntent().getIntExtra("SchID", 0);
+        //int intStuID = getActivity().getIntent().getIntExtra("SchID", 0);
 
         TextView tvConflicks = (TextView) view.findViewById(R.id.tvConflicks);
 
@@ -100,7 +100,7 @@ public class EnrollDialog extends DialogFragment {
         TextView tvRoom = (TextView)
                 view.findViewById(R.id.tvRoom);
 
-        tvConflicks.setText(conflicksArray.toString() + " conflicks with classes");
+        tvConflicks.setText(conflicksArray.toString() + " conflicks with class below");
 
         String Day = "";
         tvClassType.setText(objSchoolClasses.ClType);

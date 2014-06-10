@@ -91,7 +91,7 @@ public class AccountStudentsAdapter extends ArrayAdapter<Student> {
         holder.tvFNameLName.setText(strName + "     ");
         holder.tvFNameLName.setTag(position);
 
-        holder.tvStatus.setText(strStatus);
+        holder.tvStatus.setText("(" + strStatus + ")");
 
 
         return convertView;

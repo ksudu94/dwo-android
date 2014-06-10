@@ -68,13 +68,15 @@ public class AccountListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         _appPrefs = new AppPreferences(getActivity());
         AccountsArray = _appPrefs.getAccounts();
-        oUser = _appPrefs.getUser();
         strQuery = _appPrefs.getAccountQuery();
 
-            acctListAdpater = new AccountListAdapater(getActivity(),
-                    R.layout.item_accountlist, AccountsArray);
-            setListAdapter(acctListAdpater);
-            acctListAdpater.setNotifyOnChange(true);
+        /**
+         * The loading of the accounts list is done on the splash/login screens
+         */
+        acctListAdpater = new AccountListAdapater(getActivity(),
+                R.layout.item_accountlist, AccountsArray);
+        setListAdapter(acctListAdpater);
+        acctListAdpater.setNotifyOnChange(true);
 
 
     }
@@ -94,14 +96,10 @@ public class AccountListFragment extends ListFragment {
     }
 
     /**
-     * Change the divider line color
+     * When fragment detaches from activity ie different screen, saves the instance state so that it
+     * can be restored later when returned to fragment
      *
-     * @Override public void onActivityCreated(Bundle savedInstanceState) {
-     * super.onActivityCreated(savedInstanceState);
-     * ColorDrawable light_blue = new ColorDrawable(this.getResources().getColor(R.color.light_blue));
-     * getListView().setDivider(light_blue);
-     * getListView().setDividerHeight(2);
-     * }
+     * @param activity
      */
     @Override
     public void onAttach(Activity activity) {
@@ -140,6 +138,9 @@ public class AccountListFragment extends ListFragment {
     }
 
 
+    /**
+     * Done by using async call and rest is located in globals.
+     */
     private class getAccountsListAsync extends
             AsyncTask<Data, Void, ArrayList<Account>> {
 

@@ -88,32 +88,26 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = getActivity();
-        globals = new Globals();
         _appPrefs = new AppPreferences(activity);
         studentsArray = _appPrefs.getStudents();
         strQuery = _appPrefs.getStudentQuery();
-        if (strQuery.length() == 0) {
-            strQuery = globals.BuildQuery(_appPrefs.getStudentSelectBy(), _appPrefs.getStudentSortBy(), "Students");
-        }
-        oUser = _appPrefs.getUser();
 
-            stuListAdapter = new StudentListAdapter(activity,
-                    R.layout.item_studentlist, studentsArray);
-            setListAdapter(stuListAdapter);
-            stuListAdapter.setNotifyOnChange(true);
+        /**
+         * The loading of the students list is done on the splash/login screens
+         */
+        stuListAdapter = new StudentListAdapter(activity,
+                R.layout.item_studentlist, studentsArray);
+        setListAdapter(stuListAdapter);
+        stuListAdapter.setNotifyOnChange(true);
 
 
     }
 
     /**
-     * Change the divider line color
+     * When fragment detaches from activity ie different screen, saves the instance state so that it
+     * can be restored later when returned to fragment
      *
-     * @Override public void onActivityCreated(Bundle savedInstanceState) {
-     * super.onActivityCreated(savedInstanceState);
-     * ColorDrawable light_blue = new ColorDrawable(this.getResources().getColor(R.color.light_blue));
-     * getListView().setDivider(light_blue);
-     * getListView().setDividerHeight(2);
-     * }
+     * @param activity
      */
     @Override
     public void onAttach(Activity activity) {
@@ -157,6 +151,11 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
         private static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
         private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
     }
+
+
+    /**
+     * Done by using async call and rest is located in globals.
+     */
 
     private class getStudentsList extends AsyncTask<Data, Void, ArrayList<Student>> {
 

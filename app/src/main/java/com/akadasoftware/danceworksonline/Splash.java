@@ -15,14 +15,9 @@ import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.School;
+import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.User;
-
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,15 +29,10 @@ public class Splash extends ActionBarActivity {
     private static SharedPreferences loginPreferences;
     private static SharedPreferences.Editor loginEditor;
     private AppPreferences _appPrefs;
-    User user = new User();
-    String METHOD_NAME, SOAP_ACTION, UserGUID, newLogoName, LogoName, logoUrl;
-    static String strQuery, strStudentQuery;
-
-    int UserID, SchID;
+    String METHOD_NAME, SOAP_ACTION, UserGUID, LogoName, logoUrl;
+    int UserID, SchID, SessionID;
     Boolean isTablet;
 
-    ArrayList<Student> studentsArray = new ArrayList<Student>();
-    static SoapSerializationEnvelope envelopeOutput;
     Activity activity;
     static User oUser;
     Globals oGlobals;
@@ -67,20 +57,17 @@ public class Splash extends ActionBarActivity {
         loginEditor = loginPreferences.edit();
         _appPrefs = new AppPreferences(getApplicationContext());
 
-        LogoName = _appPrefs.getLogoName();
         _appPrefs.saveNavDrawerPosition(0);
 
 
         oUser = _appPrefs.getUser();
         oGlobals = new Globals();
+        LogoName = _appPrefs.getLogoName();
 
         /**
          * Test if they have an api high enough to be able to set their own icon otherwise goes to
          * spalsh page with default
          */
-
-
-
 
 
         Thread timer = new Thread() {
@@ -97,7 +84,7 @@ public class Splash extends ActionBarActivity {
                         UserID = loginPreferences.getInt("UserID", 0);
                         if (UserID > 0) {
                             UserGUID = loginPreferences.getString("UserGUID", "");
-                            new getUserByID().execute();
+                            new getUserByIDAsync().execute();
                         } else {
                             loginEditor.clear();
                             loginEditor.putBoolean("loggedin", false);
@@ -181,144 +168,67 @@ public class Splash extends ActionBarActivity {
         private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
     }
 
-    //Finds users by ID
-    public class getUserByID extends AsyncTask<Data, Void, User> {
+    /**
+     * Finds user based on ID
+     */
+    public class getUserByIDAsync extends AsyncTask<Data, Void, User> {
 
         @Override
         protected User doInBackground(Data... data) {
 
-            METHOD_NAME = "getUserByID";
-            SOAP_ACTION = "getUserByID";
-
-            SoapObject requestUser = new SoapObject(Data.NAMESPACE, METHOD_NAME);
-
-            PropertyInfo piUserID = new PropertyInfo();
-            piUserID.setName("UserID");
-            piUserID.setValue(UserID);
-            requestUser.addProperty(piUserID);
-
-            PropertyInfo piUserGUID = new PropertyInfo();
-            piUserGUID.setName("UserGUID");
-            piUserGUID.setValue(UserGUID);
-            requestUser.addProperty(piUserGUID);
-
-            SoapSerializationEnvelope envelopeUser = new SoapSerializationEnvelope(
-                    SoapEnvelope.VER11);
-
-            envelopeUser.dotNet = true;
-            envelopeUser.setOutputSoapObject(requestUser);
-
-            HttpTransportSE httpTransport = new HttpTransportSE(Data.URL);
-
-            try {
-                httpTransport.call(SOAP_ACTION, envelopeUser);
-                SoapObject responseUser = (SoapObject) envelopeUser
-                        .getResponse();
-                for (int i = 0; i < responseUser.getPropertyCount(); i++) {
-                    user.setProperty(i, responseUser.getProperty(i).toString());
-                }
-
-
-                ArrayList<User> userarray = new ArrayList<User>();
-                userarray.add(0, user);
-                if (user.SchID > 0) {
-                    /**
-                     * Creates Query string that handles the sorting and selecting of accounts
-                     * when the accounts list is populated
-                     */
-                    Globals global = new Globals();
-                    strQuery = global.BuildQuery(user.AccountSelection, user.AccountSort, "Accounts");
-
-                    _appPrefs.saveSchID(user.SchID);
-                    _appPrefs.saveUserID(user.UserID);
-                    _appPrefs.saveUserGUID(user.UserGUID);
-                    _appPrefs.saveAccountSortBy(user.AccountSort);
-                    _appPrefs.saveAccountSelectBy(user.AccountSelection);
-                    _appPrefs.saveStudentSortBy(user.StudentSort);
-                    _appPrefs.saveStudentSelectBy(user.StudentSelection);
-                    _appPrefs.saveUser(userarray);
-                    _appPrefs.saveAccountQuery(strQuery);
-
-                    boolean isBeingDebugged = android.os.Debug.isDebuggerConnected();
-                    if (isBeingDebugged) {
-                        ArrayList<Account> AccountsArray = new ArrayList<Account>();
-                        _appPrefs.saveAccounts(AccountsArray);
-
-                        ArrayList<Student> StudentArray = new ArrayList<Student>();
-                        _appPrefs.saveStudents(StudentArray);
-
-                    } else {
-                        /**
-                         * If all 3 are false it loads all 3 lists else it loads the list according which
-                         * variables are true
-                         */
-                        getAccountsListAsync getAccounts = new getAccountsListAsync();
-                        getAccounts.execute();
-
-                    }
-
-
-
-
-                    METHOD_NAME = "getSchool";
-                    SOAP_ACTION = "getSchool";
-                    School school = new School();
-                    SoapObject requestSchool = new SoapObject(Data.NAMESPACE,
-                            METHOD_NAME);
-
-                    PropertyInfo piSchID = new PropertyInfo();
-                    piSchID.setName("SchID");
-                    piSchID.setValue(user.SchID);
-                    requestSchool.addProperty(piSchID);
-
-                    PropertyInfo userid = new PropertyInfo();
-                    userid.setName("UserID");
-                    userid.setValue(user.UserID);
-                    requestSchool.addProperty(userid);
-
-                    PropertyInfo userguid = new PropertyInfo();
-                    userguid.setName("UserGUID");
-                    userguid.setValue(user.UserGUID);
-                    requestSchool.addProperty(userguid);
-
-                    SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
-                            SoapEnvelope.VER11);
-                    envelopeSchool.dotNet = true;
-                    envelopeSchool.setOutputSoapObject(requestSchool);
-
-                    httpTransport.call(SOAP_ACTION, envelopeSchool);
-                    SoapObject responseSchool = (SoapObject) envelopeSchool
-                            .getResponse();
-
-
-                    for (int i = 0; i < responseSchool.getPropertyCount(); i++) {
-                        school.setProperty(i, responseSchool.getProperty(i).toString());
-                    }
-
-                    ArrayList<School> schoolArrayList = new ArrayList<School>();
-                    schoolArrayList.add(0, school);
-                    _appPrefs.saveSchool(schoolArrayList);
-                    _appPrefs.saveSessionID(school.SessionID);
-                    _appPrefs.saveCCProcessor(school.CCProcessor);
-                    _appPrefs.saveST1Rate(school.ST1Rate);
-                    _appPrefs.saveST2Rate(school.ST2Rate);
-                    newLogoName = school.LogoName;
-                    if (newLogoName != LogoName)
-                        _appPrefs.saveLogoName(newLogoName);
-
-                }
-
-            } catch (Exception exception) {
-                exception.printStackTrace();
-            }
-
-            return user;
-
+            return oGlobals.getUserByID(_appPrefs);
         }
 
-        protected void onPostExecute(User user) {
-            if (user.UserID > 0) {
+        protected void onPostExecute(User oNewUser) {
+            if (oNewUser.UserID > 0) {
+                /**
+                 * The only way to use the Json parser is to save it as an array. So we create one to
+                 * parse the user we just created.
+                 */
+                ArrayList<User> userarray = new ArrayList<User>();
+                userarray.add(0, oNewUser);
 
+                Globals global = new Globals();
+                String strQuery = global.BuildQuery(oUser.AccountSelection, oUser.AccountSort, "Accounts");
+
+                _appPrefs.saveSchID(oNewUser.SchID);
+                _appPrefs.saveUserID(oNewUser.UserID);
+                _appPrefs.saveUserGUID(oNewUser.UserGUID);
+                _appPrefs.saveAccountSortBy(oNewUser.AccountSort);
+                _appPrefs.saveAccountSelectBy(oNewUser.AccountSelection);
+                _appPrefs.saveStudentSortBy(oNewUser.StudentSort);
+                _appPrefs.saveStudentSelectBy(oNewUser.StudentSelection);
+                _appPrefs.saveAccountQuery(strQuery);
+
+                /**
+                 * Check if app is debuggin, if so loads an empty list so that the debugging goes
+                 * faster and we don't have to wait forever.
+                 */
+                boolean isBeingDebugged = android.os.Debug.isDebuggerConnected();
+                if (isBeingDebugged) {
+                    getAccountsListAsync getAccounts = new getAccountsListAsync();
+                    getAccounts.execute();
+
+
+                    getStudentsListAsync getStudents = new getStudentsListAsync();
+                    getStudents.execute();
+
+                } else {
+                    /**
+                     * Loads all lists intially to speed up app. The majority of the async method is
+                     * in globals but the actual call itself is here so it can be run before generating
+                     * views so we don't end up with an empty list
+                     */
+                    getAccountsListAsync getAccounts = new getAccountsListAsync();
+                    getAccounts.execute();
+
+                    getStudentsListAsync getStudents = new getStudentsListAsync();
+                    getStudents.execute();
+
+                    getSchoolAsync getSchool = new getSchoolAsync();
+                    getSchool.execute();
+
+                }
 
                 Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.Home");
                 startActivity(openMainPage);
@@ -331,6 +241,42 @@ public class Splash extends ActionBarActivity {
 
     }
 
+    /**
+     * Gets school
+     */
+    private class getSchoolAsync extends AsyncTask<Data, Void, School> {
+
+        protected School doInBackground(Data... data) {
+            return oGlobals.getSchool(_appPrefs);
+        }
+
+        protected void onPostExecute(School oSchool) {
+            ArrayList<School> schoolArrayList = new ArrayList<School>();
+            schoolArrayList.add(0, oSchool);
+            _appPrefs.saveSchool(schoolArrayList);
+            _appPrefs.saveSessionID(oSchool.SessionID);
+            _appPrefs.saveCCProcessor(oSchool.CCProcessor);
+            _appPrefs.saveST1Rate(oSchool.ST1Rate);
+            _appPrefs.saveST2Rate(oSchool.ST2Rate);
+
+            String newLogoName = oSchool.LogoName;
+            String LogoName = _appPrefs.getLogoName();
+
+            if (newLogoName != LogoName)
+                _appPrefs.saveLogoName(newLogoName);
+
+            SessionID = oSchool.SessionID;
+
+            getStudentClassesAsync getClasses = new getStudentClassesAsync();
+            getClasses.execute();
+
+        }
+    }
+
+
+    /**
+     * Gets list of accounts
+     */
     private class getAccountsListAsync extends
             AsyncTask<Data, Void, ArrayList<Account>> {
 
@@ -347,4 +293,43 @@ public class Splash extends ActionBarActivity {
     }
 
 
+    /**
+     * Gets list of students
+     */
+    private class getStudentsListAsync extends
+            AsyncTask<Data, Void, ArrayList<Student>> {
+
+        @Override
+        protected ArrayList<Student> doInBackground(Data... data) {
+
+            /**
+             * 0 menas loads all students
+             */
+            return oGlobals.getStudents(_appPrefs, 0);
+        }
+
+        protected void onPostExecute(ArrayList<Student> result) {
+            _appPrefs.saveStudents(result);
+
+        }
+    }
+
+    /**
+     * Gets list of classes, runs in onpost of school to ensure we have a session id
+     */
+    public class getStudentClassesAsync extends
+            AsyncTask<Globals.Data, Void, ArrayList<SchoolClasses>> {
+
+        @Override
+        protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
+
+
+            return oGlobals.getClasses(_appPrefs, SessionID);
+        }
+
+        protected void onPostExecute(ArrayList<SchoolClasses> result) {
+            _appPrefs.saveSchoolClassList(result);
+
+        }
+    }
 }

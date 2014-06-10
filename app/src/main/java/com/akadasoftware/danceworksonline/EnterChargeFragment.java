@@ -277,13 +277,10 @@ public class EnterChargeFragment extends Fragment {
     public class getChargeCodesAsync extends
             AsyncTask<Data, Void, ArrayList<ChargeCodes>> {
 
-        ProgressDialog dialog;
+        ProgressDialog progress;
 
         protected void onPreExecute() {
-            dialog = new ProgressDialog(activity);
-            dialog.setProgress(ProgressDialog.STYLE_HORIZONTAL);
-            dialog.setMax(100);
-            dialog.show();
+            progress = ProgressDialog.show(activity, "Payments", "Loading...", true);
         }
 
         @Override
@@ -294,7 +291,7 @@ public class EnterChargeFragment extends Fragment {
         }
 
         protected void onPostExecute(ArrayList<ChargeCodes> result) {
-            dialog.dismiss();
+            progress.dismiss();
             arrayChargeCodes = result;
             addItemsOnSpinner(arrayChargeCodes);
 

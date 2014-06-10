@@ -18,7 +18,6 @@ import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
-import com.akadasoftware.danceworksonline.classes.StudentClasses;
 import com.akadasoftware.danceworksonline.classes.User;
 
 import org.ksoap2.SoapEnvelope;
@@ -44,7 +43,7 @@ public class StudentEnrollFragment extends ListFragment {
     SchoolClasses oSchoolClass;
     Session session;
     int SessionID, position;
-    Globals oGlobal;
+    Globals oGlobals;
 
     Button btnDone;
 
@@ -98,7 +97,7 @@ public class StudentEnrollFragment extends ListFragment {
 
         oStudent = studentsArray.get(position);
         oUser = _appPrefs.getUser();
-        oGlobal = new Globals();
+        oGlobals = new Globals();
     }
 
     @Override
@@ -176,9 +175,9 @@ public class StudentEnrollFragment extends ListFragment {
         @Override
         protected ArrayList<Session> doInBackground(Globals.Data... data) {
 
-            SoapObject session = oGlobal.getSoapRequest(Globals.Data.NAMESPACE, "getSessions");
-            session = oGlobal.setSessionPropertyInfo(session, oStudent.SchID, "getSessions", oUser);
-            return oGlobal.RetrieveSessionsFromSoap(session);
+            SoapObject session = oGlobals.getSoapRequest(Globals.Data.NAMESPACE, "getSessions");
+            session = oGlobals.setSessionPropertyInfo(session, oStudent.SchID, "getSessions", oUser);
+            return oGlobals.RetrieveSessionsFromSoap(session);
 
 
         }
@@ -226,118 +225,36 @@ public class StudentEnrollFragment extends ListFragment {
     }
 
 
+    /**
+     * Gets list of classes, runs in onpost of session to ensure we have a session id
+     */
     public class getStudentClassesAsync extends
             AsyncTask<Globals.Data, Void, ArrayList<SchoolClasses>> {
 
         @Override
         protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
 
-            return getClasses();
+
+            return oGlobals.getClasses(_appPrefs, SessionID);
         }
 
         protected void onPostExecute(ArrayList<SchoolClasses> result) {
-
             schoolClassesArray = result;
-            classAdapter = new SchoolClassAdapter(getActivity(),
+            _appPrefs.saveSchoolClassList(schoolClassesArray);
+
+            classAdapter = new SchoolClassAdapter(activity,
                     R.layout.item_studentclass, schoolClassesArray);
+
             setListAdapter(classAdapter);
             classAdapter.setNotifyOnChange(true);
 
         }
     }
 
-    public ArrayList<SchoolClasses> getClasses() {
-        String MethodName = "getSchoolClasses";
-        SoapObject response = InvokeMethod(Globals.Data.URL, MethodName);
-        return RetrieveFromSoap(response);
-
-    }
-
-    public SoapObject InvokeMethod(String URL, String MethodName) {
-
-        SoapObject request = GetSoapObject(MethodName);
-
-
-        PropertyInfo piUserID = new PropertyInfo();
-        piUserID.setName("UserID");
-        piUserID.setValue(oUser.UserID);
-        request.addProperty(piUserID);
-
-        PropertyInfo piUserGUID = new PropertyInfo();
-        piUserGUID.setType("STRING_CLASS");
-        piUserGUID.setName("UserGUID");
-        piUserGUID.setValue(oUser.UserGUID);
-        request.addProperty(piUserGUID);
-
-        PropertyInfo piSessionID = new PropertyInfo();
-        piSessionID.setName("intSessionID");
-        piSessionID.setValue(SessionID);
-        request.addProperty(piSessionID);
-
-        PropertyInfo piBoolEnroll = new PropertyInfo();
-        piBoolEnroll.setName("boolEnroll");
-        piBoolEnroll.setValue(true);
-        request.addProperty(piBoolEnroll);
-
-        PropertyInfo piStuID = new PropertyInfo();
-        piStuID.setName("intStuID");
-        piStuID.setValue(oStudent.StuID);
-        request.addProperty(piStuID);
-
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                SoapEnvelope.VER11);
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(request);
-        return MakeCall(URL, envelope, Globals.Data.NAMESPACE, MethodName);
-    }
-
-    public static SoapObject GetSoapObject(String MethodName) {
-        return new SoapObject(Globals.Data.NAMESPACE, MethodName);
-    }
-
-    public static SoapObject MakeCall(String URL,
-                                      SoapSerializationEnvelope envelope, String NAMESPACE,
-                                      String METHOD_NAME) {
-        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
-        try {
-            envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",
-                    new StudentClasses().getClass());
-            HttpTransport.call("getSchoolClasses", envelope);
-            envelopeOutput = envelope;
-            SoapObject response = (SoapObject) envelope.getResponse();
-
-            return response;
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
-        return null;
-    }
-
-    public static ArrayList<SchoolClasses> RetrieveFromSoap(SoapObject soap) {
-
-        ArrayList<SchoolClasses> schClassesArray = new ArrayList<SchoolClasses>();
-        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
-
-            SoapObject classItem = (SoapObject) soap.getProperty(i);
-
-            SchoolClasses classes = new SchoolClasses();
-            for (int j = 0; j < classItem.getPropertyCount() - 1; j++) {
-                classes.setProperty(j, classItem.getProperty(j)
-                        .toString());
-                if (classItem.getProperty(j).equals("anyType{}")) {
-                    classItem.setProperty(j, "");
-                }
-
-            }
-            schClassesArray.add(i, classes);
-        }
-
-        return schClassesArray;
-    }
-
-
+    /**
+     * Checking if class that is to be enrolled conflicks with any other previously registered
+     * classes
+     */
     public class checkClassConflicks extends AsyncTask<Globals.Data, Void, ArrayList<String>> {
         @Override
         protected ArrayList<String> doInBackground(Globals.Data... data) {
@@ -360,24 +277,11 @@ public class StudentEnrollFragment extends ListFragment {
 
     }
 
-    public static SoapObject MakeConflickCall(String URL,
-                                              SoapSerializationEnvelope envelope, String NAMESPACE,
-                                              String METHOD_NAME) {
-        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
-        try {
-            envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",
-                    new SchoolClasses().getClass());
-            HttpTransport.call(METHOD_NAME, envelope);
-            envelopeOutput = envelope;
-            SoapObject response = (SoapObject) envelope.getResponse();
-
-            return response;
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
-        return null;
+    public static SoapObject GetSoapObject(String MethodName) {
+        return new SoapObject(Globals.Data.NAMESPACE, MethodName);
     }
+
+
 
     public SoapObject InvokeEnrollmentMethod(String URL, String MethodName) {
 
@@ -481,6 +385,24 @@ public class StudentEnrollFragment extends ListFragment {
         return MakeConflickCall(URL, envelope, Globals.Data.NAMESPACE, MethodName);
     }
 
+    public static SoapObject MakeConflickCall(String URL,
+                                              SoapSerializationEnvelope envelope, String NAMESPACE,
+                                              String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        try {
+            envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",
+                    new SchoolClasses().getClass());
+            HttpTransport.call(METHOD_NAME, envelope);
+            //envelopeOutput = envelope;
+            SoapObject response = (SoapObject) envelope.getResponse();
+
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return null;
+    }
     public static ArrayList<String> RetrieveConflicksFromSoap(SoapObject soap) {
 
         ArrayList<String> strConflicksArray = new ArrayList<String>();

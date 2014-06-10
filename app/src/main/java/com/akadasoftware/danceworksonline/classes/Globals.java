@@ -1,7 +1,6 @@
 package com.akadasoftware.danceworksonline.classes;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -24,92 +23,92 @@ public class Globals {
      */
     public String BuildQuery(int selection, int sort, String mTitle) {
 
-        String Query, Sort = "", Select = "";
+        String Query, strSort = "", strSelect = "";
 
         if (mTitle.equals("Accounts") || mTitle.equals("Home")) {
             switch (sort) {
                 case 0:
-                    Sort = " ORDER BY LName,FName,AcctNo";
+                    strSort = " ORDER BY LName,FName,AcctNo";
                     break;
                 case 1:
-                    Sort = " ORDER BY FName,LName,AcctNo";
+                    strSort = " ORDER BY FName,LName,AcctNo";
                     break;
                 case 2:
-                    Sort = " ORDER BY AcctNo";
+                    strSort = " ORDER BY AcctNo";
                     break;
                 case 3:
-                    Sort = " ORDER BY Phone,LName,FName,AcctNo";
+                    strSort = " ORDER BY Phone,LName,FName,AcctNo";
                     break;
                 case 4:
-                    Sort = " ORDER BY Email,LName,FName,AcctNo";
+                    strSort = " ORDER BY Email,LName,FName,AcctNo";
                     break;
                 default:
-                    Sort = " ORDER BY LName,FName,AcctNo";
+                    strSort = " ORDER BY LName,FName,AcctNo";
                     break;
             }
 
             switch (selection) {
                 case 0:
-                    Select = " AND Status=0";
+                    strSelect = " AND Status=0";
                     break;
                 case 1:
-                    Select = " AND Status=1";
+                    strSelect = " AND Status=1";
                     break;
                 case 2:
-                    Select = " AND (Status=0 or Status=1)";
+                    strSelect = " AND (Status=0 or Status=1)";
                     break;
                 case 3:
-                    Select = " AND Status=2";
+                    strSelect = " AND Status=2";
                     break;
                 case 4:
-                    Select = " AND Status=3";
+                    strSelect = " AND Status=3";
                     break;
                 default:
-                    Select = "";
+                    strSelect = "";
                     break;
             }
         } else if (mTitle.equals("Students")) {
             switch (sort) {
                 case 0:
-                    Sort = " ORDER BY LName,FName,StuID";
+                    strSort = " ORDER BY LName,FName,StuID";
                     break;
                 case 1:
-                    Sort = " ORDER BY FName,LName,StuID";
+                    strSort = " ORDER BY FName,LName,StuID";
                     break;
                 case 2:
-                    Sort = " ORDER BY Phone,LName,FName,StuID";
+                    strSort = " ORDER BY Phone,LName,FName,StuID";
                     break;
                 case 3:
-                    Sort = "ORDER BY Email,LName,FName,StuID";
+                    strSort = "ORDER BY Email,LName,FName,StuID";
                     break;
                 case 4:
-                    Sort = " ORDER BY Birthdate,LName,FName,StuID";
+                    strSort = " ORDER BY Birthdate,LName,FName,StuID";
                     break;
                 case 5:
-                    Sort = " ORDER BY AcctNo,StuID";
+                    strSort = " ORDER BY AcctNo,StuID";
                     break;
             }
 
             switch (selection) {
                 case 0:
-                    Select = " AND Status=0";
+                    strSelect = " AND Status=0";
                     break;
                 case 1:
-                    Select = " AND Status=1";
+                    strSelect = " AND Status=1";
                     break;
                 case 2:
-                    Select = " AND (Status=0 or Status=1)";
+                    strSelect = " AND (Status=0 or Status=1)";
                     break;
                 case 3:
-                    Select = " AND Status=2";
+                    strSelect = " AND Status=2";
                     break;
                 default:
-                    Select = "";
+                    strSelect = "";
                     break;
 
             }
         }
-        Query = Select + Sort;
+        Query = strSelect + strSort;
 
 
         return Query;
@@ -223,107 +222,180 @@ public class Globals {
         return sessionArray;
     }
 
-    private class getStudentsList extends AsyncTask<Data, Void, ArrayList<Student>> {
+    /**
+     * Get User used on intial login screen
+     */
 
-        protected ArrayList<Student> doInBackground(Data... data) {
-            return getStudents();
-        }
-
-        protected void onPostExecute(ArrayList<Student> result) {
-            _appPrefs.saveStudents(result);
-        }
+    public User getUser(AppPreferences _appPrefsNew, String strEmail, String strPassword) {
+        _appPrefs = _appPrefsNew;
+        String MethodName = "getUser";
+        SoapObject response = InvokeNewUserMethod(Data.URL, MethodName, strEmail, strPassword);
+        return RetrieveUserFromSoap(response);
 
     }
 
-    public static ArrayList<Student> getStudents() {
-        String MethodName = "getStudents";
-        SoapObject response = InvokeMethod(Data.URL, MethodName);
-        return RetrieveFromSoap(response);
-    }
 
-    public static SoapObject InvokeMethod(String URL, String MethodName) {
+    public static SoapObject InvokeNewUserMethod(String URL, String METHOD_NAME, String strEmail, String strPassword) {
 
-        SoapObject request = GetSoapObject(MethodName);
+        SoapObject requestNewUser = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
-        User oUser = _appPrefs.getUser();
-        String strStudentQuery = _appPrefs.getStudentQuery();
+        PropertyInfo piEmail = new PropertyInfo();
+        piEmail.setType("STRING_CLASS");
+        piEmail.setName("email");
+        piEmail.setValue(strEmail);
+        requestNewUser.addProperty(piEmail);
 
-        PropertyInfo piWhere = new PropertyInfo();
-        piWhere.setType("STRING_CLASS");
-        piWhere.setName("Where");
-        piWhere.setValue(strStudentQuery);
-        request.addProperty(piWhere);
+        PropertyInfo piPassword = new PropertyInfo();
+        piPassword.setType("STRING_CLASS");
+        piPassword.setName("password");
+        piPassword.setValue(strPassword);
+        requestNewUser.addProperty(piPassword);
 
-        PropertyInfo piSchID = new PropertyInfo();
-        piSchID.setName("SchID");
-        piSchID.setValue(oUser.SchID);
-        request.addProperty(piSchID);
-
-        PropertyInfo piAcctID = new PropertyInfo();
-        piAcctID.setName("AcctID");
-        piAcctID.setValue(0);
-        request.addProperty(piAcctID);
-
-        PropertyInfo piUserID = new PropertyInfo();
-        piUserID.setName("UserID");
-        piUserID.setValue(oUser.UserID);
-        request.addProperty(piUserID);
-
-        PropertyInfo piUserGUID = new PropertyInfo();
-        piUserGUID.setType("STRING_CLASS");
-        piUserGUID.setName("UserGUID");
-        piUserGUID.setValue(oUser.UserGUID);
-        request.addProperty(piUserGUID);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+        SoapSerializationEnvelope envelopeNewUser = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(request);
-        return MakeCall(URL, envelope, Data.NAMESPACE, MethodName);
+
+        envelopeNewUser.dotNet = true;
+        envelopeNewUser.setOutputSoapObject(requestNewUser);
+
+        envelopeNewUser.dotNet = true;
+        return MakeUserCall(URL, envelopeNewUser, Data.NAMESPACE, METHOD_NAME);
     }
 
-    public static SoapObject GetSoapObject(String MethodName) {
-        return new SoapObject(Data.NAMESPACE, MethodName);
-    }
-
-    public static SoapObject MakeCall(String URL, SoapSerializationEnvelope envelope, String NAMESPACE,
-                                      String METHOD_NAME) {
+    public static SoapObject MakeUserCall(String URL,
+                                          SoapSerializationEnvelope envelope, String NAMESPACE,
+                                          String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
         try {
-            envelope.addMapping(Data.NAMESPACE, "Student",
-                    new Student().getClass());
-            HttpTransport.call("getStudents", envelope);
-            SoapSerializationEnvelope envelopeOutput = envelope;
-            SoapObject response = (SoapObject) envelope.getResponse();
+            envelope.addMapping(Data.NAMESPACE, "User",
+                    new User().getClass());
+            HttpTransport.call(METHOD_NAME, envelope);
+            SoapObject responseUser = (SoapObject) envelope.getResponse();
 
-            return response;
+            return responseUser;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public static ArrayList<Student> RetrieveFromSoap(SoapObject soap) {
-        ArrayList<Student> Students = new ArrayList<Student>();
-        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
-
-            SoapObject studentlistitem = (SoapObject) soap.getProperty(i);
-            Student student = new Student();
-            for (int j = 0; j < studentlistitem.getPropertyCount(); j++) {
-                student.setProperty(j, studentlistitem.getProperty(j)
-                        .toString());
-                if (studentlistitem.getProperty(j).equals("anyType{}")) {
-                    studentlistitem.setProperty(j, "");
-                }
-
-            }
-            Students.add(i, student);
+    public static User RetrieveUserFromSoap(SoapObject soap) {
+        User inputUser = new User();
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
+            inputUser.setProperty(i, soap.getProperty(i).toString());
         }
-
-        return Students;
+        return inputUser;
     }
 
 
+    /**
+     * Get User by ID used on splash screen, uses the same MakeUserCall and RetrieveUserFromSoap
+     * methods as the getUser async on initial login
+     */
+
+    public static User getUserByID(AppPreferences _appPrefsNew) {
+        _appPrefs = _appPrefsNew;
+        String MethodName = "getUserByID";
+        SoapObject response = InvokeUserMethod(Data.URL, MethodName);
+        return RetrieveUserFromSoap(response);
+
+    }
+
+    public static SoapObject InvokeUserMethod(String URL, String MethodName) {
+        User oUser = _appPrefs.getUser();
+        SoapObject requestUser = GetSoapObject(MethodName);
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        requestUser.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        requestUser.addProperty(piUserGUID);
+
+        SoapSerializationEnvelope envelopeUser = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        envelopeUser.dotNet = true;
+        envelopeUser.setOutputSoapObject(requestUser);
+
+        envelopeUser.dotNet = true;
+        return MakeUserCall(URL, envelopeUser, Data.NAMESPACE, MethodName);
+    }
+
+
+    /**
+     * Get School
+     */
+
+    public static School getSchool(AppPreferences _appPrefsNew) {
+        _appPrefs = _appPrefsNew;
+        String MethodName = "getSchool";
+        SoapObject response = InvokeSchoolMethod(Data.URL, MethodName);
+        return RetrieveSchoolFromSoap(response);
+
+    }
+
+    public static SoapObject InvokeSchoolMethod(String URL, String METHOD_NAME) {
+        User oUser = _appPrefs.getUser();
+        SoapObject requestSchool = new SoapObject(Data.NAMESPACE,
+                METHOD_NAME);
+
+        PropertyInfo piSchID = new PropertyInfo();
+        piSchID.setName("SchID");
+        piSchID.setValue(oUser.SchID);
+        requestSchool.addProperty(piSchID);
+
+        PropertyInfo userid = new PropertyInfo();
+        userid.setName("UserID");
+        userid.setValue(oUser.UserID);
+        requestSchool.addProperty(userid);
+
+        PropertyInfo userguid = new PropertyInfo();
+        userguid.setName("UserGUID");
+        userguid.setValue(oUser.UserGUID);
+        requestSchool.addProperty(userguid);
+
+        SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        envelopeSchool.dotNet = true;
+        envelopeSchool.setOutputSoapObject(requestSchool);
+
+        envelopeSchool.dotNet = true;
+        return MakeSchoolCall(URL, envelopeSchool, Data.NAMESPACE, METHOD_NAME);
+    }
+
+    public static SoapObject MakeSchoolCall(String URL,
+                                            SoapSerializationEnvelope envelope, String NAMESPACE,
+                                            String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        try {
+            envelope.addMapping(Data.NAMESPACE, "School",
+                    new School().getClass());
+            HttpTransport.call(METHOD_NAME, envelope);
+            SoapObject responseSchool = (SoapObject) envelope.getResponse();
+
+            return responseSchool;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static School RetrieveSchoolFromSoap(SoapObject soap) {
+        School inputSchool = new School();
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
+            inputSchool.setProperty(i, soap.getProperty(i).toString());
+        }
+        return inputSchool;
+    }
+
+
+    /**
+     * Get accounts list
+     */
     public static ArrayList<Account> getAccounts(AppPreferences _appPrefsNew) {
         _appPrefs = _appPrefsNew;
         String MethodName = "getAccounts";
@@ -379,8 +451,7 @@ public class Globals {
         try {
             envelope.addMapping(Data.NAMESPACE, "Account",
                     new Account().getClass());
-            HttpTransport.call("getAccounts", envelope);
-            SoapSerializationEnvelope envelopeOutput = envelope;
+            HttpTransport.call(METHOD_NAME, envelope);
             SoapObject responseAccounts = (SoapObject) envelope.getResponse();
 
             return responseAccounts;
@@ -393,7 +464,7 @@ public class Globals {
     public static ArrayList<Account> RetrieveAccountsFromSoap(SoapObject soap) {
 
         ArrayList<Account> Accounts = new ArrayList<Account>();
-        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
 
             SoapObject accountlistitem = (SoapObject) soap.getProperty(i);
             Account account = new Account();
@@ -410,5 +481,210 @@ public class Globals {
 
         return Accounts;
     }
+
+
+    /**
+     * Get students list
+     */
+
+    public static ArrayList<Student> getStudents(AppPreferences _appPrefsNew, int intAcctID) {
+        _appPrefs = _appPrefsNew;
+        String MethodName = "getStudents";
+        SoapObject response = InvokeMethod(Data.URL, MethodName, intAcctID);
+        return RetrieveStudentsFromSoap(response);
+    }
+
+    public static SoapObject InvokeMethod(String URL, String MethodName, int intAcctID) {
+
+        SoapObject request = GetSoapObject(MethodName);
+
+        Globals oGlobals = new Globals();
+        User oUser = _appPrefs.getUser();
+        String strStudentQuery = "";
+        /**
+         * Loads students for one particular account
+         */
+        if (intAcctID > 0) {
+            strStudentQuery = oGlobals.BuildQuery(4, _appPrefs.getStudentSortBy(), "Students");
+        }
+        /**
+         * Loads all students
+         */
+        else {
+            strStudentQuery = _appPrefs.getStudentQuery();
+        }
+
+
+        PropertyInfo piWhere = new PropertyInfo();
+        piWhere.setType("STRING_CLASS");
+        piWhere.setName("Where");
+        piWhere.setValue(strStudentQuery);
+        request.addProperty(piWhere);
+
+        PropertyInfo piSchID = new PropertyInfo();
+        piSchID.setName("SchID");
+        piSchID.setValue(oUser.SchID);
+        request.addProperty(piSchID);
+
+        PropertyInfo piAcctID = new PropertyInfo();
+        piAcctID.setName("AcctID");
+        piAcctID.setValue(intAcctID);
+        request.addProperty(piAcctID);
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        request.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        request.addProperty(piUserGUID);
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(request);
+        return MakeCall(URL, envelope, Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject GetSoapObject(String MethodName) {
+        return new SoapObject(Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject MakeCall(String URL, SoapSerializationEnvelope envelope, String NAMESPACE,
+                                      String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        try {
+            envelope.addMapping(Data.NAMESPACE, "Student",
+                    new Student().getClass());
+            HttpTransport.call(METHOD_NAME, envelope);
+            SoapSerializationEnvelope envelopeOutput = envelope;
+            SoapObject response = (SoapObject) envelope.getResponse();
+
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static ArrayList<Student> RetrieveStudentsFromSoap(SoapObject soap) {
+        ArrayList<Student> Students = new ArrayList<Student>();
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
+
+            SoapObject studentlistitem = (SoapObject) soap.getProperty(i);
+            Student student = new Student();
+            for (int j = 0; j < studentlistitem.getPropertyCount(); j++) {
+                student.setProperty(j, studentlistitem.getProperty(j)
+                        .toString());
+                if (studentlistitem.getProperty(j).equals("anyType{}")) {
+                    studentlistitem.setProperty(j, "");
+                }
+
+            }
+            Students.add(i, student);
+        }
+
+        return Students;
+    }
+
+    /**
+     * Get class list
+     */
+
+    public ArrayList<SchoolClasses> getClasses(AppPreferences _appPrefsNew, int intSessionID) {
+        _appPrefs = _appPrefsNew;
+        String MethodName = "getSchoolClasses";
+        SoapObject response = InvokeClassMethod(Globals.Data.URL, MethodName, intSessionID);
+        return RetrieveClassFromSoap(response);
+
+    }
+
+    public SoapObject InvokeClassMethod(String URL, String MethodName, int intSessionID) {
+
+        SoapObject request = GetClassSoapObject(MethodName);
+
+        User oUser = _appPrefs.getUser();
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        request.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        request.addProperty(piUserGUID);
+
+        PropertyInfo piSessionID = new PropertyInfo();
+        piSessionID.setName("intSessionID");
+        piSessionID.setValue(intSessionID);
+        request.addProperty(piSessionID);
+
+        PropertyInfo piBoolEnroll = new PropertyInfo();
+        piBoolEnroll.setName("boolEnroll");
+        piBoolEnroll.setValue(true);
+        request.addProperty(piBoolEnroll);
+
+        PropertyInfo piStuID = new PropertyInfo();
+        piStuID.setName("intStuID");
+        piStuID.setValue(0);
+        request.addProperty(piStuID);
+
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(request);
+        return MakeClassCall(URL, envelope, Globals.Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject GetClassSoapObject(String MethodName) {
+        return new SoapObject(Globals.Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject MakeClassCall(String URL,
+                                           SoapSerializationEnvelope envelope, String NAMESPACE,
+                                           String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        try {
+            envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",
+                    new StudentClasses().getClass());
+            HttpTransport.call(METHOD_NAME, envelope);
+            SoapObject response = (SoapObject) envelope.getResponse();
+
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return null;
+    }
+
+    public static ArrayList<SchoolClasses> RetrieveClassFromSoap(SoapObject soap) {
+
+        ArrayList<SchoolClasses> schClassesArray = new ArrayList<SchoolClasses>();
+        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
+
+            SoapObject classItem = (SoapObject) soap.getProperty(i);
+
+            SchoolClasses classes = new SchoolClasses();
+            for (int j = 0; j < classItem.getPropertyCount() - 1; j++) {
+                classes.setProperty(j, classItem.getProperty(j)
+                        .toString());
+                if (classItem.getProperty(j).equals("anyType{}")) {
+                    classItem.setProperty(j, "");
+                }
+
+            }
+            schClassesArray.add(i, classes);
+        }
+
+        return schClassesArray;
+    }
+
 
 }

@@ -1,6 +1,7 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -13,13 +14,10 @@ import android.widget.ListAdapter;
 
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.Student;
 
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
-import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 
@@ -43,6 +41,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
     static String SOAP_ACTION = "getStudents";
     Activity activity;
     Account oAccount;
+    Globals oGlobals;
 
     /**
      * The fragment's ListView/GridView.
@@ -81,8 +80,8 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
 
         accountsArray = _appPrefs.getAccounts();
         int position = getArguments().getInt("Position");
-
         oAccount = accountsArray.get(position);
+        oGlobals = new Globals();
 
 
     }
@@ -123,6 +122,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
     @Override
     public void onResume() {
         super.onResume();
+
         getAccountStudentsAsync getStudents = new getAccountStudentsAsync();
         getStudents.execute();
     }
@@ -139,117 +139,35 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
         private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
     }
 
-    public class getAccountStudentsAsync extends
+    /**
+     * Gets list of students
+     */
+    private class getAccountStudentsAsync extends
             AsyncTask<Data, Void, ArrayList<Student>> {
+        ProgressDialog progress;
+
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(getActivity(), "Getting stuff from da interwebs", "Loading...", true);
+        }
 
         @Override
         protected ArrayList<Student> doInBackground(Data... data) {
 
-            return getStudents();
+            return oGlobals.getStudents(_appPrefs, _appPrefs.getAcctID());
         }
 
-        protected void onPostExecute(ArrayList<Student> students) {
-
-            studentsArray = students;
+        protected void onPostExecute(ArrayList<Student> result) {
+            progress.dismiss();
+            studentsArray = result;
             stuAdapter = new AccountStudentsAdapter(activity,
                     R.layout.item_accountstudents, studentsArray);
 
             setListAdapter(stuAdapter);
             stuAdapter.setNotifyOnChange(true);
 
-        }
-    }
-
-    public ArrayList<Student> getStudents() {
-        String MethodName = "getStudents";
-        SoapObject response = InvokeMethod(Data.URL, MethodName);
-        return RetrieveAccountStudentsFromSoap(response);
-
-    }
-
-    public SoapObject InvokeMethod(String URL, String MethodName) {
-
-        SoapObject request = GetSoapObject(MethodName);
-
-        //This where string is built server side.
-        PropertyInfo piWhere = new PropertyInfo();
-        piWhere.setName("Where");
-        piWhere.setValue("");
-        request.addProperty(piWhere);
-
-        PropertyInfo piSchID = new PropertyInfo();
-        piSchID.setName("SchID");
-        piSchID.setValue(_appPrefs.getSchID());
-        request.addProperty(piSchID);
-
-        PropertyInfo piAcctID = new PropertyInfo();
-        piAcctID.setName("AcctID");
-        piAcctID.setValue(_appPrefs.getAcctID());
-        request.addProperty(piAcctID);
-
-        PropertyInfo piUserID = new PropertyInfo();
-        piUserID.setName("UserID");
-        piUserID.setValue(_appPrefs.getUserID());
-        request.addProperty(piUserID);
-
-        PropertyInfo piUserGUID = new PropertyInfo();
-        piUserGUID.setType("STRING_CLASS");
-        piUserGUID.setName("UserGUID");
-        piUserGUID.setValue(_appPrefs.getUserGUID());
-        request.addProperty(piUserGUID);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                SoapEnvelope.VER11);
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(request);
-        return MakeCall(URL, envelope, Data.NAMESPACE, MethodName);
-    }
-
-    public static SoapObject GetSoapObject(String MethodName) {
-        return new SoapObject(Data.NAMESPACE, MethodName);
-    }
-
-    public static SoapObject MakeCall(String URL,
-                                      SoapSerializationEnvelope envelope, String NAMESPACE,
-                                      String METHOD_NAME) {
-        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
-        try {
-            envelope.addMapping(Data.NAMESPACE, "Student",
-                    new Student().getClass());
-            HttpTransport.call(SOAP_ACTION, envelope);
-            envelopeOutput = envelope;
-            SoapObject responseAccountStudents = (SoapObject) envelope.getResponse();
-
-            return responseAccountStudents;
-        } catch (Exception e) {
-            e.printStackTrace();
 
         }
-        return null;
     }
-
-    public static ArrayList<Student> RetrieveAccountStudentsFromSoap(SoapObject soap) {
-
-        ArrayList<Student> Students = new ArrayList<Student>();
-        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
-
-            SoapObject studentitem = (SoapObject) soap.getProperty(i);
-
-            Student students = new Student();
-            for (int j = 0; j < studentitem.getPropertyCount() - 1; j++) {
-                students.setProperty(j, studentitem.getProperty(j)
-                        .toString());
-                if (studentitem.getProperty(j).equals("anyType{}")) {
-                    studentitem.setProperty(j, "");
-                }
-
-            }
-            Students.add(i, students);
-        }
-
-        return Students;
-    }
-
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

@@ -20,14 +20,9 @@ import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.School;
+import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.User;
-
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 
@@ -35,7 +30,7 @@ public class Login extends ActionBarActivity {
 
     private static SharedPreferences loginPreferences;
     private static SharedPreferences.Editor loginEditor;
-    static String strQuery;
+    private AppPreferences _appPrefs;
 
     @Override
     public boolean stopService(Intent name) {
@@ -46,6 +41,7 @@ public class Login extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        _appPrefs = new AppPreferences(getApplicationContext());
         SharedPreferences loginPreferences = getSharedPreferences("loginPrefs", MODE_PRIVATE);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -56,39 +52,11 @@ public class Login extends ActionBarActivity {
 
     }
 
-    //May want in future
-/*
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+    public void onStart() {
+        super.onStart();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        switch(id)
-        {
-            case R.id.action_settings:
-                return true;
-            case R.id.log_out:
-                loginEditor.clear();
-                loginEditor.commit();
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.container, new Login.LoginFragment()).commit();
-                break;
-            case R.id.profile:
-                return true;
-            default:
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-*/
 
     /**
      * A Login fragment containing edit texts for the email and password and various other
@@ -99,18 +67,13 @@ public class Login extends ActionBarActivity {
         Activity activity;
         private AppPreferences _appPrefs;
         Button btnLogin;
-        EditText etEmail;
-        EditText etPassword;
-        CheckBox chkShowPassword;
-        CheckBox chkRemember;
+        EditText etEmail, etPassword;
+        CheckBox chkShowPassword, chkRemember;
         TextView tvForgotPassword;
         TextView tvError;
-        User user = new User();
-        String METHOD_NAME = "";
-        String SOAP_ACTION = "";
-        Integer UserID = 0;
-        String UserGUID = "";
-        Globals oGlobal;
+        String strEmail, strPassword;
+        Globals oGlobals;
+        int SessionID;
 
         public LoginFragment() {
         }
@@ -123,6 +86,7 @@ public class Login extends ActionBarActivity {
             activity = this.getActivity();
             _appPrefs = new AppPreferences(activity);
             _appPrefs.saveNavDrawerPosition(0);
+            oGlobals = new Globals();
 
             btnLogin = (Button) rootView.findViewById(R.id.btnLogin);
             etEmail = (EditText) rootView.findViewById(R.id.etEmail);
@@ -151,27 +115,16 @@ public class Login extends ActionBarActivity {
                 @Override
                 public void onClick(View view) {
                     tvError.setText("");
-                    new getUser().execute();
+                    strEmail = etEmail.getText().toString();
+                    strPassword = etPassword.getText().toString();
+                    getUserAsync getNewUser = new getUserAsync();
+                    getNewUser.execute();
                 }
             });
 
             loginPreferences = activity.getSharedPreferences("loginPrefs", MODE_PRIVATE);
             loginEditor = loginPreferences.edit();
-            Boolean loggedin = loginPreferences.getBoolean("loggedin", false);
-
-            /*if (loggedin) {
-                UserID = loginPreferences.getInt("UserID", 0);
-                if (UserID > 0) {
-                    UserGUID = loginPreferences.getString("UserGUID", "");
-                    tvError.setText("");
-                    new getUserByID().execute();
-                } else {
-                    tvError.setText("Please enter your email address and password to login");
-                    loginEditor.clear();
-                    loginEditor.putBoolean("loggedin", false);
-                    loginEditor.commit();
-                }
-            }*/
+            //Boolean loggedin = loginPreferences.getBoolean("loggedin", false);
 
             tvForgotPassword.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -198,264 +151,175 @@ public class Login extends ActionBarActivity {
             private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
         }
 
-        public class getUser extends AsyncTask<Data, Void, User> {
+
+        /**
+         * Gets User for the initial login or if they did not check the remember me check box
+         */
+        public class getUserAsync extends AsyncTask<Globals.Data, Void, User> {
 
             @Override
-            protected User doInBackground(Data... data) {
+            protected User doInBackground(Globals.Data... data) {
 
-                METHOD_NAME = "getUser";
-                SOAP_ACTION = "getUser";
-
-                SoapObject requestUser = new SoapObject(Data.NAMESPACE, METHOD_NAME);
-
-                PropertyInfo piEmail = new PropertyInfo();
-                piEmail.setType("STRING_CLASS");
-                piEmail.setName("email");
-
-                piEmail.setValue(etEmail.getText().toString());
-                requestUser.addProperty(piEmail);
-
-                PropertyInfo piPassword = new PropertyInfo();
-                piPassword.setType("STRING_CLASS");
-                piPassword.setName("password");
-
-                piPassword.setValue(etPassword.getText().toString());
-                requestUser.addProperty(piPassword);
-
-                SoapSerializationEnvelope envelopeUser = new SoapSerializationEnvelope(
-                        SoapEnvelope.VER11);
-
-                envelopeUser.dotNet = true;
-                envelopeUser.setOutputSoapObject(requestUser);
-
-                //Creates an instance of HttpTransportSE with set url
-                HttpTransportSE httpTransport = new HttpTransportSE(Data.URL);
-
-                try {
-                    //Sets the desired soapAction field which corresponds with our webservice
-                    //method
-                    httpTransport.call(SOAP_ACTION, envelopeUser);
-                    //A dynamic object that is used to build soap calls.
-                    SoapObject responseUser = (SoapObject) envelopeUser
-                            .getResponse();
-                    for (int i = 0; i < responseUser.getPropertyCount(); i++) {
-                        user.setProperty(i, responseUser.getProperty(i).toString());
-                    }
-                    ArrayList<User> userarray = new ArrayList<User>();
-                    userarray.add(0, user);
-                    // If the user logged in before it will not hit this break point but instead
-                    // go to the splash page
-                    if (user.SchID > 0) {
-                        /**
-                         * Creates Query string that handles the sorting and selecting of accounts
-                         * when the accounts list is populated
-                         */
-                        Globals global = new Globals();
-                        strQuery = global.BuildQuery(user.AccountSelection, user.AccountSort, "Accounts");
-
-                        _appPrefs.saveSchID(user.SchID);
-                        _appPrefs.saveUserID(user.UserID);
-                        _appPrefs.saveUserGUID(user.UserGUID);
-                        _appPrefs.saveAccountSortBy(user.AccountSort);
-                        _appPrefs.saveAccountSelectBy(user.AccountSelection);
-                        _appPrefs.saveStudentSortBy(user.StudentSort);
-                        _appPrefs.saveStudentSelectBy(user.StudentSelection);
-                        _appPrefs.saveUser(userarray);
-                        _appPrefs.saveAccountQuery(strQuery);
-
-                        boolean isBeingDebugged = android.os.Debug.isDebuggerConnected();
-                        if (isBeingDebugged) {
-                            ArrayList<Account> AccountsArray = new ArrayList<Account>();
-                            _appPrefs.saveAccounts(AccountsArray);
-
-                            ArrayList<Student> StudentArray = new ArrayList<Student>();
-                            _appPrefs.saveStudents(StudentArray);
-
-                        } else {
-                            /**
-                             * If all 3 are false it loads all 3 lists else it loads the list according which
-                             * variables are true
-                             */
-                        }
-
-
-                        METHOD_NAME = "getSchool";
-                        SOAP_ACTION = "getSchool";
-                        School school = new School();
-                        SoapObject requestSchool = new SoapObject(Data.NAMESPACE,
-                                METHOD_NAME);
-
-                        PropertyInfo piSchID = new PropertyInfo();
-                        piSchID.setName("SchID");
-                        piSchID.setValue(user.SchID);
-                        requestSchool.addProperty(piSchID);
-
-                        PropertyInfo piUserID = new PropertyInfo();
-                        piUserID.setName("UserID");
-                        piUserID.setValue(user.UserID);
-                        requestSchool.addProperty(piUserID);
-
-                        PropertyInfo piUserGUID = new PropertyInfo();
-                        piUserGUID.setName("UserGUID");
-                        piUserGUID.setValue(user.UserGUID);
-                        requestSchool.addProperty(piUserGUID);
-
-                        SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
-                                SoapEnvelope.VER11);
-                        envelopeSchool.dotNet = true;
-                        envelopeSchool.setOutputSoapObject(requestSchool);
-
-                        httpTransport.call(SOAP_ACTION, envelopeSchool);
-                        SoapObject responseSchool = (SoapObject) envelopeSchool
-                                .getResponse();
-
-
-                        for (int i = 0; i < responseSchool.getPropertyCount(); i++) {
-                            school.setProperty(i, responseSchool.getProperty(i).toString());
-                        }
-
-                        ArrayList<School> schoolArrayList = new ArrayList<School>();
-                        schoolArrayList.add(0, school);
-                        _appPrefs.saveSchool(schoolArrayList);
-                        _appPrefs.saveSessionID(school.SessionID);
-                        _appPrefs.saveCCProcessor(school.CCProcessor);
-                        _appPrefs.saveST1Rate(school.ST1Rate);
-                        _appPrefs.saveST2Rate(school.ST2Rate);
-                        _appPrefs.saveLogoName(school.LogoName);
-
-                    }
-
-                } catch (Exception exception) {
-                    exception.printStackTrace();
-                }
-
-                return user;
+                return oGlobals.getUser(_appPrefs, strEmail, strPassword);
 
             }
 
-            protected void onPostExecute(User user) {
-                if (user.UserID > 0) {
+            protected void onPostExecute(User oUser) {
+                if (oUser.UserID > 0) {
                     if (chkRemember.isChecked()) {
                         loginEditor.putBoolean("loggedin", true);
-                        loginEditor.putInt("UserID", user.UserID);
-                        loginEditor.putString("UserGUID", user.UserGUID);
+                        loginEditor.putInt("UserID", oUser.UserID);
+                        loginEditor.putString("UserGUID", oUser.UserGUID);
                         loginEditor.commit();
                     } else {
                         loginEditor.clear();
                         loginEditor.putBoolean("loggedin", false);
                         loginEditor.commit();
                     }
-                    Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.Home");
-                    startActivity(openMainPage);
-                } else {
-                    tvError.setText("Login information is incorrect");
-                }
-            }
 
-        }
-
-       /* public class getUserByID extends AsyncTask<Data, Void, User> {
-
-            @Override
-            protected User doInBackground(Data... data) {
-
-                METHOD_NAME = "getUserByID";
-                SOAP_ACTION = "getUserByID";
-
-                SoapObject requestUser = new SoapObject(Data.NAMESPACE, METHOD_NAME);
-
-                PropertyInfo piUserID = new PropertyInfo();
-                piUserID.setName("UserID");
-                piUserID.setValue(UserID);
-                requestUser.addProperty(piUserID);
-
-                PropertyInfo piUserGUID = new PropertyInfo();
-                piUserGUID.setName("UserGUID");
-                piUserGUID.setValue(UserGUID);
-                requestUser.addProperty(piUserGUID);
-
-                SoapSerializationEnvelope envelopeUser = new SoapSerializationEnvelope(
-                        SoapEnvelope.VER11);
-
-                envelopeUser.dotNet = true;
-                envelopeUser.setOutputSoapObject(requestUser);
-
-                HttpTransportSE httpTransport = new HttpTransportSE(Data.URL);
-
-                try {
-                    httpTransport.call(SOAP_ACTION, envelopeUser);
-                    SoapObject responseUser = (SoapObject) envelopeUser
-                            .getResponse();
-                    for (int i = 0; i < responseUser.getPropertyCount(); i++) {
-                        user.setProperty(i, responseUser.getProperty(i).toString());
-                    }
-                                            *//*_appPrefs.saveEmail(strEmail);*//*
+                    /**
+                     * Creates Query string that handles the sorting and selecting of accounts
+                     * when the accounts list is populated
+                     */
+                    Globals global = new Globals();
+                    String strQuery = global.BuildQuery(oUser.AccountSelection, oUser.AccountSort, "Accounts");
 
                     ArrayList<User> userarray = new ArrayList<User>();
-                    userarray.add(0, user);
-                    if (user.SchID > 0) {
-                        _appPrefs.saveSchID(user.SchID);
-                        _appPrefs.saveUserID(user.UserID);
-                        _appPrefs.saveUser(userarray);
+                    userarray.add(0, oUser);
+
+                    _appPrefs.saveSchID(oUser.SchID);
+                    _appPrefs.saveUserID(oUser.UserID);
+                    _appPrefs.saveUserGUID(oUser.UserGUID);
+                    _appPrefs.saveAccountSortBy(oUser.AccountSort);
+                    _appPrefs.saveAccountSelectBy(oUser.AccountSelection);
+                    _appPrefs.saveStudentSortBy(oUser.StudentSort);
+                    _appPrefs.saveStudentSelectBy(oUser.StudentSelection);
+                    _appPrefs.saveUser(userarray);
+                    _appPrefs.saveAccountQuery(strQuery);
+
+                    boolean isBeingDebugged = android.os.Debug.isDebuggerConnected();
+                    if (isBeingDebugged) {
                         ArrayList<Account> AccountsArray = new ArrayList<Account>();
                         _appPrefs.saveAccounts(AccountsArray);
-                        METHOD_NAME = "getSchool";
-                        SOAP_ACTION = "getSchool";
-                        School school = new School();
-                        SoapObject requestSchool = new SoapObject(Data.NAMESPACE,
-                                METHOD_NAME);
 
-                        PropertyInfo piSchID = new PropertyInfo();
-                        piSchID.setName("SchID");
-                        piSchID.setValue(user.SchID);
-                        requestSchool.addProperty(piSchID);
+                        ArrayList<Student> StudentArray = new ArrayList<Student>();
+                        _appPrefs.saveStudents(StudentArray);
 
-                        SoapSerializationEnvelope envelopeSchool = new SoapSerializationEnvelope(
-                                SoapEnvelope.VER11);
-                        envelopeSchool.dotNet = true;
-                        envelopeSchool.setOutputSoapObject(requestSchool);
+                    } else {
+                        /**
+                         * Loads all lists intially to speed up app. The majority of the async method is
+                         * in globals but the actual call itself is here so it can be run before generating
+                         * views so we don't end up with an empty list
+                         */
+                        getAccountsListAsync getAccounts = new getAccountsListAsync();
+                        getAccounts.execute();
 
-                        httpTransport.call(SOAP_ACTION, envelopeSchool);
-                        SoapObject responseSchool = (SoapObject) envelopeSchool
-                                .getResponse();
+                        getStudentsListAsync getStudents = new getStudentsListAsync();
+                        getStudents.execute();
 
-                        school.SessionID = Integer.parseInt(responseSchool
-                                .getProperty(3).toString());
-                        school.CCProcessor = responseSchool.getProperty(88)
-                                .toString();
+                        getSchoolAsync getSchool = new getSchoolAsync();
+                        getSchool.execute();
 
-                        _appPrefs.saveSessionID(school.SessionID);
-                        _appPrefs.saveCCProcessor(school.CCProcessor);
+
                     }
-
-                } catch (Exception exception) {
-
-                }
-
-                return user;
-
-            }
-
-            protected void onPostExecute(User user) {
-                if (user.UserID > 0) {
-
                     Intent openMainPage = new Intent("com.akadasoftware.danceworksonline.Home");
                     startActivity(openMainPage);
                 } else {
                     tvError.setText("Login information is incorrect");
                 }
+            }
+        }
 
+        /**
+         * Gets school
+         */
+        private class getSchoolAsync extends AsyncTask<Data, Void, School> {
+
+            protected School doInBackground(Data... data) {
+                return oGlobals.getSchool(_appPrefs);
+            }
+
+            protected void onPostExecute(School oSchool) {
+                ArrayList<School> schoolArrayList = new ArrayList<School>();
+                schoolArrayList.add(0, oSchool);
+                _appPrefs.saveSchool(schoolArrayList);
+                _appPrefs.saveSessionID(oSchool.SessionID);
+                _appPrefs.saveCCProcessor(oSchool.CCProcessor);
+                _appPrefs.saveST1Rate(oSchool.ST1Rate);
+                _appPrefs.saveST2Rate(oSchool.ST2Rate);
+
+                String newLogoName = oSchool.LogoName;
+                String LogoName = _appPrefs.getLogoName();
+
+                if (newLogoName != LogoName)
+                    _appPrefs.saveLogoName(newLogoName);
+
+                SessionID = oSchool.SessionID;
+
+                getStudentClassesAsync getClasses = new getStudentClassesAsync();
+                getClasses.execute();
+
+            }
+        }
+
+        /**
+         * Gets account list
+         */
+        private class getAccountsListAsync extends
+                AsyncTask<Globals.Data, Void, ArrayList<Account>> {
+
+            @Override
+            protected ArrayList<Account> doInBackground(Globals.Data... data) {
+
+                return oGlobals.getAccounts(_appPrefs);
+            }
+
+            protected void onPostExecute(ArrayList<Account> result) {
+                _appPrefs.saveAccounts(result);
+
+            }
+        }
+
+        /**
+         * Gets student list
+         */
+        private class getStudentsListAsync extends
+                AsyncTask<Globals.Data, Void, ArrayList<Student>> {
+
+            protected ArrayList<Student> doInBackground(Globals.Data... data) {
+                return oGlobals.getStudents(_appPrefs, 0);
+            }
+
+            protected void onPostExecute(ArrayList<Student> result) {
+                _appPrefs.saveStudents(result);
             }
 
         }
-*/
+
+        /**
+         * Gets list of classes, runs in onpost of school to ensure we have a session id
+         */
+        public class getStudentClassesAsync extends
+                AsyncTask<Globals.Data, Void, ArrayList<SchoolClasses>> {
+
+            @Override
+            protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
+
+
+                return oGlobals.getClasses(_appPrefs, SessionID);
+            }
+
+            protected void onPostExecute(ArrayList<SchoolClasses> result) {
+                _appPrefs.saveSchoolClassList(result);
+
+            }
+        }
+
     }
 
     public static class RecoverPasswordFragment extends Fragment {
         View rootView;
         Activity activity;
-        SharedPreferences loginPreferences;
-        SharedPreferences.Editor loginEditor;
         private AppPreferences _appPrefs;
         TextView tvMessage;
         TextView tvResponse;
@@ -496,17 +360,7 @@ public class Login extends ActionBarActivity {
 
         }
 
-        @Override
-        public void onStart() {
-            super.onStart();
-        }
-
-        class Data {
-
-            static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
-            private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
-        }
-
     }
+
 
 }

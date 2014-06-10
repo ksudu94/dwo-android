@@ -16,14 +16,10 @@ import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Session;
-import com.akadasoftware.danceworksonline.classes.StudentClasses;
 import com.akadasoftware.danceworksonline.classes.User;
 
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 
@@ -85,6 +81,10 @@ public class ClassesListFragment extends ListFragment {
         oUser = _appPrefs.getUser();
         oGlobal = new Globals();
 
+        classAdapter = new SchoolClassAdapter(getActivity(),
+                R.layout.item_studentclass, schoolClasssesArray);
+        setListAdapter(classAdapter);
+        classAdapter.setNotifyOnChange(true);
 
     }
 
@@ -219,7 +219,7 @@ public class ClassesListFragment extends ListFragment {
         @Override
         protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
 
-            return getClasses();
+            return oGlobal.getClasses(_appPrefs, SessionID);
         }
 
         protected void onPostExecute(ArrayList<SchoolClasses> result) {
@@ -232,97 +232,5 @@ public class ClassesListFragment extends ListFragment {
 
         }
     }
-
-    public ArrayList<SchoolClasses> getClasses() {
-        String MethodName = "getSchoolClasses";
-        SoapObject response = InvokeMethod(Globals.Data.URL, MethodName);
-        return RetrieveFromSoap(response);
-
-    }
-
-    public SoapObject InvokeMethod(String URL, String MethodName) {
-
-        SoapObject request = GetSoapObject(MethodName);
-
-
-        PropertyInfo piUserID = new PropertyInfo();
-        piUserID.setName("UserID");
-        piUserID.setValue(oUser.UserID);
-        request.addProperty(piUserID);
-
-        PropertyInfo piUserGUID = new PropertyInfo();
-        piUserGUID.setType("STRING_CLASS");
-        piUserGUID.setName("UserGUID");
-        piUserGUID.setValue(oUser.UserGUID);
-        request.addProperty(piUserGUID);
-
-        PropertyInfo piSessionID = new PropertyInfo();
-        piSessionID.setName("intSessionID");
-        piSessionID.setValue(SessionID);
-        request.addProperty(piSessionID);
-
-        PropertyInfo piBoolEnroll = new PropertyInfo();
-        piBoolEnroll.setName("boolEnroll");
-        piBoolEnroll.setValue(true);
-        request.addProperty(piBoolEnroll);
-
-        PropertyInfo piStuID = new PropertyInfo();
-        piStuID.setName("intStuID");
-        piStuID.setValue(0);
-        request.addProperty(piStuID);
-
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                SoapEnvelope.VER11);
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(request);
-        return MakeCall(URL, envelope, Globals.Data.NAMESPACE, MethodName);
-    }
-
-    public static SoapObject GetSoapObject(String MethodName) {
-        return new SoapObject(Globals.Data.NAMESPACE, MethodName);
-    }
-
-    public static SoapObject MakeCall(String URL,
-                                      SoapSerializationEnvelope envelope, String NAMESPACE,
-                                      String METHOD_NAME) {
-        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
-        try {
-            envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",
-                    new StudentClasses().getClass());
-            HttpTransport.call("getSchoolClasses", envelope);
-            envelopeOutput = envelope;
-            SoapObject response = (SoapObject) envelope.getResponse();
-
-            return response;
-        } catch (Exception e) {
-            e.printStackTrace();
-
-        }
-        return null;
-    }
-
-    public static ArrayList<SchoolClasses> RetrieveFromSoap(SoapObject soap) {
-
-        ArrayList<SchoolClasses> schClassesArray = new ArrayList<SchoolClasses>();
-        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
-
-            SoapObject classItem = (SoapObject) soap.getProperty(i);
-
-            SchoolClasses classes = new SchoolClasses();
-            for (int j = 0; j < classItem.getPropertyCount() - 1; j++) {
-                classes.setProperty(j, classItem.getProperty(j)
-                        .toString());
-                if (classItem.getProperty(j).equals("anyType{}")) {
-                    classItem.setProperty(j, "");
-                }
-
-            }
-            schClassesArray.add(i, classes);
-        }
-
-        return schClassesArray;
-    }
-
 
 }

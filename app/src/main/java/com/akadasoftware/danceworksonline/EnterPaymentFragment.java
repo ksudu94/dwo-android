@@ -1,6 +1,7 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -385,6 +386,11 @@ public class EnterPaymentFragment extends Fragment {
 
 
     public class enterPaymentAsync extends AsyncTask<Data, Void, String[]> {
+        ProgressDialog progress;
+
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(activity, "Charges", "Loading...", true);
+        }
 
         public String[] doInBackground(Data... data) {
             SoapObject enterPayment = null;
@@ -421,7 +427,7 @@ public class EnterPaymentFragment extends Fragment {
         }
 
         protected void onPostExecute(String result[]) {
-
+            progress.dismiss();
             CardNumber = "";
             CCExpire = "";
             CCard = "";
