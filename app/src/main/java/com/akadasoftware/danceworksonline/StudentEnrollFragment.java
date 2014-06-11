@@ -52,7 +52,7 @@ public class StudentEnrollFragment extends ListFragment {
     ArrayList<SchoolClasses> schoolClassesArray = new ArrayList<SchoolClasses>();
     ArrayList<Student> Students = new ArrayList<Student>();
 
-    ArrayList<String> conflicksArray = new ArrayList<String>();
+    ArrayList<String> conflictsArray = new ArrayList<String>();
 
     ArrayList<Student> studentsArray = new ArrayList<Student>();
     ArrayList<Session> sessionArrayList = new ArrayList<Session>();
@@ -66,7 +66,7 @@ public class StudentEnrollFragment extends ListFragment {
 
     public interface onEnrollDialog {
 
-        public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent, ArrayList<String> conflicksArray);
+        public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent, ArrayList<String> conflictsArray);
     }
 
     public interface OnStudentEnrollListener {
@@ -162,8 +162,8 @@ public class StudentEnrollFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
         oSchoolClass = (SchoolClasses) this.getListAdapter().getItem(position);
 
-        checkClassConflicks checkConflicks = new checkClassConflicks();
-        checkConflicks.execute();
+        checkClassConflicts checkConflicts = new checkClassConflicts();
+        checkConflicts.execute();
 
 
     }
@@ -255,25 +255,25 @@ public class StudentEnrollFragment extends ListFragment {
      * Checking if class that is to be enrolled conflicks with any other previously registered
      * classes
      */
-    public class checkClassConflicks extends AsyncTask<Globals.Data, Void, ArrayList<String>> {
+    public class checkClassConflicts extends AsyncTask<Globals.Data, Void, ArrayList<String>> {
         @Override
         protected ArrayList<String> doInBackground(Globals.Data... data) {
 
-            return CheckConflicks();
+            return CheckConflicts();
         }
 
         protected void onPostExecute(ArrayList<String> result) {
 
-            conflicksArray = result;
-            dialogListener.onEnrollDialog(oSchoolClass, oStudent, conflicksArray);
+            conflictsArray = result;
+            dialogListener.onEnrollDialog(oSchoolClass, oStudent, conflictsArray);
 
         }
     }
 
-    public ArrayList<String> CheckConflicks() {
+    public ArrayList<String> CheckConflicts() {
         String MethodName = "checkClassEnrollment";
         SoapObject response = InvokeEnrollmentMethod(Globals.Data.URL, MethodName);
-        return RetrieveConflicksFromSoap(response);
+        return RetrieveConflictsFromSoap(response);
 
     }
 
@@ -359,7 +359,7 @@ public class StudentEnrollFragment extends ListFragment {
         request.addProperty(piSunday);
 
         PropertyInfo piClDayNo = new PropertyInfo();
-        piClDayNo.setName("intClDayNo");
+        piClDayNo.setName("strClDayNo");
         piClDayNo.setValue(oSchoolClass.ClDayNo);
         request.addProperty(piClDayNo);
 
@@ -382,41 +382,40 @@ public class StudentEnrollFragment extends ListFragment {
                 SoapEnvelope.VER11);
         envelope.dotNet = true;
         envelope.setOutputSoapObject(request);
-        return MakeConflickCall(URL, envelope, Globals.Data.NAMESPACE, MethodName);
+        return MakeConflictCall(URL, envelope, Globals.Data.NAMESPACE, MethodName);
     }
 
-    public static SoapObject MakeConflickCall(String URL,
+    public static SoapObject MakeConflictCall(String URL,
                                               SoapSerializationEnvelope envelope, String NAMESPACE,
                                               String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapObject response = null;
         try {
-            envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",
-                    new SchoolClasses().getClass());
+            //envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",new SchoolClasses().getClass());
             HttpTransport.call(METHOD_NAME, envelope);
             //envelopeOutput = envelope;
-            SoapObject response = (SoapObject) envelope.getResponse();
+            response = (SoapObject) envelope.getResponse();
 
-            return response;
         } catch (Exception e) {
             e.printStackTrace();
-
         }
-        return null;
+        return response;
     }
-    public static ArrayList<String> RetrieveConflicksFromSoap(SoapObject soap) {
+    public static ArrayList<String> RetrieveConflictsFromSoap(SoapObject soap) {
 
-        ArrayList<String> strConflicksArray = new ArrayList<String>();
+        ArrayList<String> strConflictsArray = new ArrayList<String>();
+
         for (int i = 0; i < soap.getPropertyCount(); i++) {
 
             //SoapObject conflickItem = (SoapObject) soap.getProperty(i);
             if (soap.getProperty(i).equals("anyType{}"))
-                strConflicksArray.add(i, "");
+                strConflictsArray.add(i, "");
             else
-                strConflicksArray.add(i, soap.getProperty(i).toString());
+                strConflictsArray.add(i, soap.getProperty(i).toString());
 
         }
 
-        return strConflicksArray;
+        return strConflictsArray;
     }
 
 }
