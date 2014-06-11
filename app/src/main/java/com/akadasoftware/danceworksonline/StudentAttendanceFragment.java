@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.Globals.Data;
+import com.akadasoftware.danceworksonline.classes.School;
 import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.StudentAttendance;
@@ -43,6 +44,8 @@ public class StudentAttendanceFragment extends ListFragment {
     String SOAP_ACTION = "";
     Student oStudent;
     Session oSession;
+    School oSchool;
+
 
     ArrayList<Session> sessionArrayList = new ArrayList<Session>();
     SessionAdapter sessionAdapter;
@@ -85,7 +88,7 @@ public class StudentAttendanceFragment extends ListFragment {
 
         oStudent = students.get(position);
         oUser = _appPrefs.getUser();
-
+        oSchool = _appPrefs.getSchool();
         oGlobal = new Globals();
     }
 
@@ -172,7 +175,7 @@ public class StudentAttendanceFragment extends ListFragment {
                 R.layout.fragment_student_attendance, sess);
 
         sessionAttendanceSpinner.setAdapter(sessionAdapter);
-
+        oGlobal.setCurrentSession(sessionAttendanceSpinner, oSchool);
         sessionAttendanceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -197,7 +200,6 @@ public class StudentAttendanceFragment extends ListFragment {
         getStudentAttendanceAsync getStudentAttendance = new getStudentAttendanceAsync();
         getStudentAttendance.execute();
     }
-
 
     public class getStudentAttendanceAsync extends
             AsyncTask<Data, Void, ArrayList<StudentAttendance>> {

@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.School;
 import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.StudentWaitList;
@@ -41,6 +42,7 @@ public class StudentWaitListFragment extends ListFragment {
     Student oStudent;
     User oUser;
     Globals oGlobal;
+    School oSchool;
     ArrayList<Session> sessionArrayList = new ArrayList<Session>();
     SessionAdapter sessionAdapter;
     ArrayList<Student> Students = new ArrayList<Student>();
@@ -81,6 +83,7 @@ public class StudentWaitListFragment extends ListFragment {
 
         oStudent = Students.get(position);
         oUser = _appPrefs.getUser();
+        oSchool = _appPrefs.getSchool();
     }
 
     @Override
@@ -187,6 +190,7 @@ public class StudentWaitListFragment extends ListFragment {
                 R.layout.fragment_studentwaitlist_list, sess);
 
         sessionWaitListSpinner.setAdapter(sessionAdapter);
+        oGlobal.setCurrentSession(sessionWaitListSpinner, oSchool);
 
         sessionWaitListSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

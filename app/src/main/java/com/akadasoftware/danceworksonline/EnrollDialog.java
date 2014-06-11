@@ -71,11 +71,11 @@ public class EnrollDialog extends DialogFragment {
         }
 
         Intent I = getActivity().getIntent();
-        ArrayList<String> conflicksArray = I.getStringArrayListExtra("Conflicks");
+        ArrayList<String> conflictsArray = I.getStringArrayListExtra("Conflicks");
 
         //int intStuID = getActivity().getIntent().getIntExtra("SchID", 0);
 
-        TextView tvConflicks = (TextView) view.findViewById(R.id.tvConflicks);
+        TextView tvConflicts = (TextView) view.findViewById(R.id.tvConflicks);
 
         TextView tvClassType = (TextView) view.findViewById(R.id.tvClassType);
 
@@ -100,7 +100,22 @@ public class EnrollDialog extends DialogFragment {
         TextView tvRoom = (TextView)
                 view.findViewById(R.id.tvRoom);
 
-        tvConflicks.setText(conflicksArray.toString() + " conflicks with class below");
+        int arrayCount = conflictsArray.size();
+        String conflitMessage = "";
+
+        if (arrayCount == 1)
+            conflitMessage = "The following class conflict with the class below";
+        else
+            conflitMessage = "The following classes conflict with the class below";
+
+        for (int i = 0; i < arrayCount; i++) {
+            if (conflictsArray.get(i).toString().equals("anyType{}"))
+                conflitMessage = "";
+            else
+                conflitMessage += "\n" + conflictsArray.get(i).toString();
+
+        }
+        tvConflicts.setText(conflitMessage);
 
         String Day = "";
         tvClassType.setText(objSchoolClasses.ClType);

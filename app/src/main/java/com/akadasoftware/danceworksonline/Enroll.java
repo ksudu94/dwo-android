@@ -1,14 +1,25 @@
 package com.akadasoftware.danceworksonline;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
+import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.google.gson.Gson;
+
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 
@@ -79,6 +90,116 @@ public class Enroll extends FragmentActivity implements
     @Override
     public void onEnrollDialogPositiveClick() {
 
+        EnrollStudentAsync enrollStudent = new EnrollStudentAsync();
+        enrollStudent.execute();
+
+
+    }
+
+    private class EnrollStudentAsync extends
+            AsyncTask<Globals.Data, Void, Boolean> {
+
+        ProgressDialog progress;
+
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(Enroll.this, "Parsing the Internet", "Loading...", true);
+        }
+
+        @Override
+        protected Boolean doInBackground(Globals.Data... data) {
+            /**
+             * Enrolling student in class, even if there are conflicts.
+             */
+            return EnrollStudent();
+        }
+
+        protected void onPostExecute(Boolean result) {
+
+            if (result == true) {
+                Toast toast = Toast.makeText(Enroll.this, "The student was enrolled in the class", Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                Toast toast = Toast.makeText(Enroll.this, "The student was not enrolled in the class", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        }
+
+    }
+
+    public Boolean EnrollStudent() {
+        AppPreferences _appPrefs = new AppPreferences(Enroll.this);
+        String MethodName = "enrollStudent";
+        SoapObject response = InvokeEnrollMethod(Globals.Data.URL, MethodName, _appPrefs);
+        return RetrieveEnrollFromSoap(response);
+    }
+
+    public static SoapObject InvokeEnrollMethod(String URL, String METHOD_NAME, AppPreferences _appPrefsNew) {
+
+        SoapObject requestEnroll = new SoapObject(Globals.Data.NAMESPACE, METHOD_NAME);
+        AppPreferences _appPrefs = _appPrefsNew;
+
+        SchoolClasses oSchoolClasses = _appPrefs.getSchoolClassList();
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(_appPrefs.getUserID());
+        requestEnroll.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(_appPrefs.getUserGUID());
+        requestEnroll.addProperty(piUserGUID);
+
+        PropertyInfo piStuID = new PropertyInfo();
+        piStuID.setName("intStuID");
+        piStuID.setValue(_appPrefs.getStuID());
+        requestEnroll.addProperty(piStuID);
+
+        PropertyInfo piClID = new PropertyInfo();
+        piClID.setName("intClID");
+        piClID.setValue(oSchoolClasses.ClID);
+        requestEnroll.addProperty(piClID);
+
+        PropertyInfo piClRID = new PropertyInfo();
+        piClRID.setName("intClRID");
+        piClRID.setValue(oSchoolClasses.ClRID);
+        requestEnroll.addProperty(piClRID);
+
+        PropertyInfo piWaitID = new PropertyInfo();
+        piWaitID.setName("intWaitID");
+        piWaitID.setValue(oSchoolClasses.WaitID);
+        requestEnroll.addProperty(piWaitID);
+
+        SoapSerializationEnvelope envelopeEnroll = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        envelopeEnroll.dotNet = true;
+        envelopeEnroll.setOutputSoapObject(requestEnroll);
+
+        envelopeEnroll.dotNet = true;
+        return MakeEnrollCall(URL, envelopeEnroll, Globals.Data.NAMESPACE, METHOD_NAME);
+    }
+
+    public static SoapObject MakeEnrollCall(String URL,
+                                            SoapSerializationEnvelope envelope, String NAMESPACE,
+                                            String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        try {
+
+            HttpTransport.call(METHOD_NAME, envelope);
+            SoapObject responseEnroll = (SoapObject) envelope.getResponse();
+
+            return responseEnroll;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static Boolean RetrieveEnrollFromSoap(SoapObject soap) {
+        Boolean response = Boolean.parseBoolean(soap.toString());
+
+        return response;
     }
 
 

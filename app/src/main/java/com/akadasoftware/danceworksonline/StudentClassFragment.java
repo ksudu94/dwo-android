@@ -1,6 +1,7 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -13,6 +14,7 @@ import android.widget.Spinner;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.Globals.Data;
+import com.akadasoftware.danceworksonline.classes.School;
 import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.StudentClasses;
@@ -39,6 +41,7 @@ public class StudentClassFragment extends ListFragment {
     Activity activity;
     Student oStudent;
     User oUser;
+    School oSchool;
     Session session;
     int SessionID;
     Globals oGlobal;
@@ -90,6 +93,7 @@ public class StudentClassFragment extends ListFragment {
 
         oStudent = Students.get(position);
         oUser = _appPrefs.getUser();
+        oSchool = _appPrefs.getSchool();
         oGlobal = new Globals();
 
     }
@@ -157,6 +161,12 @@ public class StudentClassFragment extends ListFragment {
     public class getSessionsAsync extends
             AsyncTask<Globals.Data, Void, ArrayList<Session>> {
 
+        ProgressDialog progress;
+
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(getActivity(), "Getting stuff from da interwebs", "Loading...", true);
+        }
+
         @Override
         protected ArrayList<Session> doInBackground(Globals.Data... data) {
 
@@ -168,6 +178,7 @@ public class StudentClassFragment extends ListFragment {
         }
 
         protected void onPostExecute(ArrayList<Session> result) {
+            progress.dismiss();
             sessionArrayList = result;
             addItemsOnSpinner(sessionArrayList);
 
@@ -182,6 +193,7 @@ public class StudentClassFragment extends ListFragment {
                 R.layout.fragment_studentclass_list, sess);
 
         sessionStudentClassesSpinner.setAdapter(sessionAdapter);
+        oGlobal.setCurrentSession(sessionStudentClassesSpinner, oSchool);
 
         sessionStudentClassesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -207,7 +219,6 @@ public class StudentClassFragment extends ListFragment {
         getStudentClassesAsync getStudentClass = new getStudentClassesAsync();
         getStudentClass.execute();
     }
-
 
     public class getStudentClassesAsync extends
             AsyncTask<Data, Void, ArrayList<StudentClasses>> {

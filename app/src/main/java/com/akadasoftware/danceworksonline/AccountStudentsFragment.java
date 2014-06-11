@@ -146,6 +146,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
             AsyncTask<Data, Void, ArrayList<Student>> {
         ProgressDialog progress;
 
+
         protected void onPreExecute() {
             progress = ProgressDialog.show(getActivity(), "Getting stuff from da interwebs", "Loading...", true);
         }
@@ -168,6 +169,7 @@ public class AccountStudentsFragment extends ListFragment implements AbsListView
 
         }
     }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

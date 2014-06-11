@@ -1,6 +1,7 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.widget.Spinner;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.School;
 import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Session;
 import com.akadasoftware.danceworksonline.classes.Student;
@@ -40,6 +42,7 @@ public class StudentEnrollFragment extends ListFragment {
     Activity activity;
     Student oStudent;
     User oUser;
+    School oSchool;
     SchoolClasses oSchoolClass;
     Session session;
     int SessionID, position;
@@ -95,6 +98,7 @@ public class StudentEnrollFragment extends ListFragment {
         studentsArray = _appPrefs.getStudents();
         position = _appPrefs.getStudentListPosition();
 
+        oSchool = _appPrefs.getSchool();
         oStudent = studentsArray.get(position);
         oUser = _appPrefs.getUser();
         oGlobals = new Globals();
@@ -171,6 +175,11 @@ public class StudentEnrollFragment extends ListFragment {
     //Asycn task to get the ChgDesc field to be used to populate the spinner
     public class getSessionsAsync extends
             AsyncTask<Globals.Data, Void, ArrayList<Session>> {
+        ProgressDialog progress;
+
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(getActivity(), "Gathering Energy", "Loading...", true);
+        }
 
         @Override
         protected ArrayList<Session> doInBackground(Globals.Data... data) {
@@ -183,6 +192,7 @@ public class StudentEnrollFragment extends ListFragment {
         }
 
         protected void onPostExecute(ArrayList<Session> result) {
+            progress.dismiss();
             sessionArrayList = result;
             addItemsOnSpinner(sessionArrayList);
 
@@ -197,7 +207,7 @@ public class StudentEnrollFragment extends ListFragment {
                 R.layout.fragment_studentenroll, sess);
 
         sessionStudentEnrollSpinner.setAdapter(sessionAdapter);
-
+        oGlobals.setCurrentSession(sessionStudentEnrollSpinner, oSchool);
         sessionStudentEnrollSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -280,7 +290,6 @@ public class StudentEnrollFragment extends ListFragment {
     public static SoapObject GetSoapObject(String MethodName) {
         return new SoapObject(Globals.Data.NAMESPACE, MethodName);
     }
-
 
 
     public SoapObject InvokeEnrollmentMethod(String URL, String MethodName) {
@@ -401,6 +410,7 @@ public class StudentEnrollFragment extends ListFragment {
         }
         return response;
     }
+
     public static ArrayList<String> RetrieveConflictsFromSoap(SoapObject soap) {
 
         ArrayList<String> strConflictsArray = new ArrayList<String>();

@@ -1,6 +1,9 @@
 package com.akadasoftware.danceworksonline.classes;
 
 import android.app.Activity;
+import android.widget.Spinner;
+
+import com.akadasoftware.danceworksonline.SessionAdapter;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -222,6 +225,30 @@ public class Globals {
         return sessionArray;
     }
 
+    /**
+     * Sets the spinner to display the current session for the school
+     *
+     * @param spinnerSession
+     * @param oSchool
+     */
+    public void setCurrentSession(Spinner spinnerSession, School oSchool) {
+        SessionAdapter adapter = (SessionAdapter) spinnerSession.getAdapter();
+        for (int position = 0; position < adapter.getCount(); position++) {
+
+            Session oSession = null;
+            try {
+                oSession = (Session) spinnerSession.getItemAtPosition(position);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (oSession.SessionID == oSchool.SessionID) {
+                spinnerSession.setSelection(position);
+                break;
+            }
+        }
+
+    }
     /**
      * Get User used on intial login screen
      */

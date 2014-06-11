@@ -1,5 +1,6 @@
 package com.akadasoftware.danceworksonline;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.akadasoftware.danceworksonline.classes.Account;
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.Student;
 
 import java.util.ArrayList;
 
@@ -230,18 +232,19 @@ public class Home extends ActionBarActivity
         } else if (mTitle.equals("Students")) {
 
 
-            Fragment newFragment;
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            newFragment = new StudentsListFragment();
-            ft.replace(R.id.container, newFragment);
-            ft.addToBackStack(null);
-            ft.commit();
+            getStudentsListAsync getStudents = new getStudentsListAsync();
+            getStudents.execute();
         }
     }
 
     private class getAccountsListAsync extends
             AsyncTask<Globals.Data, Void, ArrayList<Account>> {
+        ProgressDialog progress;
 
+        protected void onPreExecute() {
+
+            progress = ProgressDialog.show(Home.this, "Gathering Energy", "Loading...", true);
+        }
         @Override
         protected ArrayList<Account> doInBackground(Globals.Data... data) {
 
@@ -250,11 +253,50 @@ public class Home extends ActionBarActivity
         }
 
         protected void onPostExecute(ArrayList<Account> result) {
+            progress.dismiss();
             _appPrefs.saveAccounts(result);
 
             Fragment newFragment;
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             newFragment = new AccountListFragment();
+            ft.replace(R.id.container, newFragment);
+            ft.addToBackStack(null);
+            ft.commit();
+
+
+        }
+    }
+
+    /**
+     * Gets list of students
+     */
+    private class getStudentsListAsync extends
+            AsyncTask<Globals.Data, Void, ArrayList<Student>> {
+
+        ProgressDialog progress;
+
+        protected void onPreExecute() {
+
+            progress = ProgressDialog.show(Home.this, "Gathering Energy", "Loading...", true);
+        }
+
+        @Override
+        protected ArrayList<Student> doInBackground(Globals.Data... data) {
+            /**
+             * 0 means loads all students
+             */
+            Globals oGlobals = new Globals();
+            return oGlobals.getStudents(_appPrefs, 0);
+        }
+
+
+        protected void onPostExecute(ArrayList<Student> result) {
+            progress.dismiss();
+            _appPrefs.saveStudents(result);
+
+            Fragment newFragment;
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            newFragment = new StudentsListFragment();
             ft.replace(R.id.container, newFragment);
             ft.addToBackStack(null);
             ft.commit();

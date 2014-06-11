@@ -418,13 +418,10 @@ public class AccountInformationFragment extends Fragment {
 
     public class saveAccountChanges extends AsyncTask<Data, Void, String> {
 
-        ProgressDialog dialog;
+        ProgressDialog progress;
 
         protected void onPreExecute() {
-            dialog = new ProgressDialog(getActivity());
-            dialog.setProgress(ProgressDialog.STYLE_HORIZONTAL);
-            dialog.setMax(100);
-            dialog.show();
+            progress = ProgressDialog.show(getActivity(), "Gathering Energy", "Loading...", true);
         }
 
         @Override
@@ -433,12 +430,8 @@ public class AccountInformationFragment extends Fragment {
             return saveAccountChanges();
         }
 
-        protected void onProgressUpdate(Integer... progress) {
-            dialog.incrementProgressBy(progress[0]);
-        }
-
         protected void onPostExecute(String result) {
-            dialog.dismiss();
+            progress.dismiss();
             if (result.equals("Changes saved")) {
                 oAccount.FName = etFirst.getText().toString().trim();
                 oAccount.LName = etLast.getText().toString().trim();
