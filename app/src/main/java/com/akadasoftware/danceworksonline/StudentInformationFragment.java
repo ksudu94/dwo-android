@@ -71,6 +71,7 @@ public class StudentInformationFragment extends Fragment {
         position = getArguments().getInt("Position");
 
         oStudent = Students.get(position);
+        _appPrefs.saveStuID(oStudent.StuID);
 
     }
 

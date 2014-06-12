@@ -26,13 +26,14 @@ import java.util.ArrayList;
 public class EnrollDialog extends DialogFragment {
 
     AppPreferences _appPrefs;
+    SchoolClasses objSchoolClasses;
 
     public EnrollDialog() {
 
     }
 
     public interface EnrollDialogListener {
-        public void onEnrollDialogPositiveClick();
+        public void onEnrollDialogPositiveClick(int intStuID, SchoolClasses oSchoolClasses);
     }
 
     EnrollDialogListener dialogListener;
@@ -59,7 +60,6 @@ public class EnrollDialog extends DialogFragment {
 
         _appPrefs = new AppPreferences(getActivity());
 
-        SchoolClasses objSchoolClasses = new SchoolClasses();
 
         String strJsonSchoolClasses = getActivity().getIntent().getStringExtra("SchoolClasses");
 
@@ -73,7 +73,7 @@ public class EnrollDialog extends DialogFragment {
         Intent I = getActivity().getIntent();
         ArrayList<String> conflictsArray = I.getStringArrayListExtra("Conflicks");
 
-        //int intStuID = getActivity().getIntent().getIntExtra("SchID", 0);
+        final int intStuID = getActivity().getIntent().getIntExtra("StuID", 0);
 
         TextView tvConflicts = (TextView) view.findViewById(R.id.tvConflicks);
 
@@ -101,16 +101,19 @@ public class EnrollDialog extends DialogFragment {
                 view.findViewById(R.id.tvRoom);
 
         int arrayCount = conflictsArray.size();
+
         String conflitMessage = "";
 
-        if (arrayCount == 1)
+        if (arrayCount == 0)
+            conflitMessage = "Do you want to enrol this student in the class listed below?";
+        else if (arrayCount == 1)
             conflitMessage = "The following class conflict with the class below";
         else
             conflitMessage = "The following classes conflict with the class below";
 
         for (int i = 0; i < arrayCount; i++) {
             if (conflictsArray.get(i).toString().equals("anyType{}"))
-                conflitMessage = "";
+                conflitMessage += "";
             else
                 conflitMessage += "\n" + conflictsArray.get(i).toString();
 
@@ -186,8 +189,7 @@ public class EnrollDialog extends DialogFragment {
                 .setPositiveButton("Enroll", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-
-                        dialogListener.onEnrollDialogPositiveClick();
+                        dialogListener.onEnrollDialogPositiveClick(intStuID, objSchoolClasses);
                     }
 
 
@@ -196,7 +198,7 @@ public class EnrollDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
 
-                        dialogListener.onEnrollDialogPositiveClick();
+                        //dialogListener.onEnrollDialogPositiveClick(intStuID, objSchoolClasses);
                     }
 
                 })

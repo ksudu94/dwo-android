@@ -308,7 +308,7 @@ public class StudentWaitListFragment extends ListFragment {
             SoapObject classItem = (SoapObject) soap.getProperty(i);
 
             StudentWaitList list = new StudentWaitList();
-            for (int j = 0; j < classItem.getPropertyCount() - 1; j++) {
+            for (int j = 0; j < classItem.getPropertyCount(); j++) {
                 list.setProperty(j, classItem.getProperty(j)
                         .toString());
                 if (classItem.getProperty(j).equals("anyType{}")) {

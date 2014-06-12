@@ -13,11 +13,13 @@ import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Student;
+import com.akadasoftware.danceworksonline.classes.User;
 import com.google.gson.Gson;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
@@ -29,6 +31,7 @@ public class Enroll extends FragmentActivity implements
         StudentEnrollFragment.onEnrollDialog,
         EnrollDialog.EnrollDialogListener {
 
+    SchoolClasses globalSchoolClasses;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +84,7 @@ public class Enroll extends FragmentActivity implements
         getIntent().putExtra("SchoolClasses", strJsonSchoolClasses);
         getIntent().putExtra("StuID", oStudent.StuID);
 
+
         getIntent().putStringArrayListExtra("Conflicks", conflicksArray);
 
         //Just the name of the dialog. Has no effect on it.
@@ -88,11 +92,12 @@ public class Enroll extends FragmentActivity implements
     }
 
     @Override
-    public void onEnrollDialogPositiveClick() {
+    public void onEnrollDialogPositiveClick(int intStuID, SchoolClasses inputSchoolClasses) {
 
         EnrollStudentAsync enrollStudent = new EnrollStudentAsync();
         enrollStudent.execute();
 
+        globalSchoolClasses = inputSchoolClasses;
 
     }
 
@@ -110,11 +115,11 @@ public class Enroll extends FragmentActivity implements
             /**
              * Enrolling student in class, even if there are conflicts.
              */
-            return EnrollStudent();
+            return EnrollStudent(globalSchoolClasses);
         }
 
         protected void onPostExecute(Boolean result) {
-
+            progress.dismiss();
             if (result == true) {
                 Toast toast = Toast.makeText(Enroll.this, "The student was enrolled in the class", Toast.LENGTH_LONG);
                 toast.show();
@@ -126,48 +131,61 @@ public class Enroll extends FragmentActivity implements
 
     }
 
-    public Boolean EnrollStudent() {
+    public Boolean EnrollStudent(SchoolClasses objSchoolClasses) {
         AppPreferences _appPrefs = new AppPreferences(Enroll.this);
         String MethodName = "enrollStudent";
-        SoapObject response = InvokeEnrollMethod(Globals.Data.URL, MethodName, _appPrefs);
+        SoapPrimitive response = InvokeEnrollMethod(Globals.Data.URL, MethodName, _appPrefs, objSchoolClasses);
         return RetrieveEnrollFromSoap(response);
     }
 
-    public static SoapObject InvokeEnrollMethod(String URL, String METHOD_NAME, AppPreferences _appPrefsNew) {
+    /**
+     * @param URL              Something
+     * @param METHOD_NAME      enrollStudent
+     * @param _appPrefsNew     Used to get User and StuID which for some reason would not save otherwise.
+     * @param objSchoolClasses Comes from the selected class from yhe enroll dialog. Originally in
+     *                         on positive click which is then saved to a global variable so it can passed
+     *                         into EnrollStudent and ultimately InvokeEnrollMethod
+     * @return Boolean true or false
+     */
+    public static SoapPrimitive InvokeEnrollMethod(String URL, String METHOD_NAME, AppPreferences _appPrefsNew
+            , SchoolClasses objSchoolClasses) {
 
         SoapObject requestEnroll = new SoapObject(Globals.Data.NAMESPACE, METHOD_NAME);
         AppPreferences _appPrefs = _appPrefsNew;
 
-        SchoolClasses oSchoolClasses = _appPrefs.getSchoolClassList();
+        SchoolClasses selectedSchoolClasses = objSchoolClasses;
+
+        User oUser = _appPrefs.getUser();
+        int intStuID = _appPrefs.getStuID();
 
         PropertyInfo piUserID = new PropertyInfo();
         piUserID.setName("UserID");
-        piUserID.setValue(_appPrefs.getUserID());
+        piUserID.setValue(oUser.UserID);
         requestEnroll.addProperty(piUserID);
 
         PropertyInfo piUserGUID = new PropertyInfo();
         piUserGUID.setName("UserGUID");
-        piUserGUID.setValue(_appPrefs.getUserGUID());
+        piUserGUID.setValue(oUser.UserGUID);
         requestEnroll.addProperty(piUserGUID);
 
         PropertyInfo piStuID = new PropertyInfo();
         piStuID.setName("intStuID");
-        piStuID.setValue(_appPrefs.getStuID());
+        piStuID.setValue(intStuID);
         requestEnroll.addProperty(piStuID);
 
         PropertyInfo piClID = new PropertyInfo();
         piClID.setName("intClID");
-        piClID.setValue(oSchoolClasses.ClID);
+        piClID.setValue(selectedSchoolClasses.ClID);
         requestEnroll.addProperty(piClID);
 
         PropertyInfo piClRID = new PropertyInfo();
         piClRID.setName("intClRID");
-        piClRID.setValue(oSchoolClasses.ClRID);
+        piClRID.setValue(selectedSchoolClasses.ClRID);
         requestEnroll.addProperty(piClRID);
 
         PropertyInfo piWaitID = new PropertyInfo();
         piWaitID.setName("intWaitID");
-        piWaitID.setValue(oSchoolClasses.WaitID);
+        piWaitID.setValue(selectedSchoolClasses.WaitID);
         requestEnroll.addProperty(piWaitID);
 
         SoapSerializationEnvelope envelopeEnroll = new SoapSerializationEnvelope(
@@ -180,23 +198,23 @@ public class Enroll extends FragmentActivity implements
         return MakeEnrollCall(URL, envelopeEnroll, Globals.Data.NAMESPACE, METHOD_NAME);
     }
 
-    public static SoapObject MakeEnrollCall(String URL,
+    public static SoapPrimitive MakeEnrollCall(String URL,
                                             SoapSerializationEnvelope envelope, String NAMESPACE,
                                             String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapPrimitive responseEnroll = null;
         try {
 
             HttpTransport.call(METHOD_NAME, envelope);
-            SoapObject responseEnroll = (SoapObject) envelope.getResponse();
+            responseEnroll = (SoapPrimitive) envelope.getResponse();
 
-            return responseEnroll;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return responseEnroll;
     }
 
-    public static Boolean RetrieveEnrollFromSoap(SoapObject soap) {
+    public static Boolean RetrieveEnrollFromSoap(SoapPrimitive soap) {
         Boolean response = Boolean.parseBoolean(soap.toString());
 
         return response;

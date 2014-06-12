@@ -293,30 +293,29 @@ public class StudentClassFragment extends ListFragment {
                                       SoapSerializationEnvelope envelope, String NAMESPACE,
                                       String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapObject response = null;
         try {
             envelope.addMapping(Data.NAMESPACE, "StudentClasses",
                     new StudentClasses().getClass());
             HttpTransport.call("getStuClasses", envelope);
-            envelopeOutput = envelope;
-            SoapObject response = (SoapObject) envelope.getResponse();
+            response = (SoapObject) envelope.getResponse();
 
-            return response;
         } catch (Exception e) {
             e.printStackTrace();
 
         }
-        return null;
+        return response;
     }
 
     public static ArrayList<StudentClasses> RetrieveFromSoap(SoapObject soap) {
 
         ArrayList<StudentClasses> stuClassesArray = new ArrayList<StudentClasses>();
-        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
 
             SoapObject classItem = (SoapObject) soap.getProperty(i);
 
             StudentClasses classes = new StudentClasses();
-            for (int j = 0; j < classItem.getPropertyCount() - 1; j++) {
+            for (int j = 0; j < classItem.getPropertyCount(); j++) {
                 classes.setProperty(j, classItem.getProperty(j)
                         .toString());
                 if (classItem.getProperty(j).equals("anyType{}")) {
