@@ -658,7 +658,7 @@ public class Globals {
 
         PropertyInfo piStuID = new PropertyInfo();
         piStuID.setName("intStuID");
-        piStuID.setValue(0);
+        piStuID.setValue(_appPrefs.getStuID());
         request.addProperty(piStuID);
 
 

@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.School;
 import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.User;
@@ -32,6 +33,7 @@ public class Enroll extends FragmentActivity implements
         EnrollDialog.EnrollDialogListener {
 
     SchoolClasses globalSchoolClasses;
+    Student globalStudent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,11 +79,16 @@ public class Enroll extends FragmentActivity implements
         SchoolClasses[] arraySchoolClasses = new SchoolClasses[1];
         arraySchoolClasses[0] = objSchoolClass;
 
+        Student[] arrayStudents = new Student[1];
+        arrayStudents[0] = oStudent;
+
         Gson gson = new Gson();
         String strJsonSchoolClasses = gson.toJson(arraySchoolClasses);
+        String strStudent = gson.toJson(arrayStudents);
 
 
         getIntent().putExtra("SchoolClasses", strJsonSchoolClasses);
+        getIntent().putExtra("Student", strStudent);
         getIntent().putExtra("StuID", oStudent.StuID);
 
 
@@ -93,14 +100,186 @@ public class Enroll extends FragmentActivity implements
 
     @Override
     public void onEnrollDialogPositiveClick(int intStuID, SchoolClasses inputSchoolClasses) {
+        globalSchoolClasses = inputSchoolClasses;
 
         EnrollStudentAsync enrollStudent = new EnrollStudentAsync();
         enrollStudent.execute();
 
-        globalSchoolClasses = inputSchoolClasses;
 
     }
 
+    @Override
+    public void onEnrollDialogNuetralClick(int intStuID, SchoolClasses inputSchoolClasses, Student inputStudent) {
+        globalSchoolClasses = inputSchoolClasses;
+        globalStudent = inputStudent;
+
+        WaitListStudentAsync waitList = new WaitListStudentAsync();
+        waitList.execute();
+    }
+
+
+    /**
+     * Places student on waitlist
+     */
+    private class WaitListStudentAsync extends
+            AsyncTask<Globals.Data, Void, Boolean> {
+
+        ProgressDialog progress;
+
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(Enroll.this, "Parsing the Internet", "Accessing WaitList...", true);
+        }
+
+        @Override
+        protected Boolean doInBackground(Globals.Data... data) {
+            /**
+             * Placing student on waitlist
+             *
+             */
+            return WaitListStudent(globalSchoolClasses, globalStudent);
+        }
+
+        protected void onPostExecute(Boolean result) {
+            progress.dismiss();
+            if (result == true) {
+                Toast toast = Toast.makeText(Enroll.this, "The student was placed on the waitlist", Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                Toast toast = Toast.makeText(Enroll.this, "The student was not placed on the waitlist", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        }
+
+    }
+
+    public Boolean WaitListStudent(SchoolClasses oSchoolClasses, Student oStudent) {
+        AppPreferences _appPrefs = new AppPreferences(Enroll.this);
+        String MethodName = "waitListStudent";
+        SoapPrimitive response = InvokeWaitListMethod(Globals.Data.URL, MethodName, _appPrefs,
+                oSchoolClasses, oStudent);
+        return RetrieveWaitListFromSoap(response);
+    }
+
+    public static SoapPrimitive InvokeWaitListMethod(String URL, String METHOD_NAME, AppPreferences _appPrefsNew
+            , SchoolClasses objSchoolClasses, Student objStudent) {
+
+        SoapObject requestWaitList = new SoapObject(Globals.Data.NAMESPACE, METHOD_NAME);
+
+        AppPreferences _appPrefs = _appPrefsNew;
+
+        SchoolClasses selectedSchoolClasses = objSchoolClasses;
+        Student selectedStudent = objStudent;
+        User oUser = _appPrefs.getUser();
+        School oSchool = _appPrefs.getSchool();
+
+
+        PropertyInfo piStrAction = new PropertyInfo();
+        piStrAction.setName("strAction");
+        piStrAction.setValue("WaitlistClass");
+        requestWaitList.addProperty(piStrAction);
+
+        PropertyInfo piClID = new PropertyInfo();
+        piClID.setName("intClID");
+        piClID.setValue(selectedSchoolClasses.ClID);
+        requestWaitList.addProperty(piClID);
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("intUserID");
+        piUserID.setValue(oUser.UserID);
+        requestWaitList.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        requestWaitList.addProperty(piUserGUID);
+
+        PropertyInfo piSchID = new PropertyInfo();
+        piSchID.setName("intSchID");
+        piSchID.setValue(oSchool.SchID);
+        requestWaitList.addProperty(piSchID);
+
+        PropertyInfo piStuID = new PropertyInfo();
+        piStuID.setName("intStuID");
+        piStuID.setValue(selectedStudent.StuID);
+        requestWaitList.addProperty(piStuID);
+
+
+        PropertyInfo piAcctID = new PropertyInfo();
+        piAcctID.setName("intAcctID");
+        piAcctID.setValue(selectedStudent.AcctID);
+        requestWaitList.addProperty(piAcctID);
+
+        PropertyInfo piCurrentSessionID = new PropertyInfo();
+        piCurrentSessionID.setName("intCurrSessionID");
+        piCurrentSessionID.setValue(oSchool.SessionID);
+        requestWaitList.addProperty(piCurrentSessionID);
+
+        PropertyInfo piSelectedClassSessionID = new PropertyInfo();
+        piSelectedClassSessionID.setName("intClassSessionID");
+        piSelectedClassSessionID.setValue(oSchool.SessionID);
+        requestWaitList.addProperty(piSelectedClassSessionID);
+
+        PropertyInfo piFName = new PropertyInfo();
+        piFName.setName("FName");
+        piFName.setValue(selectedStudent.FName);
+        requestWaitList.addProperty(piFName);
+
+        PropertyInfo piLName = new PropertyInfo();
+        piLName.setName("LName");
+        piLName.setValue(selectedStudent.LName);
+        requestWaitList.addProperty(piLName);
+
+        PropertyInfo piAcctName = new PropertyInfo();
+        piAcctName.setName("strAcctName");
+        piAcctName.setValue(selectedStudent.AcctName);
+        requestWaitList.addProperty(piAcctName);
+
+        PropertyInfo piPhone = new PropertyInfo();
+        piPhone.setName("strPhone");
+        piPhone.setValue(selectedStudent.Phone);
+        requestWaitList.addProperty(piPhone);
+
+        PropertyInfo piNotes = new PropertyInfo();
+        piNotes.setName("strNotes");
+        piNotes.setValue(selectedStudent.Notes);
+        requestWaitList.addProperty(piNotes);
+
+
+        SoapSerializationEnvelope envelopeWaitList = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+
+        envelopeWaitList.dotNet = true;
+        envelopeWaitList.setOutputSoapObject(requestWaitList);
+
+        return MakeWaitListCall(URL, envelopeWaitList, Globals.Data.NAMESPACE, METHOD_NAME);
+    }
+
+    public static SoapPrimitive MakeWaitListCall(String URL,
+                                                 SoapSerializationEnvelope envelope, String NAMESPACE,
+                                                 String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapPrimitive responseWaitList = null;
+        try {
+
+            HttpTransport.call(METHOD_NAME, envelope);
+            responseWaitList = (SoapPrimitive) envelope.getResponse();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return responseWaitList;
+    }
+
+    public static Boolean RetrieveWaitListFromSoap(SoapPrimitive soap) {
+        Boolean response = Boolean.parseBoolean(soap.toString());
+
+        return response;
+    }
+
+
+    /**
+     * Enrolls a student in a class
+     */
     private class EnrollStudentAsync extends
             AsyncTask<Globals.Data, Void, Boolean> {
 
@@ -194,7 +373,6 @@ public class Enroll extends FragmentActivity implements
         envelopeEnroll.dotNet = true;
         envelopeEnroll.setOutputSoapObject(requestEnroll);
 
-        envelopeEnroll.dotNet = true;
         return MakeEnrollCall(URL, envelopeEnroll, Globals.Data.NAMESPACE, METHOD_NAME);
     }
 

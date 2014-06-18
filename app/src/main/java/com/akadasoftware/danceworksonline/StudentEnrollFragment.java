@@ -3,6 +3,7 @@ package com.akadasoftware.danceworksonline;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -60,6 +61,8 @@ public class StudentEnrollFragment extends ListFragment {
     ArrayList<Student> studentsArray = new ArrayList<Student>();
     ArrayList<Session> sessionArrayList = new ArrayList<Session>();
     SessionAdapter sessionAdapter;
+    ViewGroup objContainer;
+    View view;
 
     Spinner sessionStudentEnrollSpinner;
     private SchoolClassAdapter classAdapter;
@@ -109,7 +112,8 @@ public class StudentEnrollFragment extends ListFragment {
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container,
                 savedInstanceState);
-        View view = inflater.inflate(R.layout.fragment_studentenroll, container, false);
+        view = inflater.inflate(R.layout.fragment_studentenroll, container, false);
+        objContainer = container;
 
         btnDone = (Button) view.findViewById(R.id.btnDone);
         sessionStudentEnrollSpinner = (Spinner) view.findViewById(R.id.sessionStudentEnrollSpinner);
@@ -256,6 +260,15 @@ public class StudentEnrollFragment extends ListFragment {
                     R.layout.item_studentclass, schoolClassesArray);
 
             setListAdapter(classAdapter);
+
+            for (int i = 0; i < schoolClassesArray.size(); i++) {
+                if (schoolClassesArray.get(i).WaitID == 0) {
+                    //getListAdapter().getView(i,view,objContainer).setBackgroundColor(Color.YELLOW);
+                    getView().setBackgroundColor(Color.YELLOW);
+                } else if (schoolClassesArray.get(i).ClRID > 0 && schoolClassesArray.get(i).EnrollmentStatus == 1) {
+                    getView().setBackgroundColor(getResources().getColor(R.color.red));
+                }
+            }
             classAdapter.setNotifyOnChange(true);
 
         }

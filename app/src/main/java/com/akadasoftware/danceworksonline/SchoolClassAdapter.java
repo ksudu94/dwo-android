@@ -90,6 +90,7 @@ public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
 
             convertView.setTag(holder);
 
+
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
