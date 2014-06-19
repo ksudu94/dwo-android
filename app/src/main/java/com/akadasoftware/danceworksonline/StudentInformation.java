@@ -223,12 +223,13 @@ public class StudentInformation extends ActionBarActivity implements ActionBar.T
     }
 
     @Override
-    public void onStudentEnrollInteraction(String id) {
+    public void onStudentEnrollInteraction(int classPosition, int newClRID) {
 
     }
 
     @Override
-    public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent, ArrayList<String> conflicksArray) {
+    public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent, ArrayList<String> conflicksArray,
+                               int classPosition, SchoolClassAdapter adapter) {
 
         /**
          * Don't really need this here. It is handled ona button click that starts a whole new activity

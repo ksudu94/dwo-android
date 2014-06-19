@@ -3,7 +3,6 @@ package com.akadasoftware.danceworksonline;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -46,7 +45,7 @@ public class StudentEnrollFragment extends ListFragment {
     School oSchool;
     SchoolClasses oSchoolClass;
     Session session;
-    int SessionID, position;
+    int SessionID, position, positionOfClass;
     Globals oGlobals;
 
     Button btnDone;
@@ -72,16 +71,22 @@ public class StudentEnrollFragment extends ListFragment {
 
     public interface onEnrollDialog {
 
-        public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent, ArrayList<String> conflictsArray);
+        public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent,
+                                   ArrayList<String> conflictsArray, int positionOfClass, SchoolClassAdapter classAdapter);
     }
 
     public interface OnStudentEnrollListener {
 
-        public void onStudentEnrollInteraction(String id);
+        public void onStudentEnrollInteraction(int classPosition, int newClRID);
     }
 
     public StudentEnrollFragment() {
     }
+
+    public void onStudentEnrollInteraction() {
+
+    }
+
 
     // TODO: Rename and change types of parameters
     public static StudentEnrollFragment newInstance(int position) {
@@ -170,8 +175,12 @@ public class StudentEnrollFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
         oSchoolClass = (SchoolClasses) this.getListAdapter().getItem(position);
 
+        positionOfClass = position;
+
         checkClassConflicts checkConflicts = new checkClassConflicts();
         checkConflicts.execute();
+
+        classAdapter.setNotifyOnChange(true);
 
 
     }
@@ -249,7 +258,7 @@ public class StudentEnrollFragment extends ListFragment {
         protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
 
 
-            return oGlobals.getClasses(_appPrefs, SessionID);
+            return oGlobals.getClasses(_appPrefs, SessionID, oStudent.StuID);
         }
 
         protected void onPostExecute(ArrayList<SchoolClasses> result) {
@@ -258,21 +267,12 @@ public class StudentEnrollFragment extends ListFragment {
 
             classAdapter = new SchoolClassAdapter(activity,
                     R.layout.item_studentclass, schoolClassesArray);
+            updateListAdapter();
 
-            setListAdapter(classAdapter);
-
-            for (int i = 0; i < schoolClassesArray.size(); i++) {
-                if (schoolClassesArray.get(i).WaitID == 0) {
-                    //getListAdapter().getView(i,view,objContainer).setBackgroundColor(Color.YELLOW);
-                    getView().setBackgroundColor(Color.YELLOW);
-                } else if (schoolClassesArray.get(i).ClRID > 0 && schoolClassesArray.get(i).EnrollmentStatus == 1) {
-                    getView().setBackgroundColor(getResources().getColor(R.color.red));
-                }
-            }
-            classAdapter.setNotifyOnChange(true);
 
         }
     }
+
 
     /**
      * Checking if class that is to be enrolled conflicks with any other previously registered
@@ -288,7 +288,7 @@ public class StudentEnrollFragment extends ListFragment {
         protected void onPostExecute(ArrayList<String> result) {
 
             conflictsArray = result;
-            dialogListener.onEnrollDialog(oSchoolClass, oStudent, conflictsArray);
+            dialogListener.onEnrollDialog(oSchoolClass, oStudent, conflictsArray, positionOfClass, classAdapter);
 
         }
     }
@@ -441,4 +441,10 @@ public class StudentEnrollFragment extends ListFragment {
         return strConflictsArray;
     }
 
+
+    public void updateListAdapter() {
+        setListAdapter(classAdapter);
+
+        classAdapter.setNotifyOnChange(true);
+    }
 }

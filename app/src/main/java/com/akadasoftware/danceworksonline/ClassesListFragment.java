@@ -220,7 +220,7 @@ public class ClassesListFragment extends ListFragment {
         @Override
         protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
 
-            return oGlobal.getClasses(_appPrefs, SessionID);
+            return oGlobal.getClasses(_appPrefs, SessionID, 0);
         }
 
         protected void onPostExecute(ArrayList<SchoolClasses> result) {

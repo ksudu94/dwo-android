@@ -306,7 +306,7 @@ public class Login extends ActionBarActivity {
             protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
 
 
-                return oGlobals.getClasses(_appPrefs, SessionID);
+                return oGlobals.getClasses(_appPrefs, SessionID, 0);
             }
 
             protected void onPostExecute(ArrayList<SchoolClasses> result) {

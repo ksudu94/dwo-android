@@ -213,6 +213,11 @@ public class Splash extends ActionBarActivity {
                     getStudentsListAsync getStudents = new getStudentsListAsync();
                     getStudents.execute();
 
+
+                    getSchoolAsync getSchool = new getSchoolAsync();
+                    getSchool.execute();
+
+
                 } else {
                     /**
                      * Loads all lists intially to speed up app. The majority of the async method is
@@ -324,7 +329,7 @@ public class Splash extends ActionBarActivity {
         protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
 
 
-            return oGlobals.getClasses(_appPrefs, SessionID);
+            return oGlobals.getClasses(_appPrefs, SessionID, 0);
         }
 
         protected void onPostExecute(ArrayList<SchoolClasses> result) {

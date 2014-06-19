@@ -249,6 +249,7 @@ public class Globals {
         }
 
     }
+
     /**
      * Get User used on intial login screen
      */
@@ -292,17 +293,16 @@ public class Globals {
                                           SoapSerializationEnvelope envelope, String NAMESPACE,
                                           String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapObject responseUser = null;
         try {
             envelope.addMapping(Data.NAMESPACE, "User",
                     new User().getClass());
             HttpTransport.call(METHOD_NAME, envelope);
-            SoapObject responseUser = (SoapObject) envelope.getResponse();
-
-            return responseUser;
+            responseUser = (SoapObject) envelope.getResponse();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return responseUser;
     }
 
     public static User RetrieveUserFromSoap(SoapObject soap) {
@@ -398,17 +398,17 @@ public class Globals {
                                             SoapSerializationEnvelope envelope, String NAMESPACE,
                                             String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapObject responseSchool = null;
         try {
             envelope.addMapping(Data.NAMESPACE, "School",
                     new School().getClass());
             HttpTransport.call(METHOD_NAME, envelope);
-            SoapObject responseSchool = (SoapObject) envelope.getResponse();
+            responseSchool = (SoapObject) envelope.getResponse();
 
-            return responseSchool;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return responseSchool;
     }
 
     public static School RetrieveSchoolFromSoap(SoapObject soap) {
@@ -475,17 +475,17 @@ public class Globals {
                                              SoapSerializationEnvelope envelope, String NAMESPACE,
                                              String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapObject responseAccounts = null;
         try {
             envelope.addMapping(Data.NAMESPACE, "Account",
                     new Account().getClass());
             HttpTransport.call(METHOD_NAME, envelope);
-            SoapObject responseAccounts = (SoapObject) envelope.getResponse();
+            responseAccounts = (SoapObject) envelope.getResponse();
 
-            return responseAccounts;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return responseAccounts;
     }
 
     public static ArrayList<Account> RetrieveAccountsFromSoap(SoapObject soap) {
@@ -583,18 +583,18 @@ public class Globals {
     public static SoapObject MakeCall(String URL, SoapSerializationEnvelope envelope, String NAMESPACE,
                                       String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapObject response = null;
         try {
             envelope.addMapping(Data.NAMESPACE, "Student",
                     new Student().getClass());
             HttpTransport.call(METHOD_NAME, envelope);
             SoapSerializationEnvelope envelopeOutput = envelope;
-            SoapObject response = (SoapObject) envelope.getResponse();
+            response = (SoapObject) envelope.getResponse();
 
-            return response;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return response;
     }
 
     public static ArrayList<Student> RetrieveStudentsFromSoap(SoapObject soap) {
@@ -621,15 +621,15 @@ public class Globals {
      * Get class list
      */
 
-    public ArrayList<SchoolClasses> getClasses(AppPreferences _appPrefsNew, int intSessionID) {
+    public ArrayList<SchoolClasses> getClasses(AppPreferences _appPrefsNew, int intSessionID, int intStuID) {
         _appPrefs = _appPrefsNew;
         String MethodName = "getSchoolClasses";
-        SoapObject response = InvokeClassMethod(Globals.Data.URL, MethodName, intSessionID);
+        SoapObject response = InvokeClassMethod(Globals.Data.URL, MethodName, intSessionID, intStuID);
         return RetrieveClassFromSoap(response);
 
     }
 
-    public SoapObject InvokeClassMethod(String URL, String MethodName, int intSessionID) {
+    public SoapObject InvokeClassMethod(String URL, String MethodName, int intSessionID, int intStuID) {
 
         SoapObject request = GetClassSoapObject(MethodName);
 
@@ -641,7 +641,6 @@ public class Globals {
         request.addProperty(piUserID);
 
         PropertyInfo piUserGUID = new PropertyInfo();
-        piUserGUID.setType("STRING_CLASS");
         piUserGUID.setName("UserGUID");
         piUserGUID.setValue(oUser.UserGUID);
         request.addProperty(piUserGUID);
@@ -658,7 +657,7 @@ public class Globals {
 
         PropertyInfo piStuID = new PropertyInfo();
         piStuID.setName("intStuID");
-        piStuID.setValue(_appPrefs.getStuID());
+        piStuID.setValue(intStuID);
         request.addProperty(piStuID);
 
 
@@ -677,29 +676,30 @@ public class Globals {
                                            SoapSerializationEnvelope envelope, String NAMESPACE,
                                            String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapObject response = null;
         try {
             envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",
-                    new StudentClasses().getClass());
+                    new SchoolClasses().getClass());
             HttpTransport.call(METHOD_NAME, envelope);
-            SoapObject response = (SoapObject) envelope.getResponse();
+            response = (SoapObject) envelope.getResponse();
 
-            return response;
+
         } catch (Exception e) {
             e.printStackTrace();
 
         }
-        return null;
+        return response;
     }
 
     public static ArrayList<SchoolClasses> RetrieveClassFromSoap(SoapObject soap) {
 
         ArrayList<SchoolClasses> schClassesArray = new ArrayList<SchoolClasses>();
-        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
 
             SoapObject classItem = (SoapObject) soap.getProperty(i);
 
             SchoolClasses classes = new SchoolClasses();
-            for (int j = 0; j < classItem.getPropertyCount() - 1; j++) {
+            for (int j = 0; j < classItem.getPropertyCount(); j++) {
                 classes.setProperty(j, classItem.getProperty(j)
                         .toString());
                 if (classItem.getProperty(j).equals("anyType{}")) {

@@ -2,6 +2,7 @@ package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,7 @@ public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
 
     public class ViewHolder {
         TextView tvClassType;
+        TextView tvEnrollmentStatus;
         TextView tvClassLevel;
         TextView tvDescription;
         TextView tvInstructor;
@@ -65,6 +67,9 @@ public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
 
             holder.tvClassType = (TextView) convertView
                     .findViewById(R.id.tvClassType);
+
+            holder.tvEnrollmentStatus = (TextView) convertView
+                    .findViewById(R.id.tvEnrollmentStatus);
 
             holder.tvClassLevel = (TextView) convertView
                     .findViewById(R.id.tvClassLevel);
@@ -99,7 +104,6 @@ public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
         String Day = "";
         holder.tvClassType.setText(oSchoolClasses.ClType);
         holder.tvClassType.setTag(position);
-
 
         holder.tvClassLevel.setText(" - " + oSchoolClasses.ClLevel + " - ");
         holder.tvDescription.setText(oSchoolClasses.ClDescription);
@@ -158,6 +162,39 @@ public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
         holder.tvStart.setText(oSchoolClasses.ClStart + " - ");
         holder.tvStop.setText(oSchoolClasses.ClStop);
         holder.tvRoom.setText(oSchoolClasses.ClRoom);
+
+        switch (oSchoolClasses.EnrollmentStatus) {
+            case 0:
+                /**
+                 * Student not enrolled or waitlisted
+                 */
+                convertView.setBackgroundColor(Color.WHITE);
+                holder.tvEnrollmentStatus.setText("");
+                break;
+            case 1:
+                /**
+                 * Student already enrolled in class
+                 */
+                convertView.setBackgroundColor(Color.GREEN);
+                holder.tvEnrollmentStatus.setText("Enrolled");
+                break;
+            case 2:
+                /**
+                 * Student registered online, enrolled in class but not approved yet
+                 */
+                convertView.setBackgroundColor(Color.RED);
+                holder.tvEnrollmentStatus.setText("Pending approval");
+                break;
+            case 3:
+                /**
+                 * Student on waitlist
+                 */
+                convertView.setBackgroundColor(Color.YELLOW);
+                holder.tvEnrollmentStatus.setText("On wait list");
+                break;
+
+        }
+
 
         return convertView;
 

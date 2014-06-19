@@ -4,7 +4,7 @@
     <color name="default_color">#ffffff</color>
     <color name="light_blue">#33b5e6</color>
     <color name="red">#FF6666</color>
-    <color name="green">#FFFFCC</color>
-    <color name="yellow">#99FF99</color>
+    <color name="green">#bef9ad</color>
+    <color name="yellow">#ffff80</color>
 
 </resources>

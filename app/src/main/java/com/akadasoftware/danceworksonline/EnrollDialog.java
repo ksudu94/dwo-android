@@ -30,15 +30,18 @@ public class EnrollDialog extends DialogFragment {
     Activity activity;
     SchoolClasses objSchoolClasses;
     Student objStudent;
+    View view;
 
     public EnrollDialog() {
 
     }
 
     public interface EnrollDialogListener {
-        public void onEnrollDialogPositiveClick(int intStuID, SchoolClasses oSchoolClasses);
+        public void onEnrollDialogPositiveClick(int intStuID, SchoolClasses oSchoolClasses, View view,
+                                                int position);
 
-        public void onEnrollDialogNuetralClick(int intStuID, SchoolClasses oSchoolClasses, Student oStudent);
+        public void onEnrollDialogNuetralClick(int intStuID, SchoolClasses oSchoolClasses, Student oStudent
+                , View view, int position);
     }
 
 
@@ -61,7 +64,7 @@ public class EnrollDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.enrolldialog, null);
+        view = inflater.inflate(R.layout.enrolldialog, null);
 
 
         _appPrefs = new AppPreferences(getActivity());
@@ -90,6 +93,7 @@ public class EnrollDialog extends DialogFragment {
         ArrayList<String> conflictsArray = I.getStringArrayListExtra("Conflicks");
 
         final int intStuID = getActivity().getIntent().getIntExtra("StuID", 0);
+        final int classPosition = getActivity().getIntent().getIntExtra("Position", 0);
 
         TextView tvConflicts = (TextView) view.findViewById(R.id.tvConflicks);
 
@@ -197,10 +201,10 @@ public class EnrollDialog extends DialogFragment {
         tvStop.setText(objSchoolClasses.ClStop);
         tvRoom.setText(objSchoolClasses.ClRoom);
 
-        if (objSchoolClasses.WaitID == 0) {
-            if (objSchoolClasses.EnrollmentStatus == 0) {
+        switch (objSchoolClasses.EnrollmentStatus) {
+            case 0:
                 /**
-                 * Student not on waitlist and already enrolled in class
+                 * Student not enrolled or waitlisted
                  */
                 builder.setView(view)
                         // Title of dialog
@@ -210,7 +214,8 @@ public class EnrollDialog extends DialogFragment {
                         .setPositiveButton("Enroll", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                dialogListener.onEnrollDialogPositiveClick(intStuID, objSchoolClasses);
+                                dialogListener.onEnrollDialogPositiveClick(intStuID, objSchoolClasses,
+                                        view, classPosition);
                             }
 
                         })
@@ -218,18 +223,34 @@ public class EnrollDialog extends DialogFragment {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
 
-                                dialogListener.onEnrollDialogNuetralClick(intStuID, objSchoolClasses, objStudent);
+                                dialogListener.onEnrollDialogNuetralClick(intStuID, objSchoolClasses,
+                                        objStudent, view, classPosition);
                             }
 
                         })
-                        .setNegativeButton("Return", new DialogInterface.OnClickListener() {
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 EnrollDialog.this.getDialog().cancel();
                             }
                         });
-            } else {
+
+                break;
+            case 1:
                 /**
-                 * Student not on waitlist and are not enrolled in class
+                 * Student already enrolled in class
+                 */
+                builder.setView(view)
+                        // Title of dialog
+                        .setTitle("Enroll Student in Class?")
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                EnrollDialog.this.getDialog().cancel();
+                            }
+                        });
+                break;
+            case 2:
+                /**
+                 * Student registered online, enrolled in class but not approved yet
                  */
                 builder.setView(view)
                         // Title of dialog
@@ -239,55 +260,51 @@ public class EnrollDialog extends DialogFragment {
                         .setPositiveButton("Enroll", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                dialogListener.onEnrollDialogPositiveClick(intStuID, objSchoolClasses);
+                                dialogListener.onEnrollDialogPositiveClick(intStuID, objSchoolClasses,
+                                        view, classPosition);
                             }
 
                         })
-                        .setNegativeButton("Return", new DialogInterface.OnClickListener() {
+                        .setNeutralButton("WaitList", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+
+                                dialogListener.onEnrollDialogNuetralClick(intStuID, objSchoolClasses,
+                                        objStudent, view, classPosition);
+                            }
+
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 EnrollDialog.this.getDialog().cancel();
                             }
                         });
-            }
-        } else {
-            if (objSchoolClasses.EnrollmentStatus != 0) {
+                break;
+            case 3:
                 /**
-                 * Student already enrolled
+                 * Student on waitlist
                  */
                 builder.setView(view)
                         // Title of dialog
                         .setTitle("Enroll Student in Class?")
 
-                        .setNegativeButton("Return", new DialogInterface.OnClickListener() {
+                                // Add action buttons
+                        .setPositiveButton("Enroll", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialogListener.onEnrollDialogPositiveClick(intStuID, objSchoolClasses,
+                                        view, classPosition);
+                            }
+
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 EnrollDialog.this.getDialog().cancel();
                             }
                         });
+                break;
 
-            }
-            /**
-             * Student is on wait list and not enrolled in class
-             */
-            builder.setView(view)
-                    // Title of dialog
-                    .setTitle("Enroll Student in Class?")
-
-                            // Add action buttons
-                    .setPositiveButton("Enroll", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int id) {
-                            dialogListener.onEnrollDialogPositiveClick(intStuID, objSchoolClasses);
-                        }
-                    })
-
-                    .setNegativeButton("Return", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            EnrollDialog.this.getDialog().cancel();
-                        }
-                    });
         }
-
-
 
         return builder.create();
     }

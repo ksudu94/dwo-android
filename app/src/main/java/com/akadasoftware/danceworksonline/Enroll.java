@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
@@ -34,10 +35,15 @@ public class Enroll extends FragmentActivity implements
 
     SchoolClasses globalSchoolClasses;
     Student globalStudent;
+    private AppPreferences _appPrefs;
+    SchoolClassAdapter objClassAdapter;
+    int intClassPosition;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_enroll);
+        _appPrefs = new AppPreferences(Enroll.this);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.container, new StudentEnrollFragment())
@@ -66,12 +72,13 @@ public class Enroll extends FragmentActivity implements
     }
 
     @Override
-    public void onStudentEnrollInteraction(String id) {
+    public void onStudentEnrollInteraction(int classPosition, int newClRID) {
 
     }
 
     @Override
-    public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent, ArrayList<String> conflicksArray) {
+    public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent, ArrayList<String> conflicksArray
+            , int positionOfClass, SchoolClassAdapter inputClassAdapter) {
         FragmentManager fm = getSupportFragmentManager();
         EnrollDialog enrollDialog = new EnrollDialog();
 
@@ -90,7 +97,10 @@ public class Enroll extends FragmentActivity implements
         getIntent().putExtra("SchoolClasses", strJsonSchoolClasses);
         getIntent().putExtra("Student", strStudent);
         getIntent().putExtra("StuID", oStudent.StuID);
+        getIntent().putExtra("Position", positionOfClass);
 
+
+        objClassAdapter = inputClassAdapter;
 
         getIntent().putStringArrayListExtra("Conflicks", conflicksArray);
 
@@ -99,22 +109,29 @@ public class Enroll extends FragmentActivity implements
     }
 
     @Override
-    public void onEnrollDialogPositiveClick(int intStuID, SchoolClasses inputSchoolClasses) {
+    public void onEnrollDialogPositiveClick(int intStuID, SchoolClasses inputSchoolClasses, View view
+            , int classPosition) {
+
         globalSchoolClasses = inputSchoolClasses;
+        intClassPosition = classPosition;
 
         EnrollStudentAsync enrollStudent = new EnrollStudentAsync();
         enrollStudent.execute();
 
-
     }
 
     @Override
-    public void onEnrollDialogNuetralClick(int intStuID, SchoolClasses inputSchoolClasses, Student inputStudent) {
+    public void onEnrollDialogNuetralClick(int intStuID, SchoolClasses inputSchoolClasses, Student inputStudent,
+                                           View view, int classPosition) {
         globalSchoolClasses = inputSchoolClasses;
         globalStudent = inputStudent;
 
         WaitListStudentAsync waitList = new WaitListStudentAsync();
         waitList.execute();
+
+
+        view.invalidate();
+        view.refreshDrawableState();
     }
 
 
@@ -122,7 +139,7 @@ public class Enroll extends FragmentActivity implements
      * Places student on waitlist
      */
     private class WaitListStudentAsync extends
-            AsyncTask<Globals.Data, Void, Boolean> {
+            AsyncTask<Globals.Data, Void, Integer> {
 
         ProgressDialog progress;
 
@@ -131,7 +148,7 @@ public class Enroll extends FragmentActivity implements
         }
 
         @Override
-        protected Boolean doInBackground(Globals.Data... data) {
+        protected Integer doInBackground(Globals.Data... data) {
             /**
              * Placing student on waitlist
              *
@@ -139,11 +156,16 @@ public class Enroll extends FragmentActivity implements
             return WaitListStudent(globalSchoolClasses, globalStudent);
         }
 
-        protected void onPostExecute(Boolean result) {
+        protected void onPostExecute(Integer result) {
             progress.dismiss();
-            if (result == true) {
+            if (result > 0) {
                 Toast toast = Toast.makeText(Enroll.this, "The student was placed on the waitlist", Toast.LENGTH_LONG);
                 toast.show();
+                /**
+                 * Returns new WatiID
+                 */
+                globalSchoolClasses.WaitID = result;
+                globalSchoolClasses.EnrollmentStatus = 3;
             } else {
                 Toast toast = Toast.makeText(Enroll.this, "The student was not placed on the waitlist", Toast.LENGTH_LONG);
                 toast.show();
@@ -152,7 +174,7 @@ public class Enroll extends FragmentActivity implements
 
     }
 
-    public Boolean WaitListStudent(SchoolClasses oSchoolClasses, Student oStudent) {
+    public int WaitListStudent(SchoolClasses oSchoolClasses, Student oStudent) {
         AppPreferences _appPrefs = new AppPreferences(Enroll.this);
         String MethodName = "waitListStudent";
         SoapPrimitive response = InvokeWaitListMethod(Globals.Data.URL, MethodName, _appPrefs,
@@ -270,8 +292,8 @@ public class Enroll extends FragmentActivity implements
         return responseWaitList;
     }
 
-    public static Boolean RetrieveWaitListFromSoap(SoapPrimitive soap) {
-        Boolean response = Boolean.parseBoolean(soap.toString());
+    public static int RetrieveWaitListFromSoap(SoapPrimitive soap) {
+        int response = Integer.parseInt(soap.toString());
 
         return response;
     }
@@ -281,27 +303,47 @@ public class Enroll extends FragmentActivity implements
      * Enrolls a student in a class
      */
     private class EnrollStudentAsync extends
-            AsyncTask<Globals.Data, Void, Boolean> {
+            AsyncTask<Globals.Data, Void, Integer> {
 
         ProgressDialog progress;
 
         protected void onPreExecute() {
-            progress = ProgressDialog.show(Enroll.this, "Parsing the Internet", "Loading...", true);
+            progress = ProgressDialog.show(Enroll.this, "Enrolling Student", "Loading...", true);
         }
 
         @Override
-        protected Boolean doInBackground(Globals.Data... data) {
+        protected Integer doInBackground(Globals.Data... data) {
             /**
              * Enrolling student in class, even if there are conflicts.
              */
             return EnrollStudent(globalSchoolClasses);
         }
 
-        protected void onPostExecute(Boolean result) {
+        protected void onPostExecute(Integer result) {
             progress.dismiss();
-            if (result == true) {
+            if (result > 0) {
                 Toast toast = Toast.makeText(Enroll.this, "The student was enrolled in the class", Toast.LENGTH_LONG);
                 toast.show();
+
+                /**
+                 * Update ClRID and EnrollmentStatus
+                 */
+                globalSchoolClasses.ClRID = result;
+                globalSchoolClasses.EnrollmentStatus = 1;
+
+                /**
+                 * Get Class list
+                 */
+                ArrayList<SchoolClasses> classesArray = _appPrefs.getSchoolClassList();
+
+                /**
+                 * Update class list with new class with updated variables
+                 */
+                classesArray.set(intClassPosition, globalSchoolClasses);
+                _appPrefs.saveSchoolClassList(classesArray);
+
+                objClassAdapter.notifyDataSetChanged();
+
             } else {
                 Toast toast = Toast.makeText(Enroll.this, "The student was not enrolled in the class", Toast.LENGTH_LONG);
                 toast.show();
@@ -310,7 +352,7 @@ public class Enroll extends FragmentActivity implements
 
     }
 
-    public Boolean EnrollStudent(SchoolClasses objSchoolClasses) {
+    public Integer EnrollStudent(SchoolClasses objSchoolClasses) {
         AppPreferences _appPrefs = new AppPreferences(Enroll.this);
         String MethodName = "enrollStudent";
         SoapPrimitive response = InvokeEnrollMethod(Globals.Data.URL, MethodName, _appPrefs, objSchoolClasses);
@@ -392,8 +434,8 @@ public class Enroll extends FragmentActivity implements
         return responseEnroll;
     }
 
-    public static Boolean RetrieveEnrollFromSoap(SoapPrimitive soap) {
-        Boolean response = Boolean.parseBoolean(soap.toString());
+    public static Integer RetrieveEnrollFromSoap(SoapPrimitive soap) {
+        int response = Integer.parseInt(soap.toString());
 
         return response;
     }

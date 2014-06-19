@@ -268,16 +268,19 @@ public class AppPreferences {
         prefsEditor.commit();
     }
 
-    public SchoolClasses getSchoolClassList() {
-        SchoolClasses Classes = new SchoolClasses();
+    public ArrayList<SchoolClasses> getSchoolClassList() {
+        ArrayList<SchoolClasses> schoolClasses = new ArrayList<SchoolClasses>();
         jsonSchoolClasses = sharedPrefs.getString("Classes", "None found");
         if (jsonSchoolClasses != "None found") {
             JsonParser parser = new JsonParser();
             JsonArray array = parser.parse(jsonSchoolClasses).getAsJsonArray();
-            Classes = gson.fromJson(array.get(0), SchoolClasses.class);
+            for (int i = 0; i < array.size(); i++) {
+                SchoolClasses Class = gson.fromJson(array.get(i), SchoolClasses.class);
+                schoolClasses.add(Class);
+            }
         }
 
-        return Classes;
+        return schoolClasses;
 
     }
 
