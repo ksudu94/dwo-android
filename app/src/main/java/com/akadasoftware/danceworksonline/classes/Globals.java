@@ -157,50 +157,59 @@ public class Globals {
     /**
      * Property info's for the session b/c we use it in a spinner on several pages.
      */
-    public SoapObject setSessionPropertyInfo(SoapObject objRequest, int SchID, String SoapAction, User inputUser) {
+
+    public ArrayList<Session> getSessions(int intSchID, int intUserID, String UserGUID){
+        String MethodName = "getSessions";
+        SoapObject response = InvokeSessionMethod(Data.URL, MethodName, intSchID, intUserID, UserGUID);
+        return RetrieveSessionsFromSoap(response);
+    }
+
+    public static SoapObject InvokeSessionMethod(String URL, String METHOD_NAME, int intSchID, int intUserID, String UserGUID) {
+
+        SoapObject requestSession = new SoapObject(Data.NAMESPACE, METHOD_NAME);
 
         PropertyInfo piUserID = new PropertyInfo();
         piUserID.setName("UserID");
-        piUserID.setValue(inputUser.UserID);
-        objRequest.addProperty(piUserID);
+        piUserID.setValue(intUserID);
+        requestSession.addProperty(piUserID);
 
         PropertyInfo piUserGUID = new PropertyInfo();
         piUserGUID.setType("STRING_CLASS");
         piUserGUID.setName("UserGUID");
-        piUserGUID.setValue(inputUser.UserGUID);
-        objRequest.addProperty(piUserGUID);
+        piUserGUID.setValue(UserGUID);
+        requestSession.addProperty(piUserGUID);
 
         PropertyInfo Order = new PropertyInfo();
         Order.setName("Order");
-        Order.setValue(" WHERE SchID= " + SchID + "AND DisplaySession='True' ORDER BY SDate,EDate,SessionName");
-        objRequest.addProperty(Order);
+        Order.setValue(" WHERE SchID= " + intSchID + "AND DisplaySession='True' ORDER BY SDate,EDate,SessionName");
+        requestSession.addProperty(Order);
 
-        objRequest = getNewSoapObject(SoapAction, objRequest);
-
-        return objRequest;
-    }
-
-    public SoapObject getNewSoapObject(String SoapAction, SoapObject Request) {
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+        SoapSerializationEnvelope envelopeSessions = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
 
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(Request);
+        envelopeSessions.dotNet = true;
+        envelopeSessions.setOutputSoapObject(requestSession);
 
-        SoapObject response = null;
-        HttpTransportSE HttpTransport = new HttpTransportSE(Data.URL);
+        envelopeSessions.dotNet = true;
+        return MakeSessionCall(URL, envelopeSessions, Data.NAMESPACE, METHOD_NAME);
+    }
+
+    public static SoapObject MakeSessionCall(String URL,
+                                          SoapSerializationEnvelope envelope, String NAMESPACE,
+                                          String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapObject responseSession = null;
         try {
-            HttpTransport.call(SoapAction, envelope);
-            response = (SoapObject) envelope.getResponse();
-
+            envelope.addMapping(Data.NAMESPACE, "Session",
+                    new Session().getClass());
+            HttpTransport.call(METHOD_NAME, envelope);
+            responseSession = (SoapObject) envelope.getResponse();
         } catch (Exception e) {
-
             e.printStackTrace();
         }
-        return response;
-
+        return responseSession;
     }
+
 
     public static ArrayList<Session> RetrieveSessionsFromSoap(SoapObject soap) {
 
@@ -251,7 +260,7 @@ public class Globals {
     }
 
     /**
-     * Get User used on intial login screen
+     * Get User used on initial login screen
      */
 
     public User getUser(AppPreferences _appPrefsNew, String strEmail, String strPassword) {
@@ -418,6 +427,7 @@ public class Globals {
         }
         return inputSchool;
     }
+
 
 
     /**

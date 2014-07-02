@@ -50,7 +50,7 @@ public class ClassesListFragment extends ListFragment {
     Spinner sessionClassSpinner;
     private SchoolClassAdapter classAdapter;
 
-    private OnClassesInteractionListener classListener;
+    private OnClassInteractionListener classListener;
 
 
     /**
@@ -58,6 +58,12 @@ public class ClassesListFragment extends ListFragment {
      * Views.
      */
     private ListAdapter mAdapter;
+
+
+    public interface OnClassInteractionListener {
+        // TODO: Update argument type and name
+        public void onClassSelected(int id, String sessionName);
+    }
 
     // TODO: Rename and change types of parameters
     public static ClassesListFragment newInstance(int position) {
@@ -103,10 +109,10 @@ public class ClassesListFragment extends ListFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            classListener = (OnClassesInteractionListener) activity;
+            classListener = (OnClassInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnClassesInteractionListener");
+                    + " must implement OnClassInteractionListener");
         }
     }
 
@@ -134,23 +140,10 @@ public class ClassesListFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
         oSchoolClass = (SchoolClasses) this.getListAdapter().getItem(position);
 
-
+        classListener.onClassSelected(position, session.SessionName);
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnClassesInteractionListener {
-        // TODO: Update argument type and name
-        public void onClassesInteraction(String id);
-    }
+
 
     class Data {
 
@@ -165,9 +158,9 @@ public class ClassesListFragment extends ListFragment {
         @Override
         protected ArrayList<Session> doInBackground(Globals.Data... data) {
 
-            SoapObject session = oGlobal.getSoapRequest(Globals.Data.NAMESPACE, "getSessions");
-            session = oGlobal.setSessionPropertyInfo(session, oUser.SchID, "getSessions", oUser);
-            return oGlobal.RetrieveSessionsFromSoap(session);
+
+            return oGlobal.getSessions(oSchool.SchID, oUser.UserID, oUser.UserGUID);
+
 
 
         }

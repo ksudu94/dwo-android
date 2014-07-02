@@ -38,7 +38,6 @@ public class StudentEnrollFragment extends ListFragment {
     private AppPreferences _appPrefs;
     String METHOD_NAME = "";
     String SOAP_ACTION = "";
-    static SoapSerializationEnvelope envelopeOutput;
     Activity activity;
     Student oStudent;
     User oUser;
@@ -53,7 +52,6 @@ public class StudentEnrollFragment extends ListFragment {
     private OnStudentEnrollListener enrollListener;
 
     ArrayList<SchoolClasses> schoolClassesArray = new ArrayList<SchoolClasses>();
-    ArrayList<Student> Students = new ArrayList<Student>();
 
     ArrayList<String> conflictsArray = new ArrayList<String>();
 
@@ -88,7 +86,11 @@ public class StudentEnrollFragment extends ListFragment {
     }
 
 
-    // TODO: Rename and change types of parameters
+    /**
+     *
+     * @param position of student in arraylist
+     * @return Returns ClRID, if > 0 then it was a success, otherwise failure
+     */
     public static StudentEnrollFragment newInstance(int position) {
         StudentEnrollFragment fragment = new StudentEnrollFragment();
         Bundle args = new Bundle();
@@ -168,7 +170,9 @@ public class StudentEnrollFragment extends ListFragment {
 
 
     /**
-     * Creates a new instance
+     * When one of the classes is chosen, a dialog will pop up with the option to enroll or waitlist
+     * a student based on their current enrollment status. Prior to all of this we check for conflicts
+     * in schedule.
      */
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Notify the parent activity of selected item
@@ -179,10 +183,6 @@ public class StudentEnrollFragment extends ListFragment {
 
         checkClassConflicts checkConflicts = new checkClassConflicts();
         checkConflicts.execute();
-
-        classAdapter.setNotifyOnChange(true);
-
-
     }
 
     //Asycn task to get the ChgDesc field to be used to populate the spinner
@@ -197,10 +197,13 @@ public class StudentEnrollFragment extends ListFragment {
         @Override
         protected ArrayList<Session> doInBackground(Globals.Data... data) {
 
-            SoapObject session = oGlobals.getSoapRequest(Globals.Data.NAMESPACE, "getSessions");
-            session = oGlobals.setSessionPropertyInfo(session, oStudent.SchID, "getSessions", oUser);
-            return oGlobals.RetrieveSessionsFromSoap(session);
+            /**
+             * SoapObject session = oGlobals.getSoapRequest(Globals.Data.NAMESPACE, "getSessions");
+             * session = oGlobals.setSessionPropertyInfo(session, oStudent.SchID, "getSessions", oUser);
+             * return oGlobals.RetrieveSessionsFromSoap(session);
+             */
 
+              return oGlobals.getSessions(oSchool.SchID, oUser.UserID, oUser.UserGUID);
 
         }
 

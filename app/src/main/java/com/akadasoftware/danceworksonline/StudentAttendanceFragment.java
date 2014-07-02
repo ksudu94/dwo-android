@@ -153,9 +153,7 @@ public class StudentAttendanceFragment extends ListFragment {
         @Override
         protected ArrayList<Session> doInBackground(Data... data) {
 
-            SoapObject session = oGlobal.getSoapRequest(Data.NAMESPACE, "getSessions");
-            session = oGlobal.setSessionPropertyInfo(session, oStudent.SchID, "getSessions", oUser);
-            return oGlobal.RetrieveSessionsFromSoap(session);
+            return oGlobal.getSessions(oSchool.SchID, oUser.UserID, oUser.UserGUID);
 
 
         }

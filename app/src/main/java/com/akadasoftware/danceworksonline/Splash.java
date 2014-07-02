@@ -127,7 +127,7 @@ public class Splash extends ActionBarActivity {
                 @Override
                 public void run() {
                     if (LogoName.equals("") || LogoName.equals("anyType{}")) {
-                        fm.setBackground(getResources().getDrawable(R.drawable.logo_danceworks_online));
+                        fm.setBackground(getResources().getDrawable(R.drawable.logo_danceworks_online1));
                     } else {
                         fm.setBackground(background);
                     }

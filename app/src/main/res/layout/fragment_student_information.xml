@@ -176,7 +176,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:padding="5dip"
-                android:text="Name: " />
+                android:text="First Name: " />
 
             <EditText
                 android:id="@+id/etFName"
@@ -191,7 +191,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:padding="5dip"
-                android:text="Name: " />
+                android:text="Last Name: " />
 
             <EditText
                 android:id="@+id/etLName"
@@ -206,7 +206,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:padding="5dip"
-                android:text="Address: " />
+                android:text="Street Address: " />
 
             <EditText
                 android:id="@+id/etAddress"
@@ -221,7 +221,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:padding="5dip"
-                android:text="Address: " />
+                android:text="City: " />
 
             <EditText
                 android:id="@+id/etCity"
@@ -236,7 +236,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:padding="5dip"
-                android:text="Address: " />
+                android:text="State: " />
 
             <EditText
                 android:id="@+id/etState"
@@ -250,7 +250,7 @@
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:padding="5dip"
-                android:text="Address: " />
+                android:text="Zip: " />
 
             <EditText
                 android:id="@+id/etZip"
@@ -271,6 +271,7 @@
                 android:id="@+id/etContact"
                 android:layout_width="fill_parent"
                 android:padding="5dip"
+                android:inputType="phone"
                 android:layout_height="wrap_content" />
 
             <TextView
@@ -304,21 +305,27 @@
                 android:spinnerMode="dropdown"
                 android:prompt="@string/status" />
 
-            <Button
-                android:id="@+id/btnSave"
-                android:layout_width="80dip"
+            <LinearLayout
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:text="Save" />
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/btnSave"
+                    android:layout_width="80dip"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:text="Save" />
 
-            <Button
-                android:id="@+id/btnCancel"
-                android:layout_width="80dip"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:text="Cancel" />
+                <Button
+                    android:id="@+id/btnCancel"
+                    android:layout_width="80dip"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:text="Cancel" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

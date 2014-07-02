@@ -39,6 +39,8 @@ public class Enroll extends FragmentActivity implements
     SchoolClassAdapter objClassAdapter;
     int intClassPosition;
 
+    View objView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,8 +111,7 @@ public class Enroll extends FragmentActivity implements
     }
 
     @Override
-    public void onEnrollDialogPositiveClick(int intStuID, SchoolClasses inputSchoolClasses, View view
-            , int classPosition) {
+    public void onEnrollDialogPositiveClick( SchoolClasses inputSchoolClasses, int classPosition) {
 
         globalSchoolClasses = inputSchoolClasses;
         intClassPosition = classPosition;
@@ -121,17 +122,16 @@ public class Enroll extends FragmentActivity implements
     }
 
     @Override
-    public void onEnrollDialogNuetralClick(int intStuID, SchoolClasses inputSchoolClasses, Student inputStudent,
-                                           View view, int classPosition) {
+    public void onEnrollDialogNuetralClick( SchoolClasses inputSchoolClasses, Student inputStudent,
+                                            int classPosition) {
         globalSchoolClasses = inputSchoolClasses;
         globalStudent = inputStudent;
+        intClassPosition = classPosition;
+
 
         WaitListStudentAsync waitList = new WaitListStudentAsync();
         waitList.execute();
 
-
-        view.invalidate();
-        view.refreshDrawableState();
     }
 
 
@@ -166,6 +166,9 @@ public class Enroll extends FragmentActivity implements
                  */
                 globalSchoolClasses.WaitID = result;
                 globalSchoolClasses.EnrollmentStatus = 3;
+
+                objClassAdapter.replaceSchoolClass(globalSchoolClasses,intClassPosition);
+
             } else {
                 Toast toast = Toast.makeText(Enroll.this, "The student was not placed on the waitlist", Toast.LENGTH_LONG);
                 toast.show();
@@ -331,6 +334,10 @@ public class Enroll extends FragmentActivity implements
                 globalSchoolClasses.ClRID = result;
                 globalSchoolClasses.EnrollmentStatus = 1;
 
+                objClassAdapter.replaceSchoolClass(globalSchoolClasses,intClassPosition);
+
+
+
                 /**
                  * Get Class list
                  */
@@ -341,8 +348,6 @@ public class Enroll extends FragmentActivity implements
                  */
                 classesArray.set(intClassPosition, globalSchoolClasses);
                 _appPrefs.saveSchoolClassList(classesArray);
-
-                objClassAdapter.notifyDataSetChanged();
 
             } else {
                 Toast toast = Toast.makeText(Enroll.this, "The student was not enrolled in the class", Toast.LENGTH_LONG);

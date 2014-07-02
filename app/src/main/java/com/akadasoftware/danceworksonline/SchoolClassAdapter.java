@@ -199,4 +199,9 @@ public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
         return convertView;
 
     }
+
+    public void replaceSchoolClass(SchoolClasses objSchoolClasses, int intClassPosition){
+        Classes.set(intClassPosition, objSchoolClasses);
+        notifyDataSetChanged();
+    }
 }

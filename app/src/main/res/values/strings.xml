@@ -39,6 +39,14 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_student">Student</string>
 
+    <string name="class_information">Class Information</string>
+    <string name="class_roster">Class Roster</string>
+    <string name="class_wait_list">Class WaitList</string>
+    <string name="class_attendance">Class Attendance</string>
+    <string name="class_enroll">Class Enroll</string>
+
+
+
     <string-array name="payment_types1">
         <item>Select Charge Type</item>
         <item>Cash</item>

@@ -27,6 +27,7 @@ public class AppPreferences {
     public static final String putST2Rate = "ST2Rate";
     public static final String putAccountListPosition = "AccountListPosition";
     public static final String putStudentListPosition = "StudentListPosition";
+    public static final String putClassListPosition = "ClassListPosition";
     public static final String putLogoName = "LogoName";
     public static final String putNavDrawerPosition = "NavDrawerPosition";
     public static final String putAccountQuery = "AccountQuery";
@@ -234,6 +235,15 @@ public class AppPreferences {
 
     public void saveStudentListPosition(int position) {
         prefsEditor.putInt(putStudentListPosition, position);
+        prefsEditor.commit();
+    }
+
+    public int getClassListPosition() {
+        return sharedPrefs.getInt(putClassListPosition, 0);
+    }
+
+    public void saveClassListPosition(int position) {
+        prefsEditor.putInt(putClassListPosition, position);
         prefsEditor.commit();
     }
 

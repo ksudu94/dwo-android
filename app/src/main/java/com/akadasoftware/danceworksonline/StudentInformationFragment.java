@@ -2,6 +2,7 @@ package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -21,6 +22,13 @@ import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.Student;
 import com.akadasoftware.danceworksonline.classes.User;
 
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapPrimitive;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,13 +40,14 @@ public class StudentInformationFragment extends Fragment {
 
     private AppPreferences _appPrefs;
     Activity activity;
-    User user;
+    User oUser;
     Student oStudent;
     Globals globals;
     ArrayList<Student> Students;
 
-    int position;
-    String status;
+    int position, intStatus;
+
+    String strFName, strLName, strAddress, strCity, strState, strZip, strContact, strAcctName, strStatus;
 
 
     TextView tvName1, tvAddress1, tvContact1, tvStatus1, tvAccountName1;
@@ -71,6 +80,7 @@ public class StudentInformationFragment extends Fragment {
         position = getArguments().getInt("Position");
 
         oStudent = Students.get(position);
+        oUser = _appPrefs.getUser();
         _appPrefs.saveStuID(oStudent.StuID);
 
     }
@@ -85,19 +95,19 @@ public class StudentInformationFragment extends Fragment {
 
         switch (oStudent.Status) {
             case 0:
-                status = "active";
+                strStatus = "active";
                 break;
             case 1:
-                status = "inactive";
+                strStatus = "inactive";
                 break;
             case 2:
-                status = "prospect";
+                strStatus = "prospect";
                 break;
             case 3:
-                status = "deleted";
+                strStatus = "deleted";
                 break;
             default:
-                status = "I have no freaking clue";
+                strStatus = "I have no freaking clue";
                 break;
         }
 
@@ -117,6 +127,7 @@ public class StudentInformationFragment extends Fragment {
         etAccountName = (EditText) rootView.findViewById(R.id.etAccountName);
 
 
+
         btnEditStudent = (Button) rootView.findViewById(R.id.btnEditStudent);
         btnEnrollStudent = (Button) rootView.findViewById(R.id.btnEnrollStudent);
         btnSave = (Button) rootView.findViewById(R.id.btnSave);
@@ -129,7 +140,7 @@ public class StudentInformationFragment extends Fragment {
         tvAddress1.setText(oStudent.Address + ", " + oStudent.City + ", " + oStudent.City + ", " +
                 oStudent.ZipCode);
         tvContact1.setText(oStudent.Phone);
-        tvStatus1.setText(status);
+        tvStatus1.setText(strStatus);
         tvAccountName1.setText(oStudent.AcctName);
 
 
@@ -144,19 +155,21 @@ public class StudentInformationFragment extends Fragment {
                     etCity.setText(oStudent.City);
                     etState.setText(oStudent.State);
                     etZip.setText(oStudent.ZipCode);
+                    etContact.setText(oStudent.Phone);
                     etAccountName.setText(oStudent.AcctName);
 
                     List<String> spinnerlist = new ArrayList<String>();
                     spinnerlist.add("active");
                     spinnerlist.add("inactive");
                     spinnerlist.add("deleted");
-                    if (status.equals("prospect"))
+                    if (strStatus.equals("prospect"))
                         spinnerlist.add("prospect");
 
                     StudentStatusSpinner = (Spinner) activity.findViewById(R.id.StudentStatusSpinner);
 
                     ArrayAdapter<String> spinneradapter = new ArrayAdapter<String>(getActivity(),
                             android.R.layout.simple_list_item_1, spinnerlist);
+
 
                     spinneradapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     StudentStatusSpinner.setAdapter(spinneradapter);
@@ -189,6 +202,47 @@ public class StudentInformationFragment extends Fragment {
             }
         });
 
+        btnSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                strFName = etFName.getText().toString();
+                strLName = etLName.getText().toString();
+                strAddress = etAddress.getText().toString();
+                strCity = etCity.getText().toString();
+                strState = etState.getText().toString();
+                strZip = etZip.getText().toString();
+                strContact = etContact.getText().toString();
+                strAcctName = etAccountName.getText().toString();
+
+                switch (StudentStatusSpinner.getSelectedItemPosition()){
+                    case 0:
+                        //Active
+                        intStatus = 0;
+                        break;
+                    case 1:
+                        //Inactive
+                        intStatus = 1;
+                        break;
+                    case 2:
+                        //Prospect
+                        intStatus = 2;
+                        break;
+                }
+
+                if(!areEmpty()){
+
+                    saveStudentChangesAsync saveChanges = new saveStudentChangesAsync();
+                    saveChanges.execute();
+                }
+                else {
+                    Toast toast = Toast.makeText(getActivity(), "Please fill every field.", Toast.LENGTH_LONG);
+                    toast.show();
+                }
+
+
+            }
+        });
         return rootView;
 
     }
@@ -211,5 +265,148 @@ public class StudentInformationFragment extends Fragment {
 
         static final String NAMESPACE = "http://app.akadasoftware.com/MobileAppWebService/";
         private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
+    }
+
+
+    public class saveStudentChangesAsync extends AsyncTask<Globals.Data, Void, String> {
+        @Override
+        protected String doInBackground(Globals.Data... data) {
+
+            return saveStudentChanges();
+        }
+
+        protected void onPostExecute(String result) {
+
+            if(result.length() == 0) {
+                Toast toast = Toast.makeText(getActivity(), "Changes failed to save.", Toast.LENGTH_LONG);
+                toast.show();
+            }
+            else {
+                Toast toast = Toast.makeText(getActivity(), "Changes successfully saved", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        }
+    }
+
+    public String saveStudentChanges() {
+        String MethodName = "saveStudentInformation";
+        SoapPrimitive response = InvokeSaveStudenttMethod(Globals.Data.URL, MethodName);
+        return RetrieveSaveStudentFromSoap(response);
+
+    }
+
+
+    public SoapPrimitive InvokeSaveStudenttMethod(String URL, String METHOD_NAME) {
+
+        SoapObject request = new SoapObject(Globals.Data.NAMESPACE, METHOD_NAME);
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        request.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setType("STRING_CLASS");
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        request.addProperty(piUserGUID);
+
+        PropertyInfo piStuID = new PropertyInfo();
+        piStuID.setName("StuID");
+        piStuID.setValue(oStudent.StuID);
+        request.addProperty(piStuID);
+
+        PropertyInfo piFName = new PropertyInfo();
+        piFName.setName("FName");
+        piFName.setValue(strFName);
+        request.addProperty(piFName);
+
+        PropertyInfo piLName = new PropertyInfo();
+        piLName.setName("LName");
+        piLName.setValue(strLName);
+        request.addProperty(piLName);
+
+        PropertyInfo piAddress = new PropertyInfo();
+        piAddress.setName("Address");
+        piAddress.setValue(strAddress);
+        request.addProperty(piAddress);
+
+        PropertyInfo piCity = new PropertyInfo();
+        piCity.setName("City");
+        piCity.setValue(strCity);
+        request.addProperty(piCity);
+
+        PropertyInfo piState = new PropertyInfo();
+        piState.setName("State");
+        piState.setValue(strState);
+        request.addProperty(piState);
+
+        PropertyInfo piZipCode = new PropertyInfo();
+        piZipCode.setName("ZipCode");
+        piZipCode.setValue(strZip);
+        request.addProperty(piZipCode);
+
+        PropertyInfo piPhone = new PropertyInfo();
+        piPhone.setName("Phone");
+        piPhone.setValue(strContact);
+        request.addProperty(piPhone);
+
+        PropertyInfo piAcctName = new PropertyInfo();
+        piAcctName.setName("AcctName");
+        piAcctName.setValue(strAcctName);
+        request.addProperty(piAcctName);
+
+        PropertyInfo piStatus = new PropertyInfo();
+        piStatus.setName("Status");
+        piStatus.setValue(intStatus);
+        request.addProperty(piStatus);
+
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(request);
+        return MakeSaveCall(URL, envelope, Globals.Data.NAMESPACE, METHOD_NAME);
+    }
+
+    public static SoapPrimitive MakeSaveCall(String URL,
+                                              SoapSerializationEnvelope envelope, String NAMESPACE,
+                                              String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapPrimitive response = null;
+        try {
+            //envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",new SchoolClasses().getClass());
+            HttpTransport.call(METHOD_NAME, envelope);
+            //envelopeOutput = envelope;
+            response = (SoapPrimitive) envelope.getResponse();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
+
+    public static String RetrieveSaveStudentFromSoap(SoapPrimitive soap) {
+        String response = soap.toString();
+
+        return response;
+
+    }
+
+
+    /**
+     * Checks if all of the textviews are empty, if true runs async method to edit student information
+     * @return
+     */
+    private Boolean areEmpty(){
+        if(etFName.getText().toString().trim().equals("") || etLName.getText().toString().trim().equals("") ||
+                etAddress.getText().toString().trim().equals("") || etCity.getText().toString().trim().equals("") ||
+                etState.getText().toString().trim().equals("") || etZip.getText().toString().trim().equals("") ||
+                etContact.getText().toString().trim().equals("")){
+
+            return true;
+        }
+        else
+            return false;
     }
 }

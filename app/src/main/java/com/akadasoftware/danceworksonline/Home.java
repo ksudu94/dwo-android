@@ -28,7 +28,7 @@ public class Home extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks,
         AccountListFragment.OnAccountSelectedListener,
         StudentsListFragment.OnStudentInteractionListener,
-        ClassesListFragment.OnClassesInteractionListener,
+        ClassesListFragment.OnClassInteractionListener,
         FilterDialog.FilterDialogListener {
 
     /**
@@ -43,6 +43,8 @@ public class Home extends ActionBarActivity
 
     private CharSequence mTitle;
     private onFilterSelectedDialog fListener;
+
+
 
 
     public interface onFilterSelectedDialog {
@@ -191,6 +193,10 @@ public class Home extends ActionBarActivity
 
     @Override
     public void onStudentSelected(int position) {
+        /**
+         *  Starting a new activity (StudentInformation) which is handled by intents in the manifest.
+         *  The position is saved to fill a matching students in the listarray.
+         */
         _appPrefs.saveStudentListPosition(position);
 
         Intent openStudentPage = new Intent("com.akadasoftware.danceworksonline.StudentInformation");
@@ -199,8 +205,17 @@ public class Home extends ActionBarActivity
 
 
     @Override
-    public void onClassesInteraction(String id) {
+    public void onClassSelected(int position, String sessionName) {
+        /**
+         *  Starting a new activity (ClassInformation) which is handled by intents in the manifest.
+         *  The position is saved to fill a matching classes in the listarray.
+         */
+        _appPrefs.saveClassListPosition(position);
 
+
+        Intent openClassPage = new Intent("com.akadasoftware.danceworksonline.ClassInformation");
+        openClassPage.putExtra("SessionName", sessionName);
+        startActivity(openClassPage);
     }
 
     public void onFilterSelectedDialog(String mTitle) {

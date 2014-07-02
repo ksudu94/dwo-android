@@ -37,11 +37,10 @@ public class EnrollDialog extends DialogFragment {
     }
 
     public interface EnrollDialogListener {
-        public void onEnrollDialogPositiveClick(int intStuID, SchoolClasses oSchoolClasses, View view,
-                                                int position);
+        public void onEnrollDialogPositiveClick(SchoolClasses oSchoolClasses, int position);
 
-        public void onEnrollDialogNuetralClick(int intStuID, SchoolClasses oSchoolClasses, Student oStudent
-                , View view, int position);
+        public void onEnrollDialogNuetralClick(SchoolClasses oSchoolClasses, Student oStudent
+                , int position);
     }
 
 
@@ -214,8 +213,7 @@ public class EnrollDialog extends DialogFragment {
                         .setPositiveButton("Enroll", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                dialogListener.onEnrollDialogPositiveClick(intStuID, objSchoolClasses,
-                                        view, classPosition);
+                                dialogListener.onEnrollDialogPositiveClick(objSchoolClasses, classPosition);
                             }
 
                         })
@@ -223,8 +221,8 @@ public class EnrollDialog extends DialogFragment {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
 
-                                dialogListener.onEnrollDialogNuetralClick(intStuID, objSchoolClasses,
-                                        objStudent, view, classPosition);
+                                dialogListener.onEnrollDialogNuetralClick(objSchoolClasses,
+                                        objStudent, classPosition);
                             }
 
                         })
@@ -260,8 +258,7 @@ public class EnrollDialog extends DialogFragment {
                         .setPositiveButton("Enroll", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                dialogListener.onEnrollDialogPositiveClick(intStuID, objSchoolClasses,
-                                        view, classPosition);
+                                dialogListener.onEnrollDialogPositiveClick(objSchoolClasses, classPosition);
                             }
 
                         })
@@ -269,8 +266,8 @@ public class EnrollDialog extends DialogFragment {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
 
-                                dialogListener.onEnrollDialogNuetralClick(intStuID, objSchoolClasses,
-                                        objStudent, view, classPosition);
+                                dialogListener.onEnrollDialogNuetralClick(objSchoolClasses,
+                                        objStudent, classPosition);
                             }
 
                         })
@@ -292,8 +289,7 @@ public class EnrollDialog extends DialogFragment {
                         .setPositiveButton("Enroll", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
-                                dialogListener.onEnrollDialogPositiveClick(intStuID, objSchoolClasses,
-                                        view, classPosition);
+                                dialogListener.onEnrollDialogPositiveClick(objSchoolClasses, classPosition);
                             }
 
                         })
