@@ -1,26 +1,18 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ViewFlipper;
 
 import com.akadasoftware.danceworksonline.classes.AppPreferences;
 import com.akadasoftware.danceworksonline.classes.Globals;
 import com.akadasoftware.danceworksonline.classes.SchoolClasses;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by ksudu94 on 7/1/2014.
@@ -37,7 +29,9 @@ public class ClassInformationFragment extends Fragment {
     ArrayList<SchoolClasses> schoolClassList;
     SchoolClasses oSchoolClass;
 
-    TextView tvWhichSession, tvClassType1, tvClassLevel1, tvClassDescription1, tvNumberEnrolled1, tvNumberWaitlisted1;
+    TextView tvWhichSession, tvClassType1, tvClassLevel1, tvClassDescription1, tvNumberEnrolled1, tvMaxNumber1,
+            tvNumberWaitlisted1, tvStartTime1, tvEndTime1, tvRoomNumber1, tvTuitionAmount1, tvDaysOfTheWeek1,
+            tvInstructor1;
 
     private AppPreferences _appPrefs;
 
@@ -75,20 +69,36 @@ public class ClassInformationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_class_information, container, false);
 
-        tvWhichSession = (TextView)rootView.findViewById(R.id.tvWhichSession);
+        tvWhichSession = (TextView) rootView.findViewById(R.id.tvWhichSession);
 
-        tvClassType1 = (TextView)rootView.findViewById(R.id.tvClassType1);
-        tvClassLevel1 = (TextView)rootView.findViewById(R.id.tvClassLevel1);
-        tvClassDescription1 = (TextView)rootView.findViewById(R.id.tvClassDescription1);
-        tvNumberEnrolled1 = (TextView)rootView.findViewById(R.id.tvNumberEnrolled1);
-        tvNumberWaitlisted1 = (TextView)rootView.findViewById(R.id.tvNumberWaitlisted1);
+        tvClassType1 = (TextView) rootView.findViewById(R.id.tvClassType1);
+        tvClassLevel1 = (TextView) rootView.findViewById(R.id.tvClassLevel1);
+        tvClassDescription1 = (TextView) rootView.findViewById(R.id.tvClassDescription1);
+        tvNumberEnrolled1 = (TextView) rootView.findViewById(R.id.tvNumberEnrolled1);
+        tvMaxNumber1 = (TextView) rootView.findViewById(R.id.tvMaxNumber1);
+        tvNumberWaitlisted1 = (TextView) rootView.findViewById(R.id.tvNumberWaitlisted1);
 
-        tvClassType1.setText(oSchoolClass.ClType );
+
+        tvStartTime1 = (TextView) rootView.findViewById(R.id.tvStartTime1);
+        tvEndTime1 = (TextView) rootView.findViewById(R.id.tvEndTime1);
+        tvRoomNumber1 = (TextView) rootView.findViewById(R.id.tvRoomNumber1);
+        tvTuitionAmount1 = (TextView) rootView.findViewById(R.id.tvTuitionAmount1);
+        tvDaysOfTheWeek1 = (TextView) rootView.findViewById(R.id.tvDaysOfTheWeek1);
+        tvInstructor1 = (TextView) rootView.findViewById(R.id.tvInstructor1);
+
+        tvClassType1.setText(oSchoolClass.ClType);
         tvClassLevel1.setText(oSchoolClass.ClLevel);
         tvClassDescription1.setText(oSchoolClass.ClDescription);
-        tvNumberEnrolled1.setText(oSchoolClass.ClInstructor);
+        tvNumberEnrolled1.setText(String.valueOf(oSchoolClass.ClCur));
         tvNumberWaitlisted1.setText(oSchoolClass.ClWait);
-        tvWhichSession.setText("This class is in session: " + strSessionName );
+        tvMaxNumber1.setText(String.valueOf(oSchoolClass.ClMax));
+        tvStartTime1.setText(oSchoolClass.ClStart);
+        tvEndTime1.setText(oSchoolClass.ClStop);
+        tvRoomNumber1.setText(oSchoolClass.ClRoom);
+        tvTuitionAmount1.setText(String.valueOf(oSchoolClass.ClTuition));
+        tvDaysOfTheWeek1.setText(oSchoolClass.ClDay);
+        tvInstructor1.setText(oSchoolClass.ClInstructor);
+        tvWhichSession.setText("This class is in session: " + strSessionName);
         return rootView;
 
     }

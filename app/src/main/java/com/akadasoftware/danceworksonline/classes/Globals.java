@@ -132,6 +132,20 @@ public class Globals {
     }
 
     /**
+     * Updates the student and then resaves it into the arraylist
+     */
+
+    public void updateStudent(Student oStudent, int position, Activity activity) {
+
+        _appPrefs = new AppPreferences(activity);
+        ArrayList<Student> StudentsArray = new ArrayList<Student>();
+        StudentsArray = _appPrefs.getStudents();
+        StudentsArray.set(position, oStudent);
+        _appPrefs.saveStudents(StudentsArray);
+
+    }
+
+    /**
      * Creates a new soap object
      */
     public static SoapObject GetSoapObject(String NAMESPACE, String MethodName) {
@@ -158,7 +172,7 @@ public class Globals {
      * Property info's for the session b/c we use it in a spinner on several pages.
      */
 
-    public ArrayList<Session> getSessions(int intSchID, int intUserID, String UserGUID){
+    public ArrayList<Session> getSessions(int intSchID, int intUserID, String UserGUID) {
         String MethodName = "getSessions";
         SoapObject response = InvokeSessionMethod(Data.URL, MethodName, intSchID, intUserID, UserGUID);
         return RetrieveSessionsFromSoap(response);
@@ -195,8 +209,8 @@ public class Globals {
     }
 
     public static SoapObject MakeSessionCall(String URL,
-                                          SoapSerializationEnvelope envelope, String NAMESPACE,
-                                          String METHOD_NAME) {
+                                             SoapSerializationEnvelope envelope, String NAMESPACE,
+                                             String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
         SoapObject responseSession = null;
         try {
@@ -427,7 +441,6 @@ public class Globals {
         }
         return inputSchool;
     }
-
 
 
     /**

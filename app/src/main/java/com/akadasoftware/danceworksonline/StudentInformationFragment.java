@@ -42,7 +42,7 @@ public class StudentInformationFragment extends Fragment {
     Activity activity;
     User oUser;
     Student oStudent;
-    Globals globals;
+    Globals oGlobals;
     ArrayList<Student> Students;
 
     int position, intStatus;
@@ -60,6 +60,8 @@ public class StudentInformationFragment extends Fragment {
 
     Spinner StudentStatusSpinner;
 
+    View rootView;
+
     public static StudentInformationFragment newInstance(int position) {
         StudentInformationFragment fragment = new StudentInformationFragment();
         Bundle args = new Bundle();
@@ -74,7 +76,7 @@ public class StudentInformationFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         activity = getActivity();
-        globals = new Globals();
+        oGlobals = new Globals();
         _appPrefs = new AppPreferences(activity);
         Students = _appPrefs.getStudents();
         position = getArguments().getInt("Position");
@@ -91,31 +93,7 @@ public class StudentInformationFragment extends Fragment {
     //Create the view
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_student_information, container, false);
-
-        switch (oStudent.Status) {
-            case 0:
-                strStatus = "active";
-                break;
-            case 1:
-                strStatus = "inactive";
-                break;
-            case 2:
-                strStatus = "prospect";
-                break;
-            case 3:
-                strStatus = "deleted";
-                break;
-            default:
-                strStatus = "I have no freaking clue";
-                break;
-        }
-
-        tvName1 = (TextView) rootView.findViewById(R.id.tvName1);
-        tvAddress1 = (TextView) rootView.findViewById(R.id.tvAddress1);
-        tvContact1 = (TextView) rootView.findViewById(R.id.tvContact1);
-        tvStatus1 = (TextView) rootView.findViewById(R.id.tvStatus1);
-        tvAccountName1 = (TextView) rootView.findViewById(R.id.tvAccountName1);
+        rootView = inflater.inflate(R.layout.fragment_student_information, container, false);
 
         etFName = (EditText) rootView.findViewById(R.id.etFName);
         etLName = (EditText) rootView.findViewById(R.id.etLName);
@@ -127,7 +105,6 @@ public class StudentInformationFragment extends Fragment {
         etAccountName = (EditText) rootView.findViewById(R.id.etAccountName);
 
 
-
         btnEditStudent = (Button) rootView.findViewById(R.id.btnEditStudent);
         btnEnrollStudent = (Button) rootView.findViewById(R.id.btnEnrollStudent);
         btnSave = (Button) rootView.findViewById(R.id.btnSave);
@@ -136,12 +113,7 @@ public class StudentInformationFragment extends Fragment {
         studentSwitcher = (ViewFlipper) rootView.findViewById(R.id.studentSwitcher);
 
 
-        tvName1.setText(oStudent.FName + " " + oStudent.LName);
-        tvAddress1.setText(oStudent.Address + ", " + oStudent.City + ", " + oStudent.City + ", " +
-                oStudent.ZipCode);
-        tvContact1.setText(oStudent.Phone);
-        tvStatus1.setText(strStatus);
-        tvAccountName1.setText(oStudent.AcctName);
+        setStudentFields(oStudent, rootView);
 
 
         btnEditStudent.setOnClickListener(new View.OnClickListener() {
@@ -205,7 +177,6 @@ public class StudentInformationFragment extends Fragment {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 strFName = etFName.getText().toString();
                 strLName = etLName.getText().toString();
                 strAddress = etAddress.getText().toString();
@@ -215,7 +186,7 @@ public class StudentInformationFragment extends Fragment {
                 strContact = etContact.getText().toString();
                 strAcctName = etAccountName.getText().toString();
 
-                switch (StudentStatusSpinner.getSelectedItemPosition()){
+                switch (StudentStatusSpinner.getSelectedItemPosition()) {
                     case 0:
                         //Active
                         intStatus = 0;
@@ -230,12 +201,12 @@ public class StudentInformationFragment extends Fragment {
                         break;
                 }
 
-                if(!areEmpty()){
+                if (!areEmpty()) {
 
                     saveStudentChangesAsync saveChanges = new saveStudentChangesAsync();
                     saveChanges.execute();
-                }
-                else {
+                    studentSwitcher.setDisplayedChild(0);
+                } else {
                     Toast toast = Toast.makeText(getActivity(), "Please fill every field.", Toast.LENGTH_LONG);
                     toast.show();
                 }
@@ -260,6 +231,38 @@ public class StudentInformationFragment extends Fragment {
         return true;
     }
 
+    public void setStudentFields(Student objStudent, View rootView) {
+
+        switch (objStudent.Status) {
+            case 0:
+                strStatus = "active";
+                break;
+            case 1:
+                strStatus = "inactive";
+                break;
+            case 2:
+                strStatus = "prospect";
+                break;
+            case 3:
+                strStatus = "deleted";
+                break;
+            default:
+                strStatus = "I have no freaking clue";
+                break;
+        }
+        tvName1 = (TextView) rootView.findViewById(R.id.tvName1);
+        tvAddress1 = (TextView) rootView.findViewById(R.id.tvAddress1);
+        tvContact1 = (TextView) rootView.findViewById(R.id.tvContact1);
+        tvStatus1 = (TextView) rootView.findViewById(R.id.tvStatus1);
+        tvAccountName1 = (TextView) rootView.findViewById(R.id.tvAccountName1);
+
+        tvName1.setText(objStudent.FName + " " + objStudent.LName);
+        tvAddress1.setText(objStudent.Address + ", " + objStudent.City + ", " + objStudent.ZipCode);
+        tvContact1.setText(objStudent.Phone);
+        tvStatus1.setText(strStatus);
+        tvAccountName1.setText(objStudent.AcctName);
+
+    }
 
     class Data {
 
@@ -277,13 +280,23 @@ public class StudentInformationFragment extends Fragment {
 
         protected void onPostExecute(String result) {
 
-            if(result.length() == 0) {
+            if (result.length() == 0) {
                 Toast toast = Toast.makeText(getActivity(), "Changes failed to save.", Toast.LENGTH_LONG);
                 toast.show();
-            }
-            else {
+            } else {
                 Toast toast = Toast.makeText(getActivity(), "Changes successfully saved", Toast.LENGTH_LONG);
                 toast.show();
+                oStudent.FName = etFName.getText().toString().trim();
+                oStudent.LName = etLName.getText().toString().trim();
+                oStudent.Address = etAddress.getText().toString().trim();
+                oStudent.City = etCity.getText().toString().trim();
+                oStudent.State = etState.getText().toString().trim();
+                oStudent.ZipCode = etZip.getText().toString().trim();
+                oStudent.Phone = etContact.getText().toString().trim();
+                oStudent.AcctName = etAccountName.getText().toString().trim();
+                oStudent.Status = intStatus;
+                oGlobals.updateStudent(oStudent, position, activity);
+                setStudentFields(oStudent, rootView);
             }
         }
     }
@@ -370,8 +383,8 @@ public class StudentInformationFragment extends Fragment {
     }
 
     public static SoapPrimitive MakeSaveCall(String URL,
-                                              SoapSerializationEnvelope envelope, String NAMESPACE,
-                                              String METHOD_NAME) {
+                                             SoapSerializationEnvelope envelope, String NAMESPACE,
+                                             String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
         SoapPrimitive response = null;
         try {
@@ -396,17 +409,17 @@ public class StudentInformationFragment extends Fragment {
 
     /**
      * Checks if all of the textviews are empty, if true runs async method to edit student information
+     *
      * @return
      */
-    private Boolean areEmpty(){
-        if(etFName.getText().toString().trim().equals("") || etLName.getText().toString().trim().equals("") ||
+    private Boolean areEmpty() {
+        if (etFName.getText().toString().trim().equals("") || etLName.getText().toString().trim().equals("") ||
                 etAddress.getText().toString().trim().equals("") || etCity.getText().toString().trim().equals("") ||
                 etState.getText().toString().trim().equals("") || etZip.getText().toString().trim().equals("") ||
-                etContact.getText().toString().trim().equals("")){
+                etContact.getText().toString().trim().equals("")) {
 
             return true;
-        }
-        else
+        } else
             return false;
     }
 }
