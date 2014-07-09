@@ -8,15 +8,22 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.widget.TimePicker;
 
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Dialogs.EditEndTimeDialog;
+import com.akadasoftware.danceworksonline.Dialogs.EditStartTimeDialog;
 
 import java.util.Locale;
 
 /**
  * Created by ksudu94 on 6/26/2014.
  */
-public class ClassInformation  extends ActionBarActivity implements ActionBar.TabListener {
+public class ClassInformation extends ActionBarActivity implements ActionBar.TabListener,
+        ClassInformationFragment.onEditStartTimeDialog,
+        ClassInformationFragment.onEditEndTimeDialog,
+        EditEndTimeDialog.EditStopTimeDialogListener,
+        EditStartTimeDialog.EditTimeDialogListener {
 
     ViewPager mViewPager;
     private AppPreferences _appPrefs;
@@ -98,6 +105,53 @@ public class ClassInformation  extends ActionBarActivity implements ActionBar.Ta
     @Override
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
 
+    }
+
+    @Override
+    public void onEditEndTimeDialog(String endTime) {
+        EditEndTimeDialog endStart = new EditEndTimeDialog();
+        Bundle args = new Bundle();
+        args.putString("Stop", endTime);
+        endStart.setArguments(args);
+        endStart.show(getFragmentManager(), "");
+
+    }
+
+    @Override
+    public void onEditStartTimeDialog(String startTime) {
+        EditStartTimeDialog editStart = new EditStartTimeDialog();
+        Bundle args = new Bundle();
+        args.putString("Start", startTime);
+        editStart.setArguments(args);
+        editStart.show(getFragmentManager(), "");
+    }
+
+    public void onFinishEditTimeDialog(TimePicker tpStartTime) {
+
+        ClassInformationFragment cf = (ClassInformationFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 0);
+
+        String inputHour = tpStartTime.getCurrentHour().toString();
+        String inputMinute = tpStartTime.getCurrentMinute().toString();
+
+        if (tpStartTime.getCurrentHour() > 11) {
+            cf.isAm = true;
+        }
+
+        cf.newStartTime = inputHour + inputMinute;
+    }
+
+    @Override
+    public void onFinishEditStopTimeDialog(TimePicker tpEndTime) {
+
+        ClassInformationFragment cf = (ClassInformationFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 0);
+
+        String inputHour = tpEndTime.getCurrentHour().toString();
+        String inputMinute = tpEndTime.getCurrentMinute().toString();
+
+        if (tpEndTime.getCurrentHour() > 11) {
+            cf.isAm = true;
+        }
+        cf.newEndTime = inputHour + inputMinute;
     }
 
     /**

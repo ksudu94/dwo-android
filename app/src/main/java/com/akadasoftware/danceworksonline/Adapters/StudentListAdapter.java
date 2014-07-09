@@ -1,8 +1,4 @@
-package com.akadasoftware.danceworksonline;
-
-/**
- * Created by Kyle on 1/7/14.
- */
+package com.akadasoftware.danceworksonline.Adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,39 +9,31 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.akadasoftware.danceworksonline.classes.Account;
+import com.akadasoftware.danceworksonline.Classes.Student;
+import com.akadasoftware.danceworksonline.R;
 
 import java.util.List;
 
+/**
+ * Created by Kyle on 4/2/2014.
+ */
+public class StudentListAdapter extends ArrayAdapter<Student> {
 
-public class AccountListAdapater extends ArrayAdapter<Account> {
 
     Activity activity;
     int resource;
     private int selectedPos;
-    List<Account> Accounts;
+    List<Student> Students;
 
-    public AccountListAdapater(Context context, int resource,
-                               List<Account> items) {
+    public StudentListAdapter(Context context, int resource, List<Student> items) {
         super(context, resource, items);
         this.resource = resource;
-        Accounts = items;
+        Students = items;
     }
 
-    public void setSelectedPosition(int pos) {
-
-        selectedPos = pos;
-
-        // inform the view of this change
-        notifyDataSetChanged();
-    }
-
-    public int getSelectedPosition() {
-        return selectedPos;
-    }
 
     public class ViewHolder {
-        TextView tvAccountInformation;
+        TextView tvStudentInformation;
 
     }
 
@@ -64,12 +52,11 @@ public class AccountListAdapater extends ArrayAdapter<Account> {
             String inflater = Context.LAYOUT_INFLATER_SERVICE;
             LayoutInflater vi;
             vi = (LayoutInflater) getContext().getSystemService(inflater);
-            convertView = vi.inflate(R.layout.item_accountlist, null);
+            convertView = vi.inflate(R.layout.item_studentlist, null);
 
             holder = new ViewHolder();
-            holder.tvAccountInformation = (TextView) convertView
-                    .findViewById(R.id.tvAccountInformation);
-
+            holder.tvStudentInformation = (TextView) convertView
+                    .findViewById(R.id.tvStudentInformation);
 
             convertView.setTag(holder);
 
@@ -78,14 +65,15 @@ public class AccountListAdapater extends ArrayAdapter<Account> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Account oAccount = Accounts.get(position);
+        Student oStudent = Students.get(position);
 
-        holder.tvAccountInformation.setText(oAccount.LName + ", " + oAccount.FName);
+        holder.tvStudentInformation.setText(oStudent.LName + ", " + oStudent.FName);
 
-        holder.tvAccountInformation.setTextSize(20);
+        holder.tvStudentInformation.setTextSize(20);
 
         return convertView;
 
     }
+
 
 }

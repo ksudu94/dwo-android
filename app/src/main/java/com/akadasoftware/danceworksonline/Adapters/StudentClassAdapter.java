@@ -1,8 +1,7 @@
-package com.akadasoftware.danceworksonline;
+package com.akadasoftware.danceworksonline.Adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,23 +9,24 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.SchoolClasses;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.StudentClasses;
+import com.akadasoftware.danceworksonline.R;
 
 import java.util.List;
 
 /**
- * Created by Kyle on 5/21/2014.
+ * Created by Kyle on 4/9/2014.
  */
-public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
+public class StudentClassAdapter extends ArrayAdapter<StudentClasses> {
 
     private AppPreferences _appPrefs;
     Activity activity;
     int resource;
     //Context newContext;
-    List<SchoolClasses> Classes;
+    List<StudentClasses> Classes;
 
-    public SchoolClassAdapter(Context context, int resource, List<SchoolClasses> items) {
+    public StudentClassAdapter(Context context, int resource, List<StudentClasses> items) {
         super(context, resource, items);
         //newContext = context;
         this.resource = resource;
@@ -36,7 +36,6 @@ public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
 
     public class ViewHolder {
         TextView tvClassType;
-        TextView tvEnrollmentStatus;
         TextView tvClassLevel;
         TextView tvDescription;
         TextView tvInstructor;
@@ -68,9 +67,6 @@ public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
             holder.tvClassType = (TextView) convertView
                     .findViewById(R.id.tvClassType);
 
-            holder.tvEnrollmentStatus = (TextView) convertView
-                    .findViewById(R.id.tvEnrollmentStatus);
-
             holder.tvClassLevel = (TextView) convertView
                     .findViewById(R.id.tvClassLevel);
 
@@ -95,60 +91,60 @@ public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
 
             convertView.setTag(holder);
 
-
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        SchoolClasses oSchoolClasses = Classes.get(position);
+        StudentClasses oStudentClasses = Classes.get(position);
         String Day = "";
-        holder.tvClassType.setText(oSchoolClasses.ClType);
+        holder.tvClassType.setText(oStudentClasses.ClType);
         holder.tvClassType.setTag(position);
 
-        holder.tvClassLevel.setText(" - " + oSchoolClasses.ClLevel + " - ");
-        holder.tvDescription.setText(oSchoolClasses.ClDescription);
-        holder.tvInstructor.setText(oSchoolClasses.ClInstructor);
 
-        if (oSchoolClasses.MultiDay) {
-            if (oSchoolClasses.Monday) {
+        holder.tvClassLevel.setText(" - " + oStudentClasses.ClLevel + " - ");
+        holder.tvDescription.setText(oStudentClasses.ClDescription);
+        holder.tvInstructor.setText(oStudentClasses.ClInstructor);
+
+        if (oStudentClasses.MultiDay) {
+            if (oStudentClasses.Monday) {
                 Day = "Mon";
             }
-            if (oSchoolClasses.Tuesday) {
+            if (oStudentClasses.Tuesday) {
                 if (Day.isEmpty()) {
                     Day = "Tue";
                 } else {
                     Day = Day + "/Tue";
                 }
             }
-            if (oSchoolClasses.Wednesday) {
+            if (oStudentClasses.Wednesday) {
                 if (Day.isEmpty()) {
                     Day = "Wed";
                 } else {
                     Day = Day + "/Wed";
                 }
             }
-            if (oSchoolClasses.Thursday) {
+            if (oStudentClasses.Thursday) {
                 if (Day.isEmpty()) {
                     Day = "Thu";
                 } else {
                     Day = Day + "/Thu";
                 }
             }
-            if (oSchoolClasses.Friday) {
+            if (oStudentClasses.Friday) {
                 if (Day.isEmpty()) {
                     Day = "Fri";
                 } else {
                     Day = Day + "/Fri";
                 }
             }
-            if (oSchoolClasses.Saturday) {
+            if (oStudentClasses.Saturday) {
                 if (Day.isEmpty()) {
                     Day = "Sat";
                 } else {
                     Day = Day + "/Sat";
                 }
             }
-            if (oSchoolClasses.Sunday) {
+            if (oStudentClasses.Sunday) {
                 if (Day.isEmpty()) {
                     Day = "Sun";
                 } else {
@@ -156,52 +152,14 @@ public class SchoolClassAdapter extends ArrayAdapter<SchoolClasses> {
                 }
             }
         } else {
-            Day = oSchoolClasses.ClDay;
+            Day = oStudentClasses.ClDay;
         }
         holder.tvDay.setText(Day + " from ");
-        holder.tvStart.setText(oSchoolClasses.ClStart + " - ");
-        holder.tvStop.setText(oSchoolClasses.ClStop);
-        holder.tvRoom.setText(oSchoolClasses.ClRoom);
-
-        switch (oSchoolClasses.EnrollmentStatus) {
-            case 0:
-                /**
-                 * Student not enrolled or waitlisted
-                 */
-                convertView.setBackgroundColor(Color.WHITE);
-                holder.tvEnrollmentStatus.setText("");
-                break;
-            case 1:
-                /**
-                 * Student already enrolled in class
-                 */
-                convertView.setBackgroundColor(Color.GREEN);
-                holder.tvEnrollmentStatus.setText("Enrolled");
-                break;
-            case 2:
-                /**
-                 * Student registered online, enrolled in class but not approved yet
-                 */
-                convertView.setBackgroundColor(Color.RED);
-                holder.tvEnrollmentStatus.setText("Pending approval");
-                break;
-            case 3:
-                /**
-                 * Student on waitlist
-                 */
-                convertView.setBackgroundColor(Color.YELLOW);
-                holder.tvEnrollmentStatus.setText("On wait list");
-                break;
-
-        }
-
+        holder.tvStart.setText(oStudentClasses.ClStart + " - ");
+        holder.tvStop.setText(oStudentClasses.ClStop);
+        holder.tvRoom.setText(oStudentClasses.ClRoom);
 
         return convertView;
 
-    }
-
-    public void replaceSchoolClass(SchoolClasses objSchoolClasses, int intClassPosition){
-        Classes.set(intClassPosition, objSchoolClasses);
-        notifyDataSetChanged();
     }
 }

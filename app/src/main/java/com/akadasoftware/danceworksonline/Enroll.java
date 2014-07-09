@@ -10,12 +10,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.Globals;
-import com.akadasoftware.danceworksonline.classes.School;
-import com.akadasoftware.danceworksonline.classes.SchoolClasses;
-import com.akadasoftware.danceworksonline.classes.Student;
-import com.akadasoftware.danceworksonline.classes.User;
+import com.akadasoftware.danceworksonline.Adapters.SchoolClassAdapter;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Globals;
+import com.akadasoftware.danceworksonline.Classes.School;
+import com.akadasoftware.danceworksonline.Classes.SchoolClasses;
+import com.akadasoftware.danceworksonline.Classes.Student;
+import com.akadasoftware.danceworksonline.Classes.User;
+import com.akadasoftware.danceworksonline.Dialogs.EnrollDialog;
 import com.google.gson.Gson;
 
 import org.ksoap2.SoapEnvelope;
@@ -111,7 +113,7 @@ public class Enroll extends FragmentActivity implements
     }
 
     @Override
-    public void onEnrollDialogPositiveClick( SchoolClasses inputSchoolClasses, int classPosition) {
+    public void onEnrollDialogPositiveClick(SchoolClasses inputSchoolClasses, int classPosition) {
 
         globalSchoolClasses = inputSchoolClasses;
         intClassPosition = classPosition;
@@ -122,8 +124,8 @@ public class Enroll extends FragmentActivity implements
     }
 
     @Override
-    public void onEnrollDialogNuetralClick( SchoolClasses inputSchoolClasses, Student inputStudent,
-                                            int classPosition) {
+    public void onEnrollDialogNuetralClick(SchoolClasses inputSchoolClasses, Student inputStudent,
+                                           int classPosition) {
         globalSchoolClasses = inputSchoolClasses;
         globalStudent = inputStudent;
         intClassPosition = classPosition;
@@ -167,7 +169,7 @@ public class Enroll extends FragmentActivity implements
                 globalSchoolClasses.WaitID = result;
                 globalSchoolClasses.EnrollmentStatus = 3;
 
-                objClassAdapter.replaceSchoolClass(globalSchoolClasses,intClassPosition);
+                objClassAdapter.replaceSchoolClass(globalSchoolClasses, intClassPosition);
 
             } else {
                 Toast toast = Toast.makeText(Enroll.this, "The student was not placed on the waitlist", Toast.LENGTH_LONG);
@@ -334,8 +336,7 @@ public class Enroll extends FragmentActivity implements
                 globalSchoolClasses.ClRID = result;
                 globalSchoolClasses.EnrollmentStatus = 1;
 
-                objClassAdapter.replaceSchoolClass(globalSchoolClasses,intClassPosition);
-
+                objClassAdapter.replaceSchoolClass(globalSchoolClasses, intClassPosition);
 
 
                 /**
@@ -424,8 +425,8 @@ public class Enroll extends FragmentActivity implements
     }
 
     public static SoapPrimitive MakeEnrollCall(String URL,
-                                            SoapSerializationEnvelope envelope, String NAMESPACE,
-                                            String METHOD_NAME) {
+                                               SoapSerializationEnvelope envelope, String NAMESPACE,
+                                               String METHOD_NAME) {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
         SoapPrimitive responseEnroll = null;
         try {

@@ -1,4 +1,4 @@
-package com.akadasoftware.danceworksonline;
+package com.akadasoftware.danceworksonline.Adapters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -9,7 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.akadasoftware.danceworksonline.classes.StudentAttendance;
+import com.akadasoftware.danceworksonline.Classes.StudentAttendance;
+import com.akadasoftware.danceworksonline.R;
 
 import java.util.List;
 
@@ -120,7 +121,7 @@ public class StudentAttendanceAdapter extends ArrayAdapter<StudentAttendance> {
         }
 
         String day = "";
-        switch(oStudentAttendance.ClDayNo){
+        switch (oStudentAttendance.ClDayNo) {
             case 1:
                 day = "Monday";
                 break;
@@ -146,9 +147,9 @@ public class StudentAttendanceAdapter extends ArrayAdapter<StudentAttendance> {
         }
 
         holder.tvAttendance.setText(strStatus + " for -" + oStudentAttendance.ClLevel + " - " + oStudentAttendance.ClDescription);
-        String date = oStudentAttendance.ADate.substring(0,9);
+        String date = oStudentAttendance.ADate.substring(0, 9);
 
-        holder.tvClassDate.setText( day + ", " + date + " at " + oStudentAttendance.ClStart);
+        holder.tvClassDate.setText(day + ", " + date + " at " + oStudentAttendance.ClStart);
         return convertView;
 
     }

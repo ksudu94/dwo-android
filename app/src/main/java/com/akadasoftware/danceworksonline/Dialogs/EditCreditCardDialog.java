@@ -1,4 +1,4 @@
-package com.akadasoftware.danceworksonline;
+package com.akadasoftware.danceworksonline.Dialogs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -14,7 +14,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.akadasoftware.danceworksonline.classes.Account;
+import com.akadasoftware.danceworksonline.Classes.Account;
+import com.akadasoftware.danceworksonline.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;

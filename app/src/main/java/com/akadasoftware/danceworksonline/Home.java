@@ -13,13 +13,13 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
 import android.widget.Toast;
 
-import com.akadasoftware.danceworksonline.classes.Account;
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.Globals;
-import com.akadasoftware.danceworksonline.classes.Student;
+import com.akadasoftware.danceworksonline.Classes.Account;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Globals;
+import com.akadasoftware.danceworksonline.Classes.Student;
+import com.akadasoftware.danceworksonline.Dialogs.FilterDialog;
 
 import java.util.ArrayList;
 
@@ -37,14 +37,9 @@ public class Home extends ActionBarActivity
     private static SharedPreferences loginPreferences;
     private static SharedPreferences.Editor loginEditor;
     private NavigationDrawerFragment mNavigationDrawerFragment;
-    private DrawerLayout mDrawerLayout;
     private AppPreferences _appPrefs;
-    private ListView mDrawerListView;
 
     private CharSequence mTitle;
-    private onFilterSelectedDialog fListener;
-
-
 
 
     public interface onFilterSelectedDialog {
@@ -260,6 +255,7 @@ public class Home extends ActionBarActivity
 
             progress = ProgressDialog.show(Home.this, "Gathering Energy", "Loading...", true);
         }
+
         @Override
         protected ArrayList<Account> doInBackground(Globals.Data... data) {
 

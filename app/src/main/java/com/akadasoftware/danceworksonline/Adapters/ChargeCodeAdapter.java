@@ -1,4 +1,4 @@
-package com.akadasoftware.danceworksonline;
+package com.akadasoftware.danceworksonline.Adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -8,8 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.ChargeCodes;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.ChargeCodes;
+import com.akadasoftware.danceworksonline.R;
 
 import java.util.List;
 

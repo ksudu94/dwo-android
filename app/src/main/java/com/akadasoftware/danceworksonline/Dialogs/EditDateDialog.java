@@ -1,4 +1,4 @@
-package com.akadasoftware.danceworksonline;
+package com.akadasoftware.danceworksonline.Dialogs;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;

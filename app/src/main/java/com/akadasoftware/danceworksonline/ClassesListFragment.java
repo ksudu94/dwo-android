@@ -12,17 +12,21 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.Globals;
-import com.akadasoftware.danceworksonline.classes.School;
-import com.akadasoftware.danceworksonline.classes.SchoolClasses;
-import com.akadasoftware.danceworksonline.classes.Session;
-import com.akadasoftware.danceworksonline.classes.User;
-
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
+import com.akadasoftware.danceworksonline.Adapters.SchoolClassAdapter;
+import com.akadasoftware.danceworksonline.Adapters.SessionAdapter;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Globals;
+import com.akadasoftware.danceworksonline.Classes.School;
+import com.akadasoftware.danceworksonline.Classes.SchoolClasses;
+import com.akadasoftware.danceworksonline.Classes.Session;
+import com.akadasoftware.danceworksonline.Classes.User;
 
 import java.util.ArrayList;
+
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.Options;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 public class ClassesListFragment extends ListFragment {
 
@@ -37,7 +41,6 @@ public class ClassesListFragment extends ListFragment {
     int SessionID, position;
     String METHOD_NAME = "";
     String SOAP_ACTION = "";
-    static SoapSerializationEnvelope envelopeOutput;
 
 
     ArrayList<Session> sessionArrayList = new ArrayList<Session>();
@@ -45,12 +48,12 @@ public class ClassesListFragment extends ListFragment {
 
     ArrayList<SchoolClasses> schoolClasssesArray = new ArrayList<SchoolClasses>();
 
-    ArrayList<String> conflicksArray = new ArrayList<String>();
 
     Spinner sessionClassSpinner;
     private SchoolClassAdapter classAdapter;
 
     private OnClassInteractionListener classListener;
+    private PullToRefreshLayout mPullToRefreshLayout;
 
 
     /**
@@ -106,6 +109,44 @@ public class ClassesListFragment extends ListFragment {
     }
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        ViewGroup viewGroup = (ViewGroup) view;
+
+        mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+
+        ActionBarPullToRefresh.from(activity)
+
+                // We need to insert the PullToRefreshLayout into the Fragment's ViewGroup
+                .insertLayoutInto(viewGroup)
+
+                        // We need to mark the ListView and it's Empty View as pull-able
+                        // This is because they are not direct children of the ViewGroup
+                .theseChildrenArePullable(getListView(), getListView().getEmptyView())
+
+                        // Set the OnRefreshListener
+                .options(Options.create().refreshOnUp(true).build())
+
+
+                .listener(new OnRefreshListener() {
+                    @Override
+                    public void onRefreshStarted(View view) {
+                        getSessionsAsync getSessions = new getSessionsAsync();
+                        getSessions.execute();
+                        mPullToRefreshLayout.setRefreshComplete();
+
+                    }
+
+                })
+
+                        // Finally commit the setup to our PullToRefreshLayout
+                .setup(mPullToRefreshLayout);
+
+    }
+
+
+    @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
@@ -140,9 +181,11 @@ public class ClassesListFragment extends ListFragment {
         super.onListItemClick(l, v, position, id);
         oSchoolClass = (SchoolClasses) this.getListAdapter().getItem(position);
 
+        /**
+         * Home.Java
+         */
         classListener.onClassSelected(position, session.SessionName);
     }
-
 
 
     class Data {
@@ -160,7 +203,6 @@ public class ClassesListFragment extends ListFragment {
 
 
             return oGlobal.getSessions(oSchool.SchID, oUser.UserID, oUser.UserGUID);
-
 
 
         }

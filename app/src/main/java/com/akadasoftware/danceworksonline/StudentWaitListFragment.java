@@ -12,13 +12,15 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.Globals;
-import com.akadasoftware.danceworksonline.classes.School;
-import com.akadasoftware.danceworksonline.classes.Session;
-import com.akadasoftware.danceworksonline.classes.Student;
-import com.akadasoftware.danceworksonline.classes.StudentWaitList;
-import com.akadasoftware.danceworksonline.classes.User;
+import com.akadasoftware.danceworksonline.Adapters.SessionAdapter;
+import com.akadasoftware.danceworksonline.Adapters.StudentWaitListAdapter;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Globals;
+import com.akadasoftware.danceworksonline.Classes.School;
+import com.akadasoftware.danceworksonline.Classes.Session;
+import com.akadasoftware.danceworksonline.Classes.Student;
+import com.akadasoftware.danceworksonline.Classes.StudentWaitList;
+import com.akadasoftware.danceworksonline.Classes.User;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;

@@ -1,24 +1,29 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.akadasoftware.danceworksonline.classes.Account;
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.User;
+import com.akadasoftware.danceworksonline.Adapters.AccountListAdapater;
+import com.akadasoftware.danceworksonline.Classes.Account;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Globals;
+import com.akadasoftware.danceworksonline.Classes.User;
 
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
-import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
+
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.Options;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 /**
  * A fragment representing a list of Items.
@@ -36,9 +41,11 @@ public class AccountListFragment extends ListFragment {
     static String SOAP_ACTION = "getAccounts";
     static String strQuery = "";
     static SoapSerializationEnvelope envelopeOutput;
+    private PullToRefreshLayout mPullToRefreshLayout;
 
     Activity activity;
     static User oUser;
+    Globals oGlobals;
     /**
      * Listener to handle clicks on the list
      */
@@ -68,7 +75,9 @@ public class AccountListFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         _appPrefs = new AppPreferences(getActivity());
         AccountsArray = _appPrefs.getAccounts();
+        activity = getActivity();
         strQuery = _appPrefs.getAccountQuery();
+        oGlobals = new Globals();
 
         /**
          * The loading of the accounts list is done on the splash/login screens
@@ -78,6 +87,43 @@ public class AccountListFragment extends ListFragment {
         setListAdapter(acctListAdpater);
         acctListAdpater.setNotifyOnChange(true);
 
+
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        ViewGroup viewGroup = (ViewGroup) view;
+
+        mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+
+        ActionBarPullToRefresh.from(activity)
+
+                // We need to insert the PullToRefreshLayout into the Fragment's ViewGroup
+                .insertLayoutInto(viewGroup)
+
+                        // We need to mark the ListView and it's Empty View as pull-able
+                        // This is because they are not direct children of the ViewGroup
+                .theseChildrenArePullable(getListView(), getListView().getEmptyView())
+
+                        // Set the OnRefreshListener
+                .options(Options.create().refreshOnUp(true).build())
+
+
+                .listener(new OnRefreshListener() {
+                    @Override
+                    public void onRefreshStarted(View view) {
+                        getAccountsListAsync getAccounts = new getAccountsListAsync();
+                        getAccounts.execute();
+                        mPullToRefreshLayout.setRefreshComplete();
+
+                    }
+
+                })
+
+                        // Finally commit the setup to our PullToRefreshLayout
+                .setup(mPullToRefreshLayout);
 
     }
 
@@ -137,113 +183,32 @@ public class AccountListFragment extends ListFragment {
         private static final String URL = "http://app.akadasoftware.com/MobileAppWebService/Android.asmx";
     }
 
-
     /**
-     * Done by using async call and rest is located in globals.
+     * Gets account list
      */
     private class getAccountsListAsync extends
-            AsyncTask<Data, Void, ArrayList<Account>> {
+            AsyncTask<Globals.Data, Void, ArrayList<Account>> {
+
+        ProgressDialog progress;
+
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(activity, "Refreshing List", "Loading...", true);
+        }
 
         @Override
-        protected ArrayList<Account> doInBackground(Data... data) {
+        protected ArrayList<Account> doInBackground(Globals.Data... data) {
 
-            return getAccounts();
+            return oGlobals.getAccounts(_appPrefs);
         }
 
         protected void onPostExecute(ArrayList<Account> result) {
-
+            progress.dismiss();
+            _appPrefs.saveAccounts(result);
             AccountsArray = result;
             acctListAdpater = new AccountListAdapater(getActivity(),
                     R.layout.item_accountlist, AccountsArray);
             setListAdapter(acctListAdpater);
-            _appPrefs.saveAccounts(result);
             acctListAdpater.setNotifyOnChange(true);
-
-
         }
-    }
-
-    public static ArrayList<Account> getAccounts() {
-        String MethodName = "getAccounts";
-        SoapObject response = InvokeMethod(Data.URL, MethodName);
-        return RetrieveAccountsFromSoap(response);
-
-    }
-
-    public static SoapObject InvokeMethod(String URL, String MethodName) {
-
-        SoapObject requestAccounts = GetSoapObject(MethodName);
-
-
-        PropertyInfo piOrder = new PropertyInfo();
-        piOrder.setType("STRING_CLASS");
-        piOrder.setName("Order");
-        piOrder.setValue(strQuery);
-        requestAccounts.addProperty(piOrder);
-
-        PropertyInfo piSchID = new PropertyInfo();
-        piSchID.setName("SchID");
-        piSchID.setValue(oUser.SchID);
-        requestAccounts.addProperty(piSchID);
-
-        PropertyInfo piUserID = new PropertyInfo();
-        piUserID.setName("UserID");
-        piUserID.setValue(oUser.UserID);
-        requestAccounts.addProperty(piUserID);
-
-        PropertyInfo piUserGUID = new PropertyInfo();
-        piUserGUID.setType("STRING_CLASS");
-        piUserGUID.setName("UserGUID");
-        piUserGUID.setValue(oUser.UserGUID);
-        requestAccounts.addProperty(piUserGUID);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                SoapEnvelope.VER11);
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(requestAccounts);
-        return MakeCall(URL, envelope, Data.NAMESPACE, MethodName);
-    }
-
-    public static SoapObject GetSoapObject(String MethodName) {
-        return new SoapObject(Data.NAMESPACE, MethodName);
-    }
-
-    public static SoapObject MakeCall(String URL,
-                                      SoapSerializationEnvelope envelope, String NAMESPACE,
-                                      String METHOD_NAME) {
-        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
-        try {
-            envelope.addMapping(Data.NAMESPACE, "Account",
-                    new Account().getClass());
-            HttpTransport.call(SOAP_ACTION, envelope);
-            envelopeOutput = envelope;
-            SoapObject responseAccounts = (SoapObject) envelope.getResponse();
-
-            return responseAccounts;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static ArrayList<Account> RetrieveAccountsFromSoap(SoapObject soap) {
-
-        ArrayList<Account> Accounts = new ArrayList<Account>();
-        for (int i = 0; i < soap.getPropertyCount() - 1; i++) {
-
-            SoapObject accountlistitem = (SoapObject) soap.getProperty(i);
-            Account account = new Account();
-            for (int j = 0; j < accountlistitem.getPropertyCount() - 1; j++) {
-                account.setProperty(j, accountlistitem.getProperty(j)
-                        .toString());
-                if (accountlistitem.getProperty(j).equals("anyType{}")) {
-                    accountlistitem.setProperty(j, "");
-                }
-
-            }
-            Accounts.add(i, account);
-        }
-
-        return Accounts;
     }
 }

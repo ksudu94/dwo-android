@@ -12,9 +12,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.SchoolClasses;
-import com.akadasoftware.danceworksonline.classes.Student;
+import com.akadasoftware.danceworksonline.Adapters.SchoolClassAdapter;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.SchoolClasses;
+import com.akadasoftware.danceworksonline.Classes.Student;
 
 import java.util.ArrayList;
 import java.util.Locale;

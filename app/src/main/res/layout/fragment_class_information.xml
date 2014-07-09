@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<ViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/classSwitcher"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
 
     <ScrollView
@@ -70,14 +70,14 @@
                 <TextView
                     android:id="@+id/tvClassType"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Type: " />
 
                 <TextView
                     android:id="@+id/tvClassType1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="right" />
             </LinearLayout>
 
@@ -91,14 +91,14 @@
                 <TextView
                     android:id="@+id/tvClassLevel"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Level: " />
 
                 <TextView
                     android:id="@+id/tvClassLevel1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="right" />
             </LinearLayout>
 
@@ -112,14 +112,14 @@
                 <TextView
                     android:id="@+id/tvClassDescription"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Description: " />
 
                 <TextView
                     android:id="@+id/tvClassDescription1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <LinearLayout
@@ -132,14 +132,14 @@
                 <TextView
                     android:id="@+id/tvNumberEnrolled"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Enrolled Students: " />
 
                 <TextView
                     android:id="@+id/tvNumberEnrolled1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="right" />
             </LinearLayout>
 
@@ -153,14 +153,14 @@
                 <TextView
                     android:id="@+id/tvMaxNumber"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Max # Students: " />
 
                 <TextView
                     android:id="@+id/tvMaxNumber1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="right" />
             </LinearLayout>
 
@@ -174,14 +174,14 @@
                 <TextView
                     android:id="@+id/tvNumberWaitlisted"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Waitlisted Students: " />
 
                 <TextView
                     android:id="@+id/tvNumberWaitlisted1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="right" />
             </LinearLayout>
 
@@ -195,14 +195,14 @@
                 <TextView
                     android:id="@+id/tvStartTime"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Start Time: " />
 
                 <TextView
                     android:id="@+id/tvStartTime1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="right" />
             </LinearLayout>
 
@@ -216,14 +216,14 @@
                 <TextView
                     android:id="@+id/tvEndTime"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="End Time: " />
 
                 <TextView
                     android:id="@+id/tvEndTime1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="right" />
             </LinearLayout>
 
@@ -237,14 +237,14 @@
                 <TextView
                     android:id="@+id/tvRoomNumber"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Room #: " />
 
                 <TextView
                     android:id="@+id/tvRoomNumber1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="right" />
             </LinearLayout>
 
@@ -258,14 +258,14 @@
                 <TextView
                     android:id="@+id/tvTuitionAmount"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Tuition: " />
 
                 <TextView
                     android:id="@+id/tvTuitionAmount1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="right" />
             </LinearLayout>
 
@@ -279,14 +279,14 @@
                 <TextView
                     android:id="@+id/tvDaysOfTheWeek"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Days: " />
 
                 <TextView
                     android:id="@+id/tvDaysOfTheWeek1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="right" />
             </LinearLayout>
 
@@ -300,14 +300,14 @@
                 <TextView
                     android:id="@+id/tvInstructor"
                     android:layout_width="80dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:textStyle="bold"
                     android:text="Instructor: " />
 
                 <TextView
                     android:id="@+id/tvInstructor1"
-                    android:layout_width="100dp"
-                    android:layout_height="40dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:gravity="right" />
             </LinearLayout>
 
@@ -315,4 +315,226 @@
         </LinearLayout>
 
     </ScrollView>
-</LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/svEditClassInformation">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/tvEditClassType"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Type: " />
+
+            <EditText
+                android:id="@+id/etClassType"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="5dip" />
+
+
+            <TextView
+                android:id="@+id/tvEditClassLevel"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Level: " />
+
+            <EditText
+                android:id="@+id/etClassLevel"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+                android:id="@+id/tvEditDescription"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Description: " />
+
+            <EditText
+                android:id="@+id/etClassDescription"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content" />
+
+
+            <TextView
+                android:id="@+id/tvEditStuEnrolled"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="EnrolledStudents: " />
+
+            <EditText
+                android:id="@+id/etStudentsEnrolled"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+
+            <TextView
+                android:id="@+id/tvEditMaxStudents"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Max # Students: " />
+
+            <EditText
+                android:id="@+id/etMaxStudents"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+            <TextView
+                android:id="@+id/tvEditWaitList"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Waitlisted Students: " />
+
+            <EditText
+                android:id="@+id/etWaitList"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+            <TextView
+                android:id="@+id/tvEditStartTime"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Start Time: " />
+
+            <TextView
+                android:id="@+id/tvStartTimeClick"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip" />
+
+
+            <TextView
+                android:id="@+id/tvEditEndTime"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="End Time: " />
+
+            <TextView
+                android:id="@+id/tvEndTimeClick"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip" />
+
+
+            <TextView
+                android:id="@+id/tvEditRoomNum"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Room #: " />
+
+            <EditText
+                android:id="@+id/etRoomNumber"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content"
+                android:inputType="number" />
+
+            <TextView
+                android:id="@+id/tvEditTuition"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Tuition: " />
+
+            <EditText
+                android:id="@+id/etTuition"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+
+            <TextView
+                android:id="@+id/tvEditDayNumber"
+                android:layout_width="@dimen/information_label"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="Day of Week: " />
+
+            <EditText
+                android:id="@+id/etDayNumber"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
+
+            <TextView
+                android:id="@+id/tvEditInstructor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:padding="5dip"
+                android:text="Instructor: " />
+
+            <EditText
+                android:id="@+id/etInstructor"
+                android:layout_width="fill_parent"
+                android:padding="5dip"
+                android:layout_height="wrap_content" />
+
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnSaveClass"
+                    android:layout_width="80dip"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:text="Save" />
+
+                <Button
+                    android:id="@+id/btnCancelClass"
+                    android:layout_width="80dip"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:text="Cancel" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</ViewFlipper>

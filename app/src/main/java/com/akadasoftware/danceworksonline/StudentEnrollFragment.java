@@ -14,13 +14,15 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Spinner;
 
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.Globals;
-import com.akadasoftware.danceworksonline.classes.School;
-import com.akadasoftware.danceworksonline.classes.SchoolClasses;
-import com.akadasoftware.danceworksonline.classes.Session;
-import com.akadasoftware.danceworksonline.classes.Student;
-import com.akadasoftware.danceworksonline.classes.User;
+import com.akadasoftware.danceworksonline.Adapters.SchoolClassAdapter;
+import com.akadasoftware.danceworksonline.Adapters.SessionAdapter;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Globals;
+import com.akadasoftware.danceworksonline.Classes.School;
+import com.akadasoftware.danceworksonline.Classes.SchoolClasses;
+import com.akadasoftware.danceworksonline.Classes.Session;
+import com.akadasoftware.danceworksonline.Classes.Student;
+import com.akadasoftware.danceworksonline.Classes.User;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -87,7 +89,6 @@ public class StudentEnrollFragment extends ListFragment {
 
 
     /**
-     *
      * @param position of student in arraylist
      * @return Returns ClRID, if > 0 then it was a success, otherwise failure
      */
@@ -203,7 +204,7 @@ public class StudentEnrollFragment extends ListFragment {
              * return oGlobals.RetrieveSessionsFromSoap(session);
              */
 
-              return oGlobals.getSessions(oSchool.SchID, oUser.UserID, oUser.UserGUID);
+            return oGlobals.getSessions(oSchool.SchID, oUser.UserID, oUser.UserGUID);
 
         }
 

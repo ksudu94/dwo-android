@@ -1,23 +1,32 @@
 package com.akadasoftware.danceworksonline;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.Globals;
-import com.akadasoftware.danceworksonline.classes.Student;
-import com.akadasoftware.danceworksonline.classes.User;
+import com.akadasoftware.danceworksonline.Adapters.StudentListAdapter;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Globals;
+import com.akadasoftware.danceworksonline.Classes.Student;
+import com.akadasoftware.danceworksonline.Classes.User;
 
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 
 import java.util.ArrayList;
+
+import uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout;
+import uk.co.senab.actionbarpulltorefresh.library.ActionBarPullToRefresh;
+import uk.co.senab.actionbarpulltorefresh.library.Options;
+import uk.co.senab.actionbarpulltorefresh.library.listeners.OnRefreshListener;
 
 /**
  * Displays a list of activity students
@@ -33,10 +42,11 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
     static SoapSerializationEnvelope envelopeOutput;
     Activity activity;
     static User oUser;
-    Globals globals;
+    Globals oGlobals;
 
 
     StudentListAdapter stuListAdapter;
+    private PullToRefreshLayout mPullToRefreshLayout;
 
     private OnStudentInteractionListener mListener;
 
@@ -86,6 +96,7 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
         _appPrefs = new AppPreferences(activity);
         studentsArray = _appPrefs.getStudents();
         strQuery = _appPrefs.getStudentQuery();
+        oGlobals = new Globals();
 
         /**
          * The loading of the students list is done on the splash/login screens
@@ -95,6 +106,43 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
         setListAdapter(stuListAdapter);
         stuListAdapter.setNotifyOnChange(true);
 
+
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        ViewGroup viewGroup = (ViewGroup) view;
+
+        mPullToRefreshLayout = new PullToRefreshLayout(viewGroup.getContext());
+
+        ActionBarPullToRefresh.from(activity)
+
+                // We need to insert the PullToRefreshLayout into the Fragment's ViewGroup
+                .insertLayoutInto(viewGroup)
+
+                        // We need to mark the ListView and it's Empty View as pull-able
+                        // This is because they are not direct children of the ViewGroup
+                .theseChildrenArePullable(getListView(), getListView().getEmptyView())
+
+                        // Set the OnRefreshListener
+                .options(Options.create().refreshOnUp(true).build())
+
+
+                .listener(new OnRefreshListener() {
+                    @Override
+                    public void onRefreshStarted(View view) {
+                        getStudentsListAsync getStudents = new getStudentsListAsync();
+                        getStudents.execute();
+                        mPullToRefreshLayout.setRefreshComplete();
+
+                    }
+
+                })
+
+                        // Finally commit the setup to our PullToRefreshLayout
+                .setup(mPullToRefreshLayout);
 
     }
 
@@ -139,6 +187,33 @@ public class StudentsListFragment extends ListFragment implements AbsListView.On
         if (emptyText instanceof TextView) {
             ((TextView) emptyView).setText("There are no students in this school.");
         }
+    }
+
+    /**
+     * Gets student list
+     */
+    private class getStudentsListAsync extends
+            AsyncTask<Globals.Data, Void, ArrayList<Student>> {
+        ProgressDialog progress;
+
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(activity, "Refreshing List", "Loading...", true);
+        }
+
+        protected ArrayList<Student> doInBackground(Globals.Data... data) {
+            return oGlobals.getStudents(_appPrefs, 0);
+        }
+
+        protected void onPostExecute(ArrayList<Student> result) {
+            progress.dismiss();
+            _appPrefs.saveStudents(result);
+            studentsArray = result;
+            stuListAdapter = new StudentListAdapter(activity,
+                    R.layout.item_studentlist, studentsArray);
+            setListAdapter(stuListAdapter);
+            stuListAdapter.setNotifyOnChange(true);
+        }
+
     }
 
 

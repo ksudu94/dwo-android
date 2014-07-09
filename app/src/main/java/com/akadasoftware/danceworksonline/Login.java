@@ -16,13 +16,13 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.akadasoftware.danceworksonline.classes.Account;
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.Globals;
-import com.akadasoftware.danceworksonline.classes.School;
-import com.akadasoftware.danceworksonline.classes.SchoolClasses;
-import com.akadasoftware.danceworksonline.classes.Student;
-import com.akadasoftware.danceworksonline.classes.User;
+import com.akadasoftware.danceworksonline.Classes.Account;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Globals;
+import com.akadasoftware.danceworksonline.Classes.School;
+import com.akadasoftware.danceworksonline.Classes.SchoolClasses;
+import com.akadasoftware.danceworksonline.Classes.Student;
+import com.akadasoftware.danceworksonline.Classes.User;
 
 import java.util.ArrayList;
 
