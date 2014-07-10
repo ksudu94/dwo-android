@@ -170,109 +170,8 @@ public class ClassInformationFragment extends Fragment {
                 strInstructor = etInstructor.getText().toString();
 
 
-                //Is string blank?
-                if (newStartTime == "" || newStartTime == null) {
-                    newStartTime = oSchoolClass.ClStart;
-                } else if (newStartTime.contains(":")) {
-
-                } else {
-                    newStartTime = newStartTime.trim();
-                    switch (newStartTime.charAt(1)) {
-                        case ':':
-                            newStartTime += "am";
-                            break;
-                        case '0':
-                            if (newStartTime.charAt(0) == '2') {
-                                newStartTime = newStartTime.substring(0, 2) + ":" + newStartTime.substring(2, newStartTime.length());
-                                newStartTime += "pm";
-                            } else {
-                                newStartTime = newStartTime.substring(0, 1) + ":" + newStartTime.substring(1, newStartTime.length());
-                                newStartTime += "am";
-                            }
-                            break;
-                        case '1':
-                            if (newStartTime.charAt(0) == '2') {
-                                newStartTime = newStartTime.substring(0, 2) + ":" + newStartTime.substring(2, newStartTime.length());
-                                newStartTime += "pm";
-                            } else {
-                                newStartTime = newStartTime.substring(0, 1) + ":" + newStartTime.substring(1, newStartTime.length());
-                                newStartTime += "am";
-                            }
-                            break;
-                        case '2':
-                            if (newStartTime.charAt(0) == '2') {
-                                newStartTime = newStartTime.substring(0, 2) + ":" + newStartTime.substring(2, newStartTime.length());
-                                newStartTime += "pm";
-                            } else {
-                                newStartTime = newStartTime.substring(0, 1) + ":" + newStartTime.substring(1, newStartTime.length());
-                                newStartTime += "am";
-                            }
-                            break;
-                        default:
-                            if (newStartTime.trim().length() == 3) {
-                                newStartTime = newStartTime.substring(0, 1) + ":" + newStartTime.substring(1, newStartTime.length());
-                                newStartTime += "am";
-                            } else {
-                                newStartTime = newStartTime.substring(0, 2) + ":" + newStartTime.substring(2, newStartTime.length());
-                                newStartTime += "pm";
-                            }
-
-                            break;
-
-
-                    }
-                }
-
-
-                if (newEndTime == "" || newEndTime == null) {
-                    newEndTime = oSchoolClass.ClStop;
-                } else if (newEndTime.contains(":")) {
-
-                } else {
-                    newEndTime = newEndTime.trim();
-                    switch (newEndTime.charAt(1)) {
-                        case ':':
-                            newEndTime += "am";
-                            break;
-                        case '0':
-                            if (newEndTime.charAt(0) == '2') {
-                                newEndTime = newEndTime.substring(0, 2) + ":" + newEndTime.substring(2, newEndTime.length());
-                                newEndTime += "pm";
-                            } else {
-                                newStartTime = newEndTime.substring(0, 1) + ":" + newEndTime.substring(1, newEndTime.length());
-                                newEndTime += "am";
-                            }
-                            break;
-                        case '1':
-                            if (newEndTime.charAt(0) == '2') {
-                                newEndTime = newEndTime.substring(0, 2) + ":" + newEndTime.substring(2, newEndTime.length());
-                                newEndTime += "pm";
-                            } else {
-                                newEndTime = newEndTime.substring(0, 1) + ":" + newEndTime.substring(1, newEndTime.length());
-                                newEndTime += "am";
-                            }
-                            break;
-                        case '2':
-                            if (newEndTime.charAt(0) == '2') {
-                                newEndTime = newEndTime.substring(0, 2) + ":" + newEndTime.substring(2, newEndTime.length());
-                                newEndTime += "pm";
-                            } else {
-                                newEndTime = newEndTime.substring(0, 1) + ":" + newEndTime.substring(1, newEndTime.length());
-                                newEndTime += "am";
-                            }
-                            break;
-                        default:
-                            if (newEndTime.trim().length() == 3) {
-                                newEndTime = newEndTime.substring(0, 1) + ":" + newEndTime.substring(1, newEndTime.length());
-                                newEndTime += "am";
-                            } else {
-                                newEndTime = newEndTime.substring(0, 2) + ":" + newEndTime.substring(2, newEndTime.length());
-                                newEndTime += "pm";
-                            }
-                            break;
-                    }
-                }
-
+                newStartTime = oGlobals.BuildTimeString(newStartTime, oSchoolClass, true);
+                newEndTime = oGlobals.BuildTimeString(newEndTime, oSchoolClass, false);
 
                 System.out.print(newStartTime);
                 System.out.print(newEndTime);
@@ -296,7 +195,7 @@ public class ClassInformationFragment extends Fragment {
                 Toast toast = Toast.makeText(getActivity(), newStartTime,
                         Toast.LENGTH_LONG);
                 toast.show();
-                tvStartTimeClick.setText(newStartTime);
+
             }
         });
 

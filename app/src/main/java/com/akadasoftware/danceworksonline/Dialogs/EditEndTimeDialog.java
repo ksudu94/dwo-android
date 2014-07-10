@@ -34,22 +34,24 @@ public class EditEndTimeDialog extends DialogFragment implements TimePickerDialo
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current date as the default date in the picker
         String stopHour = getArguments().getString("Stop").trim();
-        if (stopHour.trim().equalsIgnoreCase("")) {
-            stopHour = "1:00pm";
+
+        if (stopHour == null || stopHour.trim() == "") {
+            stopHour = "1:30pm";
         }
-        int hour;
+
+        int hour, minute;
+
         if (stopHour.charAt(1) == ':') {
             String strHour = stopHour.substring(0, 1).trim();
             hour = Integer.parseInt(strHour);
+
         } else {
             String strHour = stopHour.substring(0, 2).trim();
             hour = Integer.parseInt(strHour);
         }
 
-
         String strMinute = stopHour.substring(stopHour.length() - 4, stopHour.length() - 2);
-        int minute = Integer.parseInt(strMinute);
-
+        minute = Integer.parseInt(strMinute);
         // Create a new instance of TimePickerDialog and return it
         return new TimePickerDialog(getActivity(), this, hour, minute,
                 DateFormat.is24HourFormat(getActivity()));

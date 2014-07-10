@@ -25,31 +25,34 @@ public class EditStartTimeDialog extends DialogFragment implements TimePickerDia
     public void onTimeSet(TimePicker timePicker, int i, int i2) {
 
         EditTimeDialogListener activity = (EditTimeDialogListener) getActivity();
+
         activity.onFinishEditTimeDialog(timePicker);
         //this.dismiss();
 
     }
 
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the current date as the default date in the picker
-        String startHour = getArguments().getString("Start").trim();
+        String startHour = getArguments().getString("Start");
 
-        if (startHour.trim().equalsIgnoreCase("")) {
+        if (startHour == null || startHour.trim() == "") {
             startHour = "1:00pm";
         }
-        int hour;
+        int hour, minute;
+
         if (startHour.charAt(1) == ':') {
             String strHour = startHour.substring(0, 1).trim();
             hour = Integer.parseInt(strHour);
+
         } else {
             String strHour = startHour.substring(0, 2).trim();
             hour = Integer.parseInt(strHour);
         }
 
         String strMinute = startHour.substring(startHour.length() - 4, startHour.length() - 2);
-        int minute = Integer.parseInt(strMinute);
+        minute = Integer.parseInt(strMinute);
+
 
         // Create a new instance of TimePickerDialog and return it
         return new TimePickerDialog(getActivity(), this, hour, minute,

@@ -1,0 +1,25 @@
+<!-- Acts as a framelayout so that pull to refresh can be implemented-->
+<uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/transactions"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.akadasoftware.danceworksonline.ClassRosterFragment">
+
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="#33b5e6"
+        android:dividerHeight="2px" />
+
+    <TextView
+        android:id="@android:id/empty"
+        android:text="@string/empty_transaction_list"
+        android:textSize="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center" />
+
+
+</uk.co.senab.actionbarpulltorefresh.extras.actionbarcompat.PullToRefreshLayout>

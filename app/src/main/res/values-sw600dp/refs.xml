@@ -9,15 +9,24 @@
     http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
     -->
     <item name="fragment_accountlist" type="layout">@layout/fragment_accountlist_grid</item>
-    <item name="fragment_accounttransactions" type="layout">        @layout/fragment_accounttransactions_grid</item>
-    <item name="fragment_accountstudentsfragment" type="layout">        @layout/fragment_accountstudents_grid</item>
+    <item name="fragment_accounttransactions" type="layout">
+        @layout/fragment_accounttransactions_grid
+    </item>
+    <item name="fragment_accountstudentsfragment" type="layout">
+        @layout/fragment_accountstudents_grid
+    </item>
 
     <bool name="isTablet">true</bool>
 
-    <item name="fragment_studentslistfragment" type="layout">        @layout/fragment_studentslistfragment_grid</item>
+    <item name="fragment_studentslistfragment" type="layout">
+        @layout/fragment_studentslistfragment_grid
+    </item>
     <item name="fragment_studentslist" type="layout">@layout/fragment_studentslist_grid</item>
     <item name="fragment_studentclass" type="layout">@layout/fragment_studentclass_grid</item>
     <item name="fragment_studentwaitlist" type="layout">@layout/fragment_studentwaitlist_grid</item>
-    <item name="fragment_classeslistfragment" type="layout">@layout/fragment_classeslistfragment_grid</item>
+    <item name="fragment_classeslistfragment" type="layout">
+        @layout/fragment_classeslistfragment_grid
+    </item>
+    <item name="fragment_classroster" type="layout">@layout/fragment_classroster_grid</item>
 
 </resources>

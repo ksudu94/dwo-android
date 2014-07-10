@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.widget.TimePicker;
 
 import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Globals;
 import com.akadasoftware.danceworksonline.Dialogs.EditEndTimeDialog;
 import com.akadasoftware.danceworksonline.Dialogs.EditStartTimeDialog;
 
@@ -22,6 +23,7 @@ import java.util.Locale;
 public class ClassInformation extends ActionBarActivity implements ActionBar.TabListener,
         ClassInformationFragment.onEditStartTimeDialog,
         ClassInformationFragment.onEditEndTimeDialog,
+        ClassRosterFragment.OnRosterInteractionListener,
         EditEndTimeDialog.EditStopTimeDialogListener,
         EditStartTimeDialog.EditTimeDialogListener {
 
@@ -29,6 +31,7 @@ public class ClassInformation extends ActionBarActivity implements ActionBar.Tab
     private AppPreferences _appPrefs;
     ClassPagerAdapter mSectionsPagerAdapter;
     String strSession;
+    Globals oGlobals;
     /**
      * Uses the saved position from the onAccountSelected method in Home.java to fill an empty
      * account with the matching position in the account list array.
@@ -129,29 +132,68 @@ public class ClassInformation extends ActionBarActivity implements ActionBar.Tab
     public void onFinishEditTimeDialog(TimePicker tpStartTime) {
 
         ClassInformationFragment cf = (ClassInformationFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 0);
+        oGlobals = new Globals();
 
-        String inputHour = tpStartTime.getCurrentHour().toString();
-        String inputMinute = tpStartTime.getCurrentMinute().toString();
+        int hour = tpStartTime.getCurrentHour();
 
+
+        if (hour > 12) {
+            hour -= 12;
+        }
+        String startHour = String.valueOf(hour);
+
+        int minute = tpStartTime.getCurrentMinute();
+        String startMinute = "00";
+        if (minute < 10) {
+            startMinute = "0" + minute;
+        } else {
+            startMinute = String.valueOf(minute);
+        }
         if (tpStartTime.getCurrentHour() > 11) {
             cf.isAm = true;
         }
 
-        cf.newStartTime = inputHour + inputMinute;
+
+        cf.newStartTime = startHour + ":" + startMinute;
+        cf.newStartTime = oGlobals.BuildTimeString(cf.newStartTime, cf.oSchoolClass, true);
+
+        cf.tvStartTimeClick.setText(cf.newStartTime);
+
     }
 
     @Override
     public void onFinishEditStopTimeDialog(TimePicker tpEndTime) {
 
         ClassInformationFragment cf = (ClassInformationFragment) mSectionsPagerAdapter.instantiateItem(mViewPager, 0);
+        oGlobals = new Globals();
 
-        String inputHour = tpEndTime.getCurrentHour().toString();
-        String inputMinute = tpEndTime.getCurrentMinute().toString();
+        int hour = tpEndTime.getCurrentHour();
 
+        if (hour > 12) {
+            hour -= 12;
+        }
+
+        String endHour = String.valueOf(hour);
+        int minute = tpEndTime.getCurrentMinute();
+        String endMinute = "00";
+        if (minute < 10) {
+            endMinute = "0" + minute;
+        } else {
+            endMinute = String.valueOf(minute);
+        }
         if (tpEndTime.getCurrentHour() > 11) {
             cf.isAm = true;
         }
-        cf.newEndTime = inputHour + inputMinute;
+
+        cf.newEndTime = endHour + ":" + endMinute;
+        cf.newEndTime = oGlobals.BuildTimeString(cf.newEndTime, cf.oSchoolClass, false);
+
+        cf.tvEndTimeClick.setText(cf.newEndTime);
+    }
+
+    @Override
+    public void onRosterInteraction(String id) {
+
     }
 
     /**
@@ -179,6 +221,9 @@ public class ClassInformation extends ActionBarActivity implements ActionBar.Tab
             switch (position) {
                 case 0:
                     newFragment = ClassInformationFragment.newInstance(listPosition, strSession);
+                    break;
+                case 1:
+                    newFragment = ClassRosterFragment.newInstance(listPosition);
                     break;
                 default:
                     newFragment = StudentInformationFragment.newInstance(listPosition);
