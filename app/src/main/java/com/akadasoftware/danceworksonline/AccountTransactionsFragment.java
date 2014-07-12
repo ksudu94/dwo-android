@@ -12,10 +12,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.Adapters.AccountTransactionAdapter;
-import com.akadasoftware.danceworksonline.Classes.Account;
-import com.akadasoftware.danceworksonline.Classes.AccountTransactions;
-import com.akadasoftware.danceworksonline.Classes.AppPreferences;
-import com.akadasoftware.danceworksonline.Classes.User;
+import com.akadasoftware.danceworksonline.classes.Account;
+import com.akadasoftware.danceworksonline.classes.AccountTransactions;
+import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.User;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;

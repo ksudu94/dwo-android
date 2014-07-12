@@ -12,10 +12,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.akadasoftware.danceworksonline.Classes.AppPreferences;
 import com.akadasoftware.danceworksonline.Dialogs.EditAmountDialog;
 import com.akadasoftware.danceworksonline.Dialogs.EditCreditCardDialog;
 import com.akadasoftware.danceworksonline.Dialogs.EditDateDialog;
+import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
 import java.text.NumberFormat;
 import java.util.Calendar;

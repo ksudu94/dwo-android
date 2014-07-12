@@ -14,10 +14,10 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.akadasoftware.danceworksonline.Classes.AppPreferences;
-import com.akadasoftware.danceworksonline.Classes.Globals;
-import com.akadasoftware.danceworksonline.Classes.SchoolClasses;
-import com.akadasoftware.danceworksonline.Classes.User;
+import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.SchoolClasses;
+import com.akadasoftware.danceworksonline.classes.User;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.MarshalFloat;

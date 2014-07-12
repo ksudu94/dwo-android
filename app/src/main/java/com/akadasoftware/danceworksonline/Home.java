@@ -15,11 +15,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.akadasoftware.danceworksonline.Classes.Account;
-import com.akadasoftware.danceworksonline.Classes.AppPreferences;
-import com.akadasoftware.danceworksonline.Classes.Globals;
-import com.akadasoftware.danceworksonline.Classes.Student;
 import com.akadasoftware.danceworksonline.Dialogs.FilterDialog;
+import com.akadasoftware.danceworksonline.classes.Account;
+import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.Student;
 
 import java.util.ArrayList;
 

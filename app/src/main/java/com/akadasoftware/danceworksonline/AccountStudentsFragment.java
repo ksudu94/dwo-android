@@ -13,10 +13,10 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 
 import com.akadasoftware.danceworksonline.Adapters.AccountStudentsAdapter;
-import com.akadasoftware.danceworksonline.Classes.Account;
-import com.akadasoftware.danceworksonline.Classes.AppPreferences;
-import com.akadasoftware.danceworksonline.Classes.Globals;
-import com.akadasoftware.danceworksonline.Classes.Student;
+import com.akadasoftware.danceworksonline.classes.Account;
+import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.Student;
 
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 

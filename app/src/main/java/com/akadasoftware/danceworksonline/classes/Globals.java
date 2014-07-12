@@ -3,7 +3,7 @@ package com.akadasoftware.danceworksonline.classes;
 import android.app.Activity;
 import android.widget.Spinner;
 
-import com.akadasoftware.danceworksonline.SessionAdapter;
+import com.akadasoftware.danceworksonline.Adapters.SessionAdapter;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -11,6 +11,8 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 
 /**
@@ -118,6 +120,75 @@ public class Globals {
     }
 
     /**
+     * Builds start and end time strings for classes
+     */
+
+    public String BuildTimeString(String classTime, SchoolClasses oSchoolClass, Boolean start) {
+
+        //Is string blank?
+        if (classTime == null || classTime.trim() == "") {
+            if (start)
+                if (oSchoolClass.ClStart == null || oSchoolClass.ClStart.trim().isEmpty())
+                    classTime = "1:00pm";
+                else
+                    classTime = oSchoolClass.ClStart;
+            else if (oSchoolClass.ClStop == null || oSchoolClass.ClStop.trim().isEmpty())
+                classTime = "1:30pm";
+            else
+                classTime = oSchoolClass.ClStop;
+
+        } else if (classTime.contains("am") || classTime.contains("pm")) {
+
+        } else {
+            classTime = classTime.trim();
+            switch (classTime.charAt(1)) {
+                case ':':
+                    classTime += "am";
+                    break;
+                case '0':
+                    if (classTime.charAt(0) == '2') {
+                        classTime = classTime.substring(0, 2) + ":" + classTime.substring(2, classTime.length());
+                        classTime += "pm";
+                    } else {
+                        classTime = classTime.substring(0, 1) + ":" + classTime.substring(1, classTime.length());
+                        classTime += "am";
+                    }
+                    break;
+                case '1':
+                    if (classTime.charAt(0) == '2') {
+                        classTime = classTime.substring(0, 2) + ":" + classTime.substring(2, classTime.length());
+                        classTime += "pm";
+                    } else {
+                        classTime = classTime.substring(0, 1) + ":" + classTime.substring(1, classTime.length());
+                        classTime += "am";
+                    }
+                    break;
+                case '2':
+                    if (classTime.charAt(0) == '2') {
+                        classTime = classTime.substring(0, 2) + ":" + classTime.substring(2, classTime.length());
+                        classTime += "pm";
+                    } else {
+                        classTime = classTime.substring(0, 1) + ":" + classTime.substring(1, classTime.length());
+                        classTime += "am";
+                    }
+                    break;
+                default:
+                    if (classTime.trim().length() == 3) {
+                        classTime = classTime.substring(0, 1) + ":" + classTime.substring(1, classTime.length());
+                        classTime += "am";
+                    } else {
+                        classTime = classTime.substring(0, 2) + ":" + classTime.substring(2, classTime.length());
+                        classTime += "pm";
+                    }
+
+                    break;
+            }
+        }
+
+        return classTime;
+    }
+
+    /**
      * Updates the account and then resaves it into the arraylist
      */
 
@@ -142,6 +213,20 @@ public class Globals {
         StudentsArray = _appPrefs.getStudents();
         StudentsArray.set(position, oStudent);
         _appPrefs.saveStudents(StudentsArray);
+
+    }
+
+    /**
+     * Updates the class and then resaves it into the arraylist
+     */
+
+    public void updateClass(SchoolClasses oSchoolClass, int position, Activity activity) {
+
+        _appPrefs = new AppPreferences(activity);
+        ArrayList<SchoolClasses> ClassesArray = new ArrayList<SchoolClasses>();
+        ClassesArray = _appPrefs.getSchoolClassList();
+        ClassesArray.set(position, oSchoolClass);
+        _appPrefs.saveSchoolClassList(ClassesArray);
 
     }
 
@@ -308,7 +393,6 @@ public class Globals {
         envelopeNewUser.dotNet = true;
         envelopeNewUser.setOutputSoapObject(requestNewUser);
 
-        envelopeNewUser.dotNet = true;
         return MakeUserCall(URL, envelopeNewUser, Data.NAMESPACE, METHOD_NAME);
     }
 
@@ -318,10 +402,19 @@ public class Globals {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
         SoapObject responseUser = null;
         try {
-            envelope.addMapping(Data.NAMESPACE, "User",
+
+            envelope.addMapping(NAMESPACE, "User",
                     new User().getClass());
             HttpTransport.call(METHOD_NAME, envelope);
+            //If the app breaks here for no reason(IO exception), re-install. Not sure why...
             responseUser = (SoapObject) envelope.getResponse();
+        } catch (InterruptedIOException e) {
+            // handle timeout here...
+            e.printStackTrace();
+        } catch (IOException e) {
+            // some other io problem...
+            e.getMessage();
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -367,10 +460,11 @@ public class Globals {
         SoapSerializationEnvelope envelopeUser = new SoapSerializationEnvelope(
                 SoapEnvelope.VER11);
 
-        envelopeUser.dotNet = true;
         envelopeUser.setOutputSoapObject(requestUser);
 
         envelopeUser.dotNet = true;
+
+
         return MakeUserCall(URL, envelopeUser, Data.NAMESPACE, MethodName);
     }
 

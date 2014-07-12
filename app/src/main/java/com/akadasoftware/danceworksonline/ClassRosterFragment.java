@@ -13,11 +13,11 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.akadasoftware.danceworksonline.Adapters.StudentRosterAdapter;
-import com.akadasoftware.danceworksonline.Classes.AppPreferences;
-import com.akadasoftware.danceworksonline.Classes.Globals;
-import com.akadasoftware.danceworksonline.Classes.SchoolClasses;
-import com.akadasoftware.danceworksonline.Classes.StudentRoster;
-import com.akadasoftware.danceworksonline.Classes.User;
+import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.SchoolClasses;
+import com.akadasoftware.danceworksonline.classes.StudentRoster;
+import com.akadasoftware.danceworksonline.classes.User;
 import com.akadasoftware.danceworksonline.dummy.DummyContent;
 
 import org.ksoap2.SoapEnvelope;

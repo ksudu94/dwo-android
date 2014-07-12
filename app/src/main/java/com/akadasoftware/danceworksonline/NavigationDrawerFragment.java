@@ -24,7 +24,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.AppPreferences;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.

@@ -114,7 +114,7 @@ public class Account implements KvmSerializable {
         UsesNewPassword = usesnewpassword;
         AlertID = alertid;
         SourceID = sourceid;
-        Subscribed =  subscribed;
+        Subscribed = subscribed;
         CCToken = cctoken;
     }
 
@@ -572,98 +572,86 @@ public class Account implements KvmSerializable {
                 AcctID = Integer.parseInt(value.toString());
                 break;
             case 2:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     AcctNo = "";
-                }
-                else{
+                } else {
                     AcctNo = value.toString();
                 }
                 break;
             case 3:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     LName = "";
-                }
-                else{
+                } else {
                     LName = value.toString();
                 }
                 break;
             case 4:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     FName = "";
-                }
-                else{
+                } else {
                     FName = value.toString();
                 }
                 break;
             case 5:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     Address = "";
-                }
-                else{
+                } else {
                     Address = value.toString();
                 }
                 break;
             case 6:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     City = "";
-                }
-                else{
+                } else {
                     City = value.toString();
                 }
                 break;
             case 7:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     State = "";
-                }
-                else{
+                } else {
                     State = value.toString();
                 }
                 break;
             case 8:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     ZipCode = "";
-                }
-                else{
+                } else {
                     ZipCode = value.toString();
                 }
                 break;
             case 9:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     Phone = "";
-                }
-                else{
+                } else {
                     Phone = value.toString();
                 }
                 break;
             case 10:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     EMail = "";
-                }
-                else{
+                } else {
                     EMail = value.toString();
                 }
                 break;
             case 11:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     AcctSSN = "";
-                }
-                else{
+                } else {
                     AcctSSN = value.toString();
                 }
                 break;
             case 12:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     DateReg = "";
-                }
-                else{
+                } else {
                     DateReg = value.toString();
                 }
                 break;
             case 13:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     InactiveDate = "";
-                }
-                else{
+                } else {
                     InactiveDate = value.toString();
                 }
                 break;
@@ -677,10 +665,9 @@ public class Account implements KvmSerializable {
                 Balance = Float.parseFloat(value.toString());
                 break;
             case 17:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     LastPmtDate = "";
-                }
-                else{
+                } else {
                     LastPmtDate = value.toString();
                 }
                 break;
@@ -694,18 +681,16 @@ public class Account implements KvmSerializable {
                 TuitionSel = Integer.parseInt(value.toString());
                 break;
             case 21:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     Alert = "";
-                }
-                else{
+                } else {
                     Alert = value.toString();
                 }
                 break;
             case 22:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     Source = "";
-                }
-                else{
+                } else {
                     Source = value.toString();
                 }
                 break;
@@ -716,146 +701,128 @@ public class Account implements KvmSerializable {
                 ClassTime = Integer.parseInt(value.toString());
                 break;
             case 25:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     P1Name = "";
-                }
-                else{
+                } else {
                     P1Name = value.toString();
                 }
                 break;
             case 26:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     P1EMail = "";
-                }
-                else{
+                } else {
                     P1EMail = value.toString();
                 }
                 break;
             case 27:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     P1Phone = "";
-                }
-                else{
+                } else {
                     P1Phone = value.toString();
                 }
                 break;
             case 28:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     P1Cell = "";
-                }
-                else{
+                } else {
                     P1Cell = value.toString();
                 }
                 break;
             case 29:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     P1Work = "";
-                }
-                else{
+                } else {
                     P1Work = value.toString();
                 }
                 break;
             case 30:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     P2Name = "";
-                }
-                else{
+                } else {
                     P2Name = value.toString();
                 }
                 break;
             case 31:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     P2EMail = "";
-                }
-                else{
+                } else {
                     P2EMail = value.toString();
                 }
                 break;
             case 32:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     P2Phone = "";
-                }
-                else{
+                } else {
                     P2Phone = value.toString();
                 }
                 break;
             case 33:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     P2Cell = "";
-                }
-                else{
+                } else {
                     P2Cell = value.toString();
                 }
                 break;
             case 34:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     P2Work = "";
-                }
-                else{
+                } else {
                     P2Work = value.toString();
                 }
                 break;
             case 35:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     E1Name = "";
-                }
-                else{
+                } else {
                     E1Name = value.toString();
                 }
                 break;
             case 36:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     E1Phone = "";
-                }
-                else{
+                } else {
                     E1Phone = value.toString();
                 }
                 break;
             case 37:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     E2Name = "";
-                }
-                else{
+                } else {
                     E2Name = value.toString();
                 }
                 break;
             case 38:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     E2Phone = "";
-                }
-                else{
+                } else {
                     E2Phone = value.toString();
                 }
                 break;
             case 39:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     E3Name = "";
-                }
-                else{
+                } else {
                     E3Name = value.toString();
                 }
                 break;
             case 40:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     E3Phone = "";
-                }
-                else{
+                } else {
                     E3Phone = value.toString();
                 }
                 break;
             case 41:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     E4Name = "";
-                }
-                else{
+                } else {
                     E4Name = value.toString();
                 }
                 break;
             case 42:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     E4Phone = "";
-                }
-                else{
+                } else {
                     E4Phone = value.toString();
                 }
                 break;
@@ -864,66 +831,58 @@ public class Account implements KvmSerializable {
                 CCType = Integer.parseInt(value.toString());
                 break;
             case 44:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     CCTrail = "";
-                }
-                else{
+                } else {
                     CCTrail = value.toString();
                 }
                 break;
             case 45:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     CCExpire = "";
-                }
-                else{
+                } else {
                     CCExpire = value.toString();
                 }
                 break;
             case 46:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     CCFName = "";
-                }
-                else{
+                } else {
                     CCFName = value.toString();
                 }
                 break;
             case 47:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     CCLName = "";
-                }
-                else{
+                } else {
                     CCLName = value.toString();
                 }
                 break;
             case 48:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     CCAddress = "";
-                }
-                else{
+                } else {
                     CCAddress = value.toString();
                 }
                 break;
             case 49:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     CCCity = "";
-                }
-                else{
+                } else {
                     CCCity = value.toString();
                 }
                 break;
             case 50:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     CCState = "";
-                }
-                else{
+                } else {
                     CCState = value.toString();
                 }
                 break;
             case 51:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     CCZip = "";
-                }
-                else{
+                } else {
                     CCZip = value.toString();
                 }
                 break;
@@ -931,24 +890,22 @@ public class Account implements KvmSerializable {
                 CCConsentID = Integer.parseInt(value.toString());
                 break;
             case 53:
-                CCMonthly =  Boolean.parseBoolean(value.toString());
+                CCMonthly = Boolean.parseBoolean(value.toString());
                 break;
             case 54:
                 CCDate = Integer.parseInt(value.toString());
                 break;
             case 55:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     Notes = "";
-                }
-                else{
+                } else {
                     Notes = value.toString();
                 }
                 break;
             case 56:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     AccountFee = "";
-                }
-                else{
+                } else {
                     AccountFee = value.toString();
                 }
                 break;
@@ -956,38 +913,36 @@ public class Account implements KvmSerializable {
                 AccountFeeAmount = Float.parseFloat(value.toString());
                 break;
             case 58:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     AcctPWord = "";
-                }
-                else{
+                } else {
                     AcctPWord = value.toString();
                 }
                 break;
             case 59:
-                OLReg =  Boolean.parseBoolean(value.toString());
+                OLReg = Boolean.parseBoolean(value.toString());
                 break;
             case 60:
-                AgreePol =  Boolean.parseBoolean(value.toString());
+                AgreePol = Boolean.parseBoolean(value.toString());
                 break;
             case 61:
-                RequireCreditCard =  Boolean.parseBoolean(value.toString());
+                RequireCreditCard = Boolean.parseBoolean(value.toString());
                 break;
             case 62:
-                Complete =  Boolean.parseBoolean(value.toString());
+                Complete = Boolean.parseBoolean(value.toString());
                 break;
             case 63:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     ResetString = "";
-                }
-                else{
+                } else {
                     ResetString = value.toString();
                 }
                 break;
             case 64:
-                Activated =  Boolean.parseBoolean(value.toString());
+                Activated = Boolean.parseBoolean(value.toString());
                 break;
             case 65:
-                UsesNewPassword =  Boolean.parseBoolean(value.toString());
+                UsesNewPassword = Boolean.parseBoolean(value.toString());
                 break;
             case 66:
                 AlertID = Integer.parseInt(value.toString());
@@ -999,10 +954,9 @@ public class Account implements KvmSerializable {
                 Subscribed = Boolean.parseBoolean(value.toString());
                 break;
             case 69:
-                if(value.equals("anyType{}")){
+                if (value.equals("anyType{}")) {
                     CCToken = "";
-                }
-                else{
+                } else {
                     CCToken = value.toString();
                 }
                 break;

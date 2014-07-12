@@ -11,13 +11,13 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.FrameLayout;
 
-import com.akadasoftware.danceworksonline.Classes.Account;
-import com.akadasoftware.danceworksonline.Classes.AppPreferences;
-import com.akadasoftware.danceworksonline.Classes.Globals;
-import com.akadasoftware.danceworksonline.Classes.School;
-import com.akadasoftware.danceworksonline.Classes.SchoolClasses;
-import com.akadasoftware.danceworksonline.Classes.Student;
-import com.akadasoftware.danceworksonline.Classes.User;
+import com.akadasoftware.danceworksonline.classes.Account;
+import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.classes.School;
+import com.akadasoftware.danceworksonline.classes.SchoolClasses;
+import com.akadasoftware.danceworksonline.classes.Student;
+import com.akadasoftware.danceworksonline.classes.User;
 
 import java.io.IOException;
 import java.io.InputStream;

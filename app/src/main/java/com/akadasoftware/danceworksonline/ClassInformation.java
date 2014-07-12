@@ -10,10 +10,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.TimePicker;
 
-import com.akadasoftware.danceworksonline.Classes.AppPreferences;
-import com.akadasoftware.danceworksonline.Classes.Globals;
 import com.akadasoftware.danceworksonline.Dialogs.EditEndTimeDialog;
 import com.akadasoftware.danceworksonline.Dialogs.EditStartTimeDialog;
+import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.classes.Globals;
 
 import java.util.Locale;
 

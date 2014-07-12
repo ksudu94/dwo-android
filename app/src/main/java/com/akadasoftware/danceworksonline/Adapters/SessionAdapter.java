@@ -9,8 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.akadasoftware.danceworksonline.Classes.Session;
 import com.akadasoftware.danceworksonline.R;
+import com.akadasoftware.danceworksonline.classes.Session;
 
 import java.util.List;
 
