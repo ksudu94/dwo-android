@@ -9,10 +9,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.akadasoftware.danceworksonline.Classes.Student;
 import com.akadasoftware.danceworksonline.R;
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.Student;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Student;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,7 +27,7 @@ public class AccountStudentsAdapter extends ArrayAdapter<Student> {
     int resource;
     List<Student> Students;
 
-    public AccountStudentsAdapter(Context context, int resource, List<Student> items) {
+    public AccountStudentsAdapter(Context context, int resource, ArrayList<Student> items) {
         super(context, resource, items);
         this.resource = resource;
         Students = items;

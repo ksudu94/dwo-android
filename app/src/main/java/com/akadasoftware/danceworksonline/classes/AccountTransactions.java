@@ -1,4 +1,4 @@
-package com.akadasoftware.danceworksonline.classes;
+package com.akadasoftware.danceworksonline.Classes;
 
 import org.ksoap2.serialization.KvmSerializable;
 import org.ksoap2.serialization.PropertyInfo;

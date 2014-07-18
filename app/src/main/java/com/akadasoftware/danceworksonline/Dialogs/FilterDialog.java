@@ -12,8 +12,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import com.akadasoftware.danceworksonline.R;
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.Globals;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Globals;
 
 
 /**

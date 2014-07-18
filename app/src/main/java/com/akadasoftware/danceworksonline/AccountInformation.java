@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.akadasoftware.danceworksonline.Dialogs.EditAmountDialog;
 import com.akadasoftware.danceworksonline.Dialogs.EditCreditCardDialog;
 import com.akadasoftware.danceworksonline.Dialogs.EditDateDialog;
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
 
 import java.text.NumberFormat;
 import java.util.Calendar;
@@ -64,6 +64,7 @@ public class AccountInformation extends ActionBarActivity implements ActionBar.T
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_information);
+
 
         _appPrefs = new AppPreferences(getApplicationContext());
 

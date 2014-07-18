@@ -9,11 +9,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.akadasoftware.danceworksonline.Classes.AccountTransactions;
 import com.akadasoftware.danceworksonline.R;
-import com.akadasoftware.danceworksonline.classes.AccountTransactions;
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.AccountTransactions;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +38,7 @@ public class AccountTransactionAdapter extends ArrayAdapter<AccountTransactions>
     List<AccountTransactions> transactionsList;
 
 
-    public AccountTransactionAdapter(Context context, int resource, List<AccountTransactions> items) {
+    public AccountTransactionAdapter(Context context, int resource, ArrayList<AccountTransactions> items) {
         super(context, resource, items);
         this.resource = resource;
         transactionsList = items;

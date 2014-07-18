@@ -8,10 +8,12 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.akadasoftware.danceworksonline.Classes.ChargeCodes;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.ChargeCodes;
 import com.akadasoftware.danceworksonline.R;
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.ChargeCodes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,7 +35,7 @@ public class ChargeCodeAdapter extends ArrayAdapter<ChargeCodes> {
     Context context;
     int resource;
 
-    public ChargeCodeAdapter(Context context, int resource, List<ChargeCodes> items) {
+    public ChargeCodeAdapter(Context context, int resource, ArrayList<ChargeCodes> items) {
         super(context, resource, items);
         this.resource = resource;
         Codes = items;

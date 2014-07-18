@@ -1,4 +1,4 @@
-package com.akadasoftware.danceworksonline.classes;
+package com.akadasoftware.danceworksonline.Classes;
 
 import android.content.Context;
 import android.content.SharedPreferences;

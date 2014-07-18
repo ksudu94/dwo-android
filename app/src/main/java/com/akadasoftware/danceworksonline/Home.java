@@ -16,10 +16,10 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.Dialogs.FilterDialog;
-import com.akadasoftware.danceworksonline.classes.Account;
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.Globals;
-import com.akadasoftware.danceworksonline.classes.Student;
+import com.akadasoftware.danceworksonline.Classes.Account;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.Globals;
+import com.akadasoftware.danceworksonline.Classes.Student;
 
 import java.util.ArrayList;
 
@@ -183,6 +183,8 @@ public class Home extends ActionBarActivity
         Intent openAccountPage = new Intent("com.akadasoftware.danceworksonline.AccountInformation");
         startActivity(openAccountPage);
 
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
 
     }
 
@@ -196,6 +198,8 @@ public class Home extends ActionBarActivity
 
         Intent openStudentPage = new Intent("com.akadasoftware.danceworksonline.StudentInformation");
         startActivity(openStudentPage);
+
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
 
@@ -211,6 +215,8 @@ public class Home extends ActionBarActivity
         Intent openClassPage = new Intent("com.akadasoftware.danceworksonline.ClassInformation");
         openClassPage.putExtra("SessionName", sessionName);
         startActivity(openClassPage);
+
+        overridePendingTransition(R.anim.scale_towards_corner, R.anim.scale_from_corner);
     }
 
     public void onFilterSelectedDialog(String mTitle) {

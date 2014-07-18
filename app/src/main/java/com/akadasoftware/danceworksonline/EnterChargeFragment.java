@@ -16,10 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.Adapters.ChargeCodeAdapter;
-import com.akadasoftware.danceworksonline.classes.Account;
-import com.akadasoftware.danceworksonline.classes.AppPreferences;
-import com.akadasoftware.danceworksonline.classes.ChargeCodes;
-import com.akadasoftware.danceworksonline.classes.User;
+import com.akadasoftware.danceworksonline.Classes.Account;
+import com.akadasoftware.danceworksonline.Classes.AppPreferences;
+import com.akadasoftware.danceworksonline.Classes.ChargeCodes;
+import com.akadasoftware.danceworksonline.Classes.User;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.MarshalFloat;

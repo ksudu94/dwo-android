@@ -13,9 +13,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.akadasoftware.danceworksonline.Classes.Account;
 import com.akadasoftware.danceworksonline.R;
-import com.akadasoftware.danceworksonline.classes.Account;
+import com.akadasoftware.danceworksonline.Classes.Account;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,7 +29,7 @@ public class AccountListAdapater extends ArrayAdapter<Account> {
     List<Account> Accounts;
 
     public AccountListAdapater(Context context, int resource,
-                               List<Account> items) {
+                               ArrayList<Account> items) {
         super(context, resource, items);
         this.resource = resource;
         Accounts = items;

@@ -9,9 +9,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.akadasoftware.danceworksonline.Classes.Session;
 import com.akadasoftware.danceworksonline.R;
-import com.akadasoftware.danceworksonline.classes.Session;
+import com.akadasoftware.danceworksonline.Classes.Session;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,7 +25,7 @@ public class SessionAdapter extends ArrayAdapter<Session> {
     int resource;
     List<Session> Sessions;
 
-    public SessionAdapter(Context context, int resource, List<Session> items) {
+    public SessionAdapter(Context context, int resource, ArrayList<Session> items) {
         super(context, resource, items);
         this.resource = resource;
         Sessions = items;
