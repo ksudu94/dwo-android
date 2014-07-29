@@ -16,7 +16,14 @@ import com.akadasoftware.danceworksonline.Classes.AppPreferences;
 import com.akadasoftware.danceworksonline.Classes.Globals;
 import com.akadasoftware.danceworksonline.Classes.Student;
 import com.akadasoftware.danceworksonline.Classes.StudentAttendance;
+import com.akadasoftware.danceworksonline.Classes.User;
 import com.squareup.timessquare.CalendarPickerView;
+
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -83,6 +90,24 @@ public class RecordAttendanceFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnRecordAttendanceInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement onRecordFragmentInteraction");
+        }
+        try {
+            aListener = (OnAttendanceDialogInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnAttendanceDialogInteractionListener");
+        }
+    }
+
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = getActivity();
@@ -96,14 +121,13 @@ public class RecordAttendanceFragment extends Fragment {
         oGlobal = new Globals();
         dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss ");
 
-        getStudentAttendanceAsync getAttendance = new getStudentAttendanceAsync();
-        getAttendance.execute();
 
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_record_attendance, container, false);
 
@@ -133,20 +157,7 @@ public class RecordAttendanceFragment extends Fragment {
         dates.add(thisMonth.getTime());
         dates.add(Calendar.getInstance().getTime());
 
-        for (int i = 0; i < 30; i++) {
-            if (Calendar.DAY_OF_MONTH % 2 == 0) {
-                int dayOfMonth = Calendar.DAY_OF_MONTH;
-                String dayOfMonthStr = String.valueOf(dayOfMonth);
-                try {
-                    calendarPicker.selectDate(dateFormat.parse(dayOfMonthStr));
-                } catch (ParseException e) {
 
-                }
-
-            }
-
-            i++;
-        }
 
         calendarPicker.init(thisMonth.getTime(), nextMonth.getTime()).inMode(CalendarPickerView.SelectionMode.MULTIPLE)
                 .withSelectedDates(dates);
@@ -172,7 +183,7 @@ public class RecordAttendanceFragment extends Fragment {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                getStudentAttendanceAsync getAttendance = new getStudentAttendanceAsync();
+                getCompleteStudentAttendanceAsync getAttendance = new getCompleteStudentAttendanceAsync();
                 getAttendance.execute();
 
             }
@@ -246,21 +257,11 @@ public class RecordAttendanceFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (OnRecordAttendanceInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement onRecordFragmentInteraction");
-        }
-        try {
-            aListener = (OnAttendanceDialogInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnAttendanceDialogInteractionListener");
-        }
+
+    public void onResume() {
+        super.onResume();
+        getCompleteStudentAttendanceAsync getAttendance = new getCompleteStudentAttendanceAsync();
+        getAttendance.execute();
     }
 
     @Override
@@ -291,10 +292,11 @@ public class RecordAttendanceFragment extends Fragment {
 
     }
 
+
     /**
      * Get's the Student's attendance record after the the session is choosen.
      */
-    public class getStudentAttendanceAsync extends
+    public class getCompleteStudentAttendanceAsync extends
             AsyncTask<Globals.Data, Void, ArrayList<StudentAttendance>> {
         ProgressDialog progress;
 
@@ -306,7 +308,7 @@ public class RecordAttendanceFragment extends Fragment {
         protected ArrayList<StudentAttendance> doInBackground(Globals.Data... data) {
 
             //return getAttendance();
-            return oGlobal.getAttendance(_appPrefs, oStudent.StuID);
+            return getCompleteAttendance();
         }
 
         protected void onPostExecute(ArrayList<StudentAttendance> result) {
@@ -317,6 +319,104 @@ public class RecordAttendanceFragment extends Fragment {
 
         }
     }
+
+    /**
+     * Get Student Attendance
+     */
+
+    public ArrayList<StudentAttendance> getCompleteAttendance() {
+        String MethodName = "getCombinedStudentAttendance";
+        SoapObject response = InvokeCompleteAttendanceMethod(Globals.Data.URL, MethodName);
+        return RetrieveCompleteAttendanceFromSoap(response);
+
+    }
+
+    public SoapObject InvokeCompleteAttendanceMethod(String URL, String MethodName) {
+
+        SoapObject request = GetSoapObject(MethodName);
+
+        User oUser = _appPrefs.getUser();
+        int selectedMonth = Calendar.getInstance().get(Calendar.MONTH);
+        int selecteYear = Calendar.getInstance().get(Calendar.YEAR);
+
+
+        PropertyInfo piUserID = new PropertyInfo();
+        piUserID.setName("UserID");
+        piUserID.setValue(oUser.UserID);
+        request.addProperty(piUserID);
+
+        PropertyInfo piUserGUID = new PropertyInfo();
+        piUserGUID.setName("UserGUID");
+        piUserGUID.setValue(oUser.UserGUID);
+        request.addProperty(piUserGUID);
+
+        PropertyInfo piMonth = new PropertyInfo();
+        piMonth.setName("intMonth");
+        piMonth.setValue(selectedMonth + 1);
+        request.addProperty(piMonth);
+
+        PropertyInfo piYear = new PropertyInfo();
+        piYear.setName("intYear");
+        piYear.setValue(selecteYear);
+        request.addProperty(piYear);
+
+        PropertyInfo piStuID = new PropertyInfo();
+        piStuID.setName("StuID");
+        piStuID.setValue(oStudent.StuID);
+        request.addProperty(piStuID);
+
+
+        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
+                SoapEnvelope.VER11);
+        envelope.dotNet = true;
+        envelope.setOutputSoapObject(request);
+        return MakeAttendanceCall(URL, envelope, Globals.Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject GetSoapObject(String MethodName) {
+        return new SoapObject(Globals.Data.NAMESPACE, MethodName);
+    }
+
+    public static SoapObject MakeAttendanceCall(String URL,
+                                                SoapSerializationEnvelope envelope, String NAMESPACE,
+                                                String METHOD_NAME) {
+        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
+        SoapObject response = null;
+        try {
+            envelope.addMapping(NAMESPACE, "StudentAttendance",
+                    new StudentAttendance().getClass());
+            HttpTransport.call(METHOD_NAME, envelope);
+            response = (SoapObject) envelope.getResponse();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        return response;
+    }
+
+    public static ArrayList<StudentAttendance> RetrieveCompleteAttendanceFromSoap(SoapObject soap) {
+
+        ArrayList<StudentAttendance> stuAttendance = new ArrayList<StudentAttendance>();
+        for (int i = 0; i < soap.getPropertyCount(); i++) {
+
+            SoapObject attendanceItem = (SoapObject) soap.getProperty(i);
+
+            StudentAttendance attendance = new StudentAttendance();
+            for (int j = 0; j < attendanceItem.getPropertyCount(); j++) {
+                attendance.setProperty(j, attendanceItem.getProperty(j)
+                        .toString());
+                if (attendanceItem.getProperty(j).equals("anyType{}")) {
+                    attendanceItem.setProperty(j, "");
+                }
+
+            }
+            stuAttendance.add(i, attendance);
+        }
+
+        return stuAttendance;
+    }
+
 
 
     public void drawCalandar(CalendarPickerView calendar, Calendar currentMonth, Calendar nextMonth) {
@@ -365,12 +465,12 @@ public class RecordAttendanceFragment extends Fragment {
 
     public boolean validateDate(String dateAttended) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss ");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
 
         // if not valid, it will throw ParseException
         try {
             Date date = sdf.parse(dateAttended);
-            if (date.getTime() >= thisMonth.getTime().getTime() && (date.getTime() <= nextMonth.getTime().getTime()))
+            if (date.getTime() >= thisMonth.getTime().getTime() && date.getTime() <= nextMonth.getTime().getTime())
                 //Within range
                 return true;
 
