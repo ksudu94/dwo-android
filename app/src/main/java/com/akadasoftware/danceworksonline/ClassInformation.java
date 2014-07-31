@@ -41,7 +41,7 @@ public class ClassInformation extends ActionBarActivity implements ActionBar.Tab
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_student_information);
+        setContentView(R.layout.activity_class_information);
 
         _appPrefs = new AppPreferences(getApplicationContext());
 
@@ -57,7 +57,7 @@ public class ClassInformation extends ActionBarActivity implements ActionBar.Tab
 
         // Set up the ViewPager with the sections adapter. setOFfScreenPageLimit handles the number
         // of tabs that are preloaded
-        mViewPager = (ViewPager) findViewById(R.id.studentPager);
+        mViewPager = (ViewPager) findViewById(R.id.classPager);
         //How many adjacent pages it loads
         mViewPager.setOffscreenPageLimit(1);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -234,11 +234,14 @@ public class ClassInformation extends ActionBarActivity implements ActionBar.Tab
                 case 2:
                     newFragment = ClassWaitListFragment.newInstance(listPosition);
                     break;
+                case 3:
+                    newFragment = ClassInformationFragment.newInstance(listPosition, strSession);
+                    break;
                 case 4:
                     newFragment = ClassEnrollFragment.newInstance(listPosition);
                     break;
                 default:
-                    newFragment = StudentInformationFragment.newInstance(listPosition);
+                    newFragment = ClassInformationFragment.newInstance(listPosition, strSession);
                     break;
             }
 

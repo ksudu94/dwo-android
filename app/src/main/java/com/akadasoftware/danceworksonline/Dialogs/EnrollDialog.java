@@ -92,7 +92,6 @@ public class EnrollDialog extends DialogFragment {
         Intent I = getActivity().getIntent();
         ArrayList<String> conflictsArray = I.getStringArrayListExtra("Conflicks");
 
-        final int intStuID = getActivity().getIntent().getIntExtra("StuID", 0);
         final int classPosition = getActivity().getIntent().getIntExtra("Position", 0);
 
         TextView tvConflicts = (TextView) view.findViewById(R.id.tvConflicks);

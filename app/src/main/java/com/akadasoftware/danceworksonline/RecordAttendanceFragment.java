@@ -80,7 +80,6 @@ public class RecordAttendanceFragment extends Fragment {
         RecordAttendanceFragment fragment = new RecordAttendanceFragment();
         Bundle args = new Bundle();
         args.putInt("Position", position);
-
         fragment.setArguments(args);
         return fragment;
     }
@@ -119,7 +118,7 @@ public class RecordAttendanceFragment extends Fragment {
 
         oStudent = students.get(position);
         oGlobal = new Globals();
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss ");
+        dateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
 
     }
@@ -154,9 +153,6 @@ public class RecordAttendanceFragment extends Fragment {
         seekBar.setProgress(intMonth);
 
         dates = new ArrayList<Date>();
-        dates.add(thisMonth.getTime());
-        dates.add(Calendar.getInstance().getTime());
-
 
 
         calendarPicker.init(thisMonth.getTime(), nextMonth.getTime()).inMode(CalendarPickerView.SelectionMode.MULTIPLE)
@@ -168,12 +164,10 @@ public class RecordAttendanceFragment extends Fragment {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 
                 intMonth = progress;
-
                 thisMonth.set(Calendar.MONTH, intMonth);
                 nextMonth.set(Calendar.MONTH, intMonth + 1);
 
 
-                drawCalandar(calendarPicker, thisMonth, nextMonth);
             }
 
             @Override
@@ -232,7 +226,9 @@ public class RecordAttendanceFragment extends Fragment {
                 thisMonth.set(Calendar.MONTH, 0);
                 nextMonth.set(Calendar.MONTH, 1);
 
-                drawCalandar(calendarPicker, thisMonth, nextMonth);
+                seekBar.setProgress(0);
+                getCompleteStudentAttendanceAsync getAttendance = new getCompleteStudentAttendanceAsync();
+                getAttendance.execute();
             }
         });
 
@@ -249,7 +245,9 @@ public class RecordAttendanceFragment extends Fragment {
                 thisMonth.set(Calendar.MONTH, 0);
                 nextMonth.set(Calendar.MONTH, 1);
 
-                drawCalandar(calendarPicker, thisMonth, nextMonth);
+                seekBar.setProgress(0);
+                getCompleteStudentAttendanceAsync getAttendance = new getCompleteStudentAttendanceAsync();
+                getAttendance.execute();
             }
         });
 
@@ -260,6 +258,7 @@ public class RecordAttendanceFragment extends Fragment {
 
     public void onResume() {
         super.onResume();
+
         getCompleteStudentAttendanceAsync getAttendance = new getCompleteStudentAttendanceAsync();
         getAttendance.execute();
     }
@@ -294,7 +293,7 @@ public class RecordAttendanceFragment extends Fragment {
 
 
     /**
-     * Get's the Student's attendance record after the the session is choosen.
+     * Get's the Student's attendance record
      */
     public class getCompleteStudentAttendanceAsync extends
             AsyncTask<Globals.Data, Void, ArrayList<StudentAttendance>> {
@@ -307,7 +306,6 @@ public class RecordAttendanceFragment extends Fragment {
         @Override
         protected ArrayList<StudentAttendance> doInBackground(Globals.Data... data) {
 
-            //return getAttendance();
             return getCompleteAttendance();
         }
 
@@ -320,9 +318,6 @@ public class RecordAttendanceFragment extends Fragment {
         }
     }
 
-    /**
-     * Get Student Attendance
-     */
 
     public ArrayList<StudentAttendance> getCompleteAttendance() {
         String MethodName = "getCombinedStudentAttendance";
@@ -336,8 +331,8 @@ public class RecordAttendanceFragment extends Fragment {
         SoapObject request = GetSoapObject(MethodName);
 
         User oUser = _appPrefs.getUser();
-        int selectedMonth = Calendar.getInstance().get(Calendar.MONTH);
-        int selecteYear = Calendar.getInstance().get(Calendar.YEAR);
+        int selectedMonth = thisMonth.get(Calendar.MONTH);
+        int selectedYear = thisMonth.get(Calendar.YEAR);
 
 
         PropertyInfo piUserID = new PropertyInfo();
@@ -357,7 +352,7 @@ public class RecordAttendanceFragment extends Fragment {
 
         PropertyInfo piYear = new PropertyInfo();
         piYear.setName("intYear");
-        piYear.setValue(selecteYear);
+        piYear.setValue(selectedYear);
         request.addProperty(piYear);
 
         PropertyInfo piStuID = new PropertyInfo();
@@ -418,13 +413,11 @@ public class RecordAttendanceFragment extends Fragment {
     }
 
 
-
-    public void drawCalandar(CalendarPickerView calendar, Calendar currentMonth, Calendar nextMonth) {
+    public void drawCalendar(CalendarPickerView calendar, Calendar currentMonth, Calendar nextMonth) {
         calendar.init(currentMonth.getTime(), nextMonth.getTime()).inMode(CalendarPickerView.SelectionMode.MULTIPLE);
-    }    // TODO: Rename method, update argument and hook method into UI event
+    }
 
-
-    public void drawCalandar(CalendarPickerView calendar, Calendar currentMonth, Calendar nextMonth,
+    public void drawCalendar(CalendarPickerView calendar, Calendar currentMonth, Calendar nextMonth,
                              ArrayList<Date> datesSelected) {
         calendar.init(currentMonth.getTime(), nextMonth.getTime()).inMode(CalendarPickerView.SelectionMode.MULTIPLE)
                 .withSelectedDates(datesSelected);
@@ -439,8 +432,8 @@ public class RecordAttendanceFragment extends Fragment {
         for (int i = 0; i < attendanceArray.size(); i++) {
 
             try {
-
-                if (validateDate(attendanceArray.get(i).ADate)) {
+                datesAttended.add(dateFormat.parse(attendanceArray.get(i).ADate));
+               /* if (validateDate(attendanceArray.get(i).ADate)) {
                     Toast toast = Toast.makeText(getActivity(), "Within range.", Toast.LENGTH_SHORT);
                     toast.show();
                     datesAttended.add(dateFormat.parse(attendanceArray.get(i).ADate));
@@ -448,29 +441,28 @@ public class RecordAttendanceFragment extends Fragment {
                     Toast toast = Toast.makeText(getActivity(), "Not within range.", Toast.LENGTH_SHORT);
                     toast.show();
 
-                }
+                }*/
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
-            i++;
         }
 
         if (datesAttended.size() > 0)
-            drawCalandar(calendarPicker, thisMonth, nextMonth, datesAttended);
+            drawCalendar(calendarPicker, thisMonth, nextMonth, datesAttended);
         else
-            drawCalandar(calendarPicker, thisMonth, nextMonth);
+            drawCalendar(calendarPicker, thisMonth, nextMonth);
     }
 
 
     public boolean validateDate(String dateAttended) {
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
         // if not valid, it will throw ParseException
         try {
             Date date = sdf.parse(dateAttended);
-            if (date.getTime() >= thisMonth.getTime().getTime() && date.getTime() <= nextMonth.getTime().getTime())
+            if (date.getTime() > thisMonth.getTime().getTime() && date.getTime() < nextMonth.getTime().getTime())
                 //Within range
                 return true;
 

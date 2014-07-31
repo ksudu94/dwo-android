@@ -25,6 +25,7 @@
     <string name="title_activity_student_information">Student Information</string>
 
     <string name="empty_student_list">No students registered to this account.</string>
+    <string name="empty_roster">No students on class roster.</string>
     <string name="empty_transaction_list">No transactions present on this account.</string>
 
     <string name="title_account_info">Information</string>

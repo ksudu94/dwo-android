@@ -94,7 +94,7 @@ public class ClassRosterFragment extends ListFragment implements AbsListView.OnI
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container,
                 savedInstanceState);
-        View view = inflater.inflate(R.layout.fragment_classroster, container, false);
+        View view = inflater.inflate(R.layout.fragment_classroster_list, container, false);
 
         return view;
     }

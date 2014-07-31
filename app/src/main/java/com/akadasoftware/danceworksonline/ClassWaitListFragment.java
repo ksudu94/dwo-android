@@ -99,7 +99,7 @@ public class ClassWaitListFragment extends ListFragment implements AbsListView.O
                              Bundle savedInstanceState) {
         super.onCreateView(inflater, container,
                 savedInstanceState);
-        View view = inflater.inflate(R.layout.fragment_classroster, container, false);
+        View view = inflater.inflate(R.layout.fragment_classroster_list, container, false);
 
         return view;
     }
