@@ -235,7 +235,7 @@ public class ClassInformation extends ActionBarActivity implements ActionBar.Tab
                     newFragment = ClassWaitListFragment.newInstance(listPosition);
                     break;
                 case 3:
-                    newFragment = ClassInformationFragment.newInstance(listPosition, strSession);
+                    newFragment = ClassAttendance.newInstance(listPosition);
                     break;
                 case 4:
                     newFragment = ClassEnrollFragment.newInstance(listPosition);

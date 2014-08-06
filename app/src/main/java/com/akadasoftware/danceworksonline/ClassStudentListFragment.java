@@ -9,18 +9,13 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Spinner;
 
-import com.akadasoftware.danceworksonline.Adapters.SchoolClassAdapter;
-import com.akadasoftware.danceworksonline.Adapters.SessionAdapter;
+import com.akadasoftware.danceworksonline.Adapters.StudentListAdapter;
 import com.akadasoftware.danceworksonline.Classes.AppPreferences;
 import com.akadasoftware.danceworksonline.Classes.Globals;
-import com.akadasoftware.danceworksonline.Classes.School;
 import com.akadasoftware.danceworksonline.Classes.SchoolClasses;
-import com.akadasoftware.danceworksonline.Classes.Session;
 import com.akadasoftware.danceworksonline.Classes.Student;
 import com.akadasoftware.danceworksonline.Classes.User;
 
@@ -32,246 +27,157 @@ import org.ksoap2.transport.HttpTransportSE;
 
 import java.util.ArrayList;
 
-/**
- * Created by Kyle on 5/14/2014.
- */
-public class StudentEnrollFragment extends ListFragment {
+
+public class ClassStudentListFragment extends ListFragment {
+
+    int classPosition;
+
+    Globals oGlobals;
+    User oUser;
+    Student oStudent;
+    SchoolClasses oSchoolClass;
+
+    ArrayList<SchoolClasses> schoolClassList;
+    ArrayList<Student> studentsArray = new ArrayList<Student>();
+    ArrayList<String> conflictsArray = new ArrayList<String>();
 
     private AppPreferences _appPrefs;
-    String METHOD_NAME = "";
-    String SOAP_ACTION = "";
     Activity activity;
-    Student oStudent;
-    User oUser;
-    School oSchool;
-    SchoolClasses oSchoolClass;
-    Session session;
-    int SessionID, position, positionOfClass;
-    Globals oGlobals;
+
+    StudentListAdapter stuListAdapter;
+
+    //private OnClassListInteractionListener mListener;
+
+    private onClassStudentListDialog dListener;
 
     Button btnDone;
 
+    /**
+     * public interface OnClassListInteractionListener {
+     * public void onClassListInteraction(Uri uri); }
+     */
 
-    ArrayList<SchoolClasses> schoolClassesArray = new ArrayList<SchoolClasses>();
-
-    ArrayList<String> conflictsArray = new ArrayList<String>();
-
-    ArrayList<Student> studentsArray = new ArrayList<Student>();
-    ArrayList<Session> sessionArrayList = new ArrayList<Session>();
-    SessionAdapter sessionAdapter;
-    ViewGroup objContainer;
-    View view;
-
-    Spinner sessionStudentEnrollSpinner;
-    private SchoolClassAdapter classAdapter;
-
-    private onEnrollDialog dialogListener;
-    //private OnStudentEnrollListener enrollListener;
-
-
-    public interface onEnrollDialog {
-
-        public void onEnrollDialog(SchoolClasses objSchoolClass, Student oStudent,
-                                   ArrayList<String> conflictsArray, int positionOfClass, SchoolClassAdapter classAdapter);
+    public interface onClassStudentListDialog {
+        public void onClassStudentListDialog(ArrayList<String> conflictsArray, SchoolClasses oSchoolClass, Student oStudent, int position);
     }
 
-    /**
-     * Handles by enrolldialog
-     * public interface OnStudentEnrollListener {
-     * public void onStudentEnrollInteraction(int classPosition, int newClRID);  }
-     */
-    public StudentEnrollFragment() {
-    }
-
-
-    /**
-     * @param position of student in arraylist
-     * @return Returns ClRID, if > 0 then it was a success, otherwise failure
-     */
-    public static StudentEnrollFragment newInstance(int position) {
-        StudentEnrollFragment fragment = new StudentEnrollFragment();
+    public static ClassStudentListFragment newInstance(int position) {
+        ClassStudentListFragment fragment = new ClassStudentListFragment();
         Bundle args = new Bundle();
         args.putInt("Position", position);
         fragment.setArguments(args);
         return fragment;
     }
 
+    public ClassStudentListFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         activity = getActivity();
-        _appPrefs = new AppPreferences(activity);
 
-        studentsArray = _appPrefs.getStudents();
-        position = _appPrefs.getStudentListPosition();
 
-        oSchool = _appPrefs.getSchool();
-        oStudent = studentsArray.get(position);
-        oUser = _appPrefs.getUser();
         oGlobals = new Globals();
+        _appPrefs = new AppPreferences(activity);
+        oUser = _appPrefs.getUser();
+        classPosition = _appPrefs.getClassListPosition();
+
+        schoolClassList = _appPrefs.getSchoolClassList();
+        oSchoolClass = schoolClassList.get(classPosition);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        super.onCreateView(inflater, container,
-                savedInstanceState);
-        view = inflater.inflate(R.layout.fragment_studentenroll, container, false);
-        objContainer = container;
+        // Inflate the layout for this fragment
 
+        View view = inflater.inflate(R.layout.fragment_class_list_of_students, container, false);
         btnDone = (Button) view.findViewById(R.id.btnDone);
-        sessionStudentEnrollSpinner = (Spinner) view.findViewById(R.id.sessionStudentEnrollSpinner);
 
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent openStudentPage = new Intent("com.akadasoftware.danceworksonline.StudentInformation");
-                startActivity(openStudentPage);
+                Intent openClassPage = new Intent("com.akadasoftware.danceworksonline.ClassInformation");
+                startActivity(openClassPage);
             }
         });
         return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        getSessionsAsync getSessions = new getSessionsAsync();
-        getSessions.execute();
 
     }
+
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            //enrollListener = (OnStudentEnrollListener) activity;
+            //mListener = (OnClassListInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement onStudentEnrollInteraction");
+                    + " must implement OnFragmentInteractionListener");
         }
-
         try {
-            dialogListener = (onEnrollDialog) activity;
+            dListener = (onClassStudentListDialog) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement onEnrollDialog");
+                    + " must implement onClassStudentListDialog");
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getStudentsListAsync getStudentsList = new getStudentsListAsync();
+        getStudentsList.execute();
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        //enrollListener = null;
-        dialogListener = null;
+        //mListener = null;
+        dListener = null;
     }
 
-
-    /**
-     * When one of the Classes is chosen, a dialog will pop up with the option to enroll or waitlist
-     * a student based on their current enrollment status. Prior to all of this we check for conflicts
-     * in schedule.
-     */
     public void onListItemClick(ListView l, View v, int position, long id) {
         // Notify the parent activity of selected item
         super.onListItemClick(l, v, position, id);
-        oSchoolClass = (SchoolClasses) this.getListAdapter().getItem(position);
 
-        positionOfClass = position;
+        oStudent = (Student) this.getListAdapter().getItem(position);
 
-        checkClassConflicts checkConflicts = new checkClassConflicts();
-        checkConflicts.execute();
-    }
+        checkClassConflicts conflictCheck = new checkClassConflicts();
+        conflictCheck.execute();
 
-    //Asycn task to get the ChgDesc field to be used to populate the spinner
-    public class getSessionsAsync extends
-            AsyncTask<Globals.Data, Void, ArrayList<Session>> {
-        ProgressDialog progress;
-
-        protected void onPreExecute() {
-            progress = ProgressDialog.show(getActivity(), "Gathering Energy", "Loading...", true);
-        }
-
-        @Override
-        protected ArrayList<Session> doInBackground(Globals.Data... data) {
-
-            /**
-             * SoapObject session = oGlobals.getSoapRequest(Globals.Data.NAMESPACE, "getSessions");
-             * session = oGlobals.setSessionPropertyInfo(session, oStudent.SchID, "getSessions", oUser);
-             * return oGlobals.RetrieveSessionsFromSoap(session);
-             */
-
-            return oGlobals.getSessions(oSchool.SchID, oUser.UserID, oUser.UserGUID);
-
-        }
-
-        protected void onPostExecute(ArrayList<Session> result) {
-            progress.dismiss();
-            sessionArrayList = result;
-            addItemsOnSpinner(sessionArrayList);
-
-        }
-    }
-
-
-    //Adds all items from the Session field to the spinner
-    public void addItemsOnSpinner(ArrayList<Session> sess) {
-
-        sessionAdapter = new SessionAdapter(activity,
-                R.layout.fragment_studentenroll, sess);
-
-        sessionStudentEnrollSpinner.setAdapter(sessionAdapter);
-        oGlobals.setCurrentSession(sessionStudentEnrollSpinner, oSchool);
-        sessionStudentEnrollSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                setSelectedSession(sessionStudentEnrollSpinner);
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-    }
-
-    //Handles if the selected field for the spinner
-    public void setSelectedSession(Spinner sessionSpinner) {
-
-        int selected = sessionSpinner.getSelectedItemPosition();
-        session = (Session) sessionSpinner.getItemAtPosition(selected);
-        SessionID = session.SessionID;
-
-        getStudentClassesAsync getStudentClass = new getStudentClassesAsync();
-        getStudentClass.execute();
-
+        dListener.onClassStudentListDialog(conflictsArray, oSchoolClass, oStudent, classPosition);
     }
 
 
     /**
-     * Gets list of Classes, runs in onpost of session to ensure we have a session id
+     * Gets student list
      */
-    public class getStudentClassesAsync extends
-            AsyncTask<Globals.Data, Void, ArrayList<SchoolClasses>> {
+    private class getStudentsListAsync extends
+            AsyncTask<Globals.Data, Void, ArrayList<Student>> {
+        ProgressDialog progress;
 
-        @Override
-        protected ArrayList<SchoolClasses> doInBackground(Globals.Data... data) {
-
-
-            return oGlobals.getClasses(_appPrefs, SessionID, oStudent.StuID);
+        protected void onPreExecute() {
+            progress = ProgressDialog.show(activity, "Refreshing List", "Loading...", true);
         }
 
-        protected void onPostExecute(ArrayList<SchoolClasses> result) {
-            schoolClassesArray = result;
-            _appPrefs.saveSchoolClassList(schoolClassesArray);
-
-            classAdapter = new SchoolClassAdapter(activity,
-                    R.layout.item_studentclass, schoolClassesArray);
-            updateListAdapter();
-
-
+        protected ArrayList<Student> doInBackground(Globals.Data... data) {
+            return oGlobals.getStudents(_appPrefs, 0);
         }
+
+        protected void onPostExecute(ArrayList<Student> result) {
+            progress.dismiss();
+            _appPrefs.saveStudents(result);
+            studentsArray = result;
+            stuListAdapter = new StudentListAdapter(activity,
+                    R.layout.item_studentlist, studentsArray);
+            setListAdapter(stuListAdapter);
+            stuListAdapter.setNotifyOnChange(true);
+        }
+
     }
 
 
@@ -287,9 +193,7 @@ public class StudentEnrollFragment extends ListFragment {
         }
 
         protected void onPostExecute(ArrayList<String> result) {
-
             conflictsArray = result;
-            dialogListener.onEnrollDialog(oSchoolClass, oStudent, conflictsArray, positionOfClass, classAdapter);
 
         }
     }
@@ -398,7 +302,7 @@ public class StudentEnrollFragment extends ListFragment {
 
         PropertyInfo piSessionID = new PropertyInfo();
         piSessionID.setName("intSessionID");
-        piSessionID.setValue(SessionID);
+        piSessionID.setValue(oSchoolClass.SessionID);
         request.addProperty(piSessionID);
 
         SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
@@ -414,9 +318,8 @@ public class StudentEnrollFragment extends ListFragment {
         HttpTransportSE HttpTransport = new HttpTransportSE(URL);
         SoapObject response = null;
         try {
-            //envelope.addMapping(Globals.Data.NAMESPACE, "SchoolClasses",new SchoolClasses().getClass());
+
             HttpTransport.call(METHOD_NAME, envelope);
-            //envelopeOutput = envelope;
             response = (SoapObject) envelope.getResponse();
 
         } catch (Exception e) {
@@ -431,7 +334,6 @@ public class StudentEnrollFragment extends ListFragment {
 
         for (int i = 0; i < soap.getPropertyCount(); i++) {
 
-            //SoapObject conflickItem = (SoapObject) soap.getProperty(i);
             if (soap.getProperty(i).equals("anyType{}"))
                 strConflictsArray.add(i, "");
             else
@@ -443,9 +345,4 @@ public class StudentEnrollFragment extends ListFragment {
     }
 
 
-    public void updateListAdapter() {
-        setListAdapter(classAdapter);
-
-        classAdapter.setNotifyOnChange(true);
-    }
 }
