@@ -6,7 +6,7 @@ import org.ksoap2.serialization.PropertyInfo;
 import java.util.Hashtable;
 
 /**
- * Created by DJ on 12/27/13.
+ * Created by DJ on 12/27/13. changed
  */
 public class Account implements KvmSerializable {
 
