@@ -353,7 +353,8 @@ public class ClassAttendance extends Fragment {
         for (int i = 0; i < attendanceArray.size(); i++) {
 
             try {
-                datesAttended.add(dateFormat.parse(attendanceArray.get(i).ADate));
+                if (! datesAttended.contains(dateFormat.parse(attendanceArray.get(i).ADate)))
+                    datesAttended.add(dateFormat.parse(attendanceArray.get(i).ADate));
 
             } catch (ParseException e) {
                 e.printStackTrace();
