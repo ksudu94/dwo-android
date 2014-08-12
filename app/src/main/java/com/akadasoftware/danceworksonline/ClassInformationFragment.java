@@ -99,13 +99,23 @@ public class ClassInformationFragment extends Fragment {
 
         oGlobals = new Globals();
         _appPrefs = new AppPreferences(activity);
-        position = getArguments().getInt("Position");
 
-        schoolClassList = _appPrefs.getSchoolClassList();
-        oSchoolClass = schoolClassList.get(position);
         oUser = _appPrefs.getUser();
+        position = getArguments().getInt("Position");
+        if (_appPrefs.getAccessAllClasses())
+            schoolClassList = _appPrefs.getSchoolClassList();
+        else
+            schoolClassList = _appPrefs.getMySchoolClassList();
 
+        oSchoolClass = schoolClassList.get(position);
         isAm = false;
+
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
 
     }

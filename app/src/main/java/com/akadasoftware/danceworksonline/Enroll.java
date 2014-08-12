@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.akadasoftware.danceworksonline.Adapters.SchoolClassAdapter;
@@ -33,7 +32,6 @@ public class Enroll extends FragmentActivity implements
     int intClassPosition, intStuID;
     Globals oGlobals;
 
-    View objView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,9 +107,10 @@ public class Enroll extends FragmentActivity implements
     }
 
     @Override
-    public void onEnrollDialogPositiveClick(SchoolClasses inputSchoolClasses, int classPosition) {
+    public void onEnrollDialogPositiveClick(SchoolClasses inputSchoolClasses, Student inputStudent, int classPosition) {
 
         globalSchoolClasses = inputSchoolClasses;
+        globalStudent = inputStudent;
         intClassPosition = classPosition;
 
         EnrollStudentAsync enrollStudent = new EnrollStudentAsync();
@@ -178,13 +177,7 @@ public class Enroll extends FragmentActivity implements
     /**
      * Enrolls a student in a class
      *
-     * @param URL              Something
-     * @param METHOD_NAME      enrollStudent
-     * @param _appPrefsNew     Used to get User and StuID which for some reason would not save otherwise.
-     * @param objSchoolClasses Comes from the selected class from the enroll dialog. Originally in
-     *                         on positive click which is then saved to a global variable so it can passed
-     *                         into EnrollStudent and ultimately InvokeEnrollMethod
-     *
+
      * @return Integer greater than 0 means success
      */
     private class EnrollStudentAsync extends
@@ -201,7 +194,7 @@ public class Enroll extends FragmentActivity implements
             /**
              * Enrolling student in class, even if there are conflicts.
              */
-            return oGlobals.enrollInClass(_appPrefs, intStuID, globalSchoolClasses);
+            return oGlobals.enrollInClass(_appPrefs, globalStudent.StuID, globalSchoolClasses);
         }
 
         protected void onPostExecute(Integer result) {

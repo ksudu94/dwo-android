@@ -90,6 +90,7 @@ public class AccountInformationFragment extends Fragment {
         position = getArguments().getInt("Position");
 
         oAccount = arrayListAccounts.get(position);
+        oUser = _appPrefs.getUser();
         AcctID = oAccount.AcctID;
         _appPrefs.saveAcctID(oAccount.AcctID);
     }
@@ -290,13 +291,13 @@ public class AccountInformationFragment extends Fragment {
                 } else {
                     //Amex, needs to be length 15
                     if (creditCard.charAt(0) == '3') {
-                        if (creditCard.length() != 15) {
+                        if (creditCard.trim().length() != 15) {
                             Toast toast = Toast.makeText(activity, "Invalid Credit Card #", Toast.LENGTH_LONG);
                             toast.show();
                         }
                         //All other card lengths are 16
                     } else {
-                        if (creditCard.length() != 16) {
+                        if (creditCard.trim().length() != 16) {
                             Toast toast = Toast.makeText(activity, "Invalid Credit Card #", Toast.LENGTH_LONG);
                             toast.show();
                         }

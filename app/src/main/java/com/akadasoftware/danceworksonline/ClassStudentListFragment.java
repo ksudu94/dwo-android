@@ -19,12 +19,6 @@ import com.akadasoftware.danceworksonline.Classes.SchoolClasses;
 import com.akadasoftware.danceworksonline.Classes.Student;
 import com.akadasoftware.danceworksonline.Classes.User;
 
-import org.ksoap2.SoapEnvelope;
-import org.ksoap2.serialization.PropertyInfo;
-import org.ksoap2.serialization.SoapObject;
-import org.ksoap2.serialization.SoapSerializationEnvelope;
-import org.ksoap2.transport.HttpTransportSE;
-
 import java.util.ArrayList;
 
 
@@ -189,7 +183,7 @@ public class ClassStudentListFragment extends ListFragment {
         @Override
         protected ArrayList<String> doInBackground(Globals.Data... data) {
 
-            return CheckConflicts();
+            return oGlobals.checkConflicts(_appPrefs, oSchoolClass, oStudent);
         }
 
         protected void onPostExecute(ArrayList<String> result) {
@@ -197,152 +191,5 @@ public class ClassStudentListFragment extends ListFragment {
 
         }
     }
-
-    public ArrayList<String> CheckConflicts() {
-        String MethodName = "checkClassEnrollment";
-        SoapObject response = InvokeEnrollmentMethod(Globals.Data.URL, MethodName);
-        return RetrieveConflictsFromSoap(response);
-
-    }
-
-    public static SoapObject GetSoapObject(String MethodName) {
-        return new SoapObject(Globals.Data.NAMESPACE, MethodName);
-    }
-
-
-    public SoapObject InvokeEnrollmentMethod(String URL, String MethodName) {
-
-        SoapObject request = GetSoapObject(MethodName);
-
-        PropertyInfo piUserID = new PropertyInfo();
-        piUserID.setName("UserID");
-        piUserID.setValue(oUser.UserID);
-        request.addProperty(piUserID);
-
-        PropertyInfo piUserGUID = new PropertyInfo();
-        piUserGUID.setType("STRING_CLASS");
-        piUserGUID.setName("UserGUID");
-        piUserGUID.setValue(oUser.UserGUID);
-        request.addProperty(piUserGUID);
-
-        PropertyInfo piClMax = new PropertyInfo();
-        piClMax.setName("intClMax");
-        piClMax.setValue(oSchoolClass.ClMax);
-        request.addProperty(piClMax);
-
-        PropertyInfo piClCur = new PropertyInfo();
-        piClCur.setName("intClCur");
-        piClCur.setValue(oSchoolClass.ClCur);
-        request.addProperty(piClCur);
-
-        PropertyInfo piClTime = new PropertyInfo();
-        piClTime.setName("strClTime");
-        piClTime.setValue(oSchoolClass.ClTime);
-        request.addProperty(piClTime);
-
-        PropertyInfo piClStop = new PropertyInfo();
-        piClStop.setName("strClStop");
-        piClStop.setValue(oSchoolClass.ClStop);
-        request.addProperty(piClStop);
-
-        PropertyInfo piMultiDay = new PropertyInfo();
-        piMultiDay.setName("boolMultiDay");
-        piMultiDay.setValue(oSchoolClass.MultiDay);
-        request.addProperty(piMultiDay);
-
-        PropertyInfo piMonday = new PropertyInfo();
-        piMonday.setName("boolMonday");
-        piMonday.setValue(oSchoolClass.Monday);
-        request.addProperty(piMonday);
-
-        PropertyInfo piTuesday = new PropertyInfo();
-        piTuesday.setName("boolTuesday");
-        piTuesday.setValue(oSchoolClass.Tuesday);
-        request.addProperty(piTuesday);
-
-        PropertyInfo piWednesday = new PropertyInfo();
-        piWednesday.setName("boolWednesday");
-        piWednesday.setValue(oSchoolClass.Wednesday);
-        request.addProperty(piWednesday);
-
-        PropertyInfo piThursday = new PropertyInfo();
-        piThursday.setName("boolThursday");
-        piThursday.setValue(oSchoolClass.Thursday);
-        request.addProperty(piThursday);
-
-        PropertyInfo piFriday = new PropertyInfo();
-        piFriday.setName("boolFriday");
-        piFriday.setValue(oSchoolClass.Friday);
-        request.addProperty(piFriday);
-
-        PropertyInfo piSaturday = new PropertyInfo();
-        piSaturday.setName("boolSaturday");
-        piSaturday.setValue(oSchoolClass.Saturday);
-        request.addProperty(piSaturday);
-
-        PropertyInfo piSunday = new PropertyInfo();
-        piSunday.setName("boolSunday");
-        piSunday.setValue(oSchoolClass.Sunday);
-        request.addProperty(piSunday);
-
-        PropertyInfo piClDayNo = new PropertyInfo();
-        piClDayNo.setName("strClDayNo");
-        piClDayNo.setValue(oSchoolClass.ClDayNo);
-        request.addProperty(piClDayNo);
-
-        PropertyInfo piStuID = new PropertyInfo();
-        piStuID.setName("intStuID");
-        piStuID.setValue(oStudent.StuID);
-        request.addProperty(piStuID);
-
-        PropertyInfo piClID = new PropertyInfo();
-        piClID.setName("intClID");
-        piClID.setValue(oSchoolClass.ClID);
-        request.addProperty(piClID);
-
-        PropertyInfo piSessionID = new PropertyInfo();
-        piSessionID.setName("intSessionID");
-        piSessionID.setValue(oSchoolClass.SessionID);
-        request.addProperty(piSessionID);
-
-        SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(
-                SoapEnvelope.VER11);
-        envelope.dotNet = true;
-        envelope.setOutputSoapObject(request);
-        return MakeConflictCall(URL, envelope, Globals.Data.NAMESPACE, MethodName);
-    }
-
-    public static SoapObject MakeConflictCall(String URL,
-                                              SoapSerializationEnvelope envelope, String NAMESPACE,
-                                              String METHOD_NAME) {
-        HttpTransportSE HttpTransport = new HttpTransportSE(URL);
-        SoapObject response = null;
-        try {
-
-            HttpTransport.call(METHOD_NAME, envelope);
-            response = (SoapObject) envelope.getResponse();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
-
-    public static ArrayList<String> RetrieveConflictsFromSoap(SoapObject soap) {
-
-        ArrayList<String> strConflictsArray = new ArrayList<String>();
-
-        for (int i = 0; i < soap.getPropertyCount(); i++) {
-
-            if (soap.getProperty(i).equals("anyType{}"))
-                strConflictsArray.add(i, "");
-            else
-                strConflictsArray.add(i, soap.getProperty(i).toString());
-
-        }
-
-        return strConflictsArray;
-    }
-
 
 }
