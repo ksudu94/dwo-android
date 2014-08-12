@@ -11,7 +11,8 @@ import java.util.Hashtable;
  */
 public class SchoolClasses implements KvmSerializable {
 
-    public int ClID, ClLength, ClTchID, ClLAge, ClUAge, ClCur, ClMax, EnrollmentStatus, WaitID, ClRID;
+    public int ClID, ClLength, ClTchID, ClLAge, ClUAge, ClCur, ClMax, EnrollmentStatus, WaitID, ClRID,
+            SessionID;
 
     public float ClTuition;
 
@@ -28,7 +29,8 @@ public class SchoolClasses implements KvmSerializable {
                          String clinstructor, float cltuition, int cllength, int cltchid, Boolean multiday,
                          Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday,
                          Boolean saturday, Boolean sunday, int cllage, int cluage, String clkey, int clcur, int clmax,
-                         String clwait, String cldayno, int enrollmentstatus, int waitid, int clrid) {
+                         String clwait, String cldayno, int enrollmentstatus, int waitid, int clrid,
+                         int sessionid) {
 
         clid = ClID;
         cltype = ClType;
@@ -61,6 +63,7 @@ public class SchoolClasses implements KvmSerializable {
         enrollmentstatus = EnrollmentStatus;
         waitid = WaitID;
         clrid = ClRID;
+        sessionid = SessionID;
 
 
     }
@@ -131,6 +134,8 @@ public class SchoolClasses implements KvmSerializable {
                 return WaitID;
             case 30:
                 return EnrollmentStatus;
+            case 31:
+                return SessionID;
 
         }
 
@@ -141,7 +146,7 @@ public class SchoolClasses implements KvmSerializable {
     @Override
     public int getPropertyCount() {
         // TODO Auto-generated method stub
-        return 31;
+        return 32;
     }
 
     @Override
@@ -270,6 +275,9 @@ public class SchoolClasses implements KvmSerializable {
             case 30:
                 info.type = PropertyInfo.INTEGER_CLASS;
                 info.name = "EnrollmentStatus";
+            case 31:
+                info.type = PropertyInfo.INTEGER_CLASS;
+                info.name = "SessionID";
 
             default:
                 break;
@@ -419,6 +427,9 @@ public class SchoolClasses implements KvmSerializable {
                 break;
             case 30:
                 EnrollmentStatus = Integer.parseInt(value.toString());
+                break;
+            case 31:
+                SessionID = Integer.parseInt(value.toString());
                 break;
             default:
                 break;

@@ -10,11 +10,11 @@ import java.util.Hashtable;
  */
 public class StudentClasses implements KvmSerializable {
 
-    public int ClID, Length, ClTchID, ClLAge, ClUAge, ClCur, ClMax;
+    public int ClID, Length, ClTchID, ClLAge, ClUAge, ClCur, ClMax, SessionID;
 
     public float Tuition, Discount;
 
-    public Boolean Recital, Edit, MultiDay, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday;
+    public Boolean Recital, Edit, MultiDay, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday, OLReg;
 
     public String ClType, ClLevel, ClRoom, ClDay, ClDescription, ClStart, ClStop, ClInstructor, ClKey, ClWait;
 
@@ -26,7 +26,7 @@ public class StudentClasses implements KvmSerializable {
                           float tuition, Boolean recital, Boolean edit, int length, int cltchid, Boolean multiday,
                           Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday,
                           Boolean saturday, Boolean sunday, int cllage, int cluage, String clkey, int clcur, int clmax,
-                          String clwait, float discount) {
+                          String clwait, float discount, Boolean olreg, int sessionid) {
 
         clid = ClID;
         cltype = ClType;
@@ -57,6 +57,8 @@ public class StudentClasses implements KvmSerializable {
         clmax = ClMax;
         clwait = ClWait;
         discount = Discount;
+        sessionid = SessionID;
+        olreg = OLReg;
 
     }
 
@@ -122,6 +124,10 @@ public class StudentClasses implements KvmSerializable {
                 return ClWait;
             case 28:
                 return Discount;
+            case 29:
+                return OLReg;
+            case 30:
+                return SessionID;
         }
 
         return null;
@@ -130,7 +136,7 @@ public class StudentClasses implements KvmSerializable {
     @Override
     public int getPropertyCount() {
         // TODO Auto-generated method stub
-        return 29;
+        return 31;
     }
 
     @Override
@@ -251,6 +257,14 @@ public class StudentClasses implements KvmSerializable {
             case 28:
                 info.type = PropertyInfo.STRING_CLASS;
                 info.name = "Discount";
+                break;
+            case 29:
+                info.type = PropertyInfo.BOOLEAN_CLASS;
+                info.name = "OLReg";
+                break;
+            case 30:
+                info.type = PropertyInfo.INTEGER_CLASS;
+                info.name = "SessionID";
                 break;
             default:
                 break;
@@ -386,6 +400,12 @@ public class StudentClasses implements KvmSerializable {
                 }
             case 28:
                 Discount = Float.parseFloat(value.toString());
+                break;
+            case 29:
+                OLReg = Boolean.parseBoolean(value.toString());
+                break;
+            case 30:
+                SessionID = Integer.parseInt(value.toString());
                 break;
             default:
                 break;
