@@ -437,7 +437,8 @@ public class RecordAttendanceFragment extends Fragment {
         for (int i = 0; i < attendanceArray.size(); i++) {
 
             try {
-                datesAttended.add(dateFormat.parse(attendanceArray.get(i).ADate));
+                if (!datesAttended.contains(dateFormat.parse(attendanceArray.get(i).ADate)))
+                    datesAttended.add(dateFormat.parse(attendanceArray.get(i).ADate));
                /*
                 if (validateDate(attendanceArray.get(i).ADate)) {
                     Toast toast = Toast.makeText(getActivity(), "Within range.", Toast.LENGTH_SHORT);
@@ -461,23 +462,5 @@ public class RecordAttendanceFragment extends Fragment {
     }
 
 
-    public boolean validateDate(String dateAttended) {
-
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
-        // if not valid, it will throw ParseException
-        try {
-            Date date = sdf.parse(dateAttended);
-            if (date.getTime() > thisMonth.getTime().getTime() && date.getTime() < nextMonth.getTime().getTime())
-                //Within range
-                return true;
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-
-        }
-
-        return false;
-    }
 
 }
