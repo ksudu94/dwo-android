@@ -243,7 +243,9 @@ public class AccountInformationFragment extends Fragment {
             }
         });
 
-
+        /**
+         * Has to be valid credit card so 5454... and 1215 for exp. The exp must always be a 4 character string.
+         */
         btnEditCreditCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
